@@ -1190,20 +1190,20 @@
                     <path d={strokePath} fill="none" stroke="rgba(140,120,210,0.65)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
 
-                  {/* Mood face avatars at each data point */}
+                  {/* Mood face avatars at each data point — white circle, ring on select */}
                   {pts.map((p, i) => (
                     <div key={i} onClick={() => setSelDay(i)} style={{
-                      position:'absolute', left: p.x - 13, top: p.y - 13,
-                      width:26, height:26, borderRadius:13,
-                      background: FACE_BG[p.mood] || '#f0f0f0',
+                      position:'absolute', left: p.x - 14, top: p.y - 14,
+                      width:28, height:28, borderRadius:14,
+                      background: 'white',
                       display:'flex', alignItems:'center', justifyContent:'center',
-                      border: i===selDay ? `2px solid ${FACE_RING[p.mood]||'#999'}` : '1.5px solid rgba(255,255,255,0.95)',
-                      boxShadow: i===selDay ? `0 2px 14px ${FACE_RING[p.mood]||'#999'}55` : '0 1px 6px rgba(0,0,0,0.10)',
-                      transform: i===selDay ? 'scale(1.22)' : 'scale(1)',
+                      border: i===selDay ? `2.5px solid ${FACE_RING[p.mood]||'#999'}` : '1.5px solid rgba(20,20,19,0.09)',
+                      boxShadow: i===selDay ? `0 2px 12px ${FACE_RING[p.mood]||'#999'}50` : '0 1px 5px rgba(0,0,0,0.09)',
+                      transform: i===selDay ? 'scale(1.18)' : 'scale(1)',
                       transition:'transform 0.15s, box-shadow 0.15s',
                       cursor:'pointer', zIndex:5,
                     }}>
-                      <img alt="" src={faceImg(p.mood)} style={{ width:17, height:17, objectFit:'contain' }} onError={e=>e.target.style.display='none'} />
+                      <img alt="" src={faceImg(p.mood)} style={{ width:19, height:19, objectFit:'contain' }} onError={e=>e.target.style.display='none'} />
                     </div>
                   ))}
 
@@ -1239,12 +1239,25 @@
 
             {/* ── CARD 2: Weekly Overview ── */}
             <div style={CARD}>
-              <p style={{ fontFamily:SF, fontWeight:700, fontSize:15, color:'#141413', margin:'0 0 14px', letterSpacing:'-0.2px' }}>Weekly Overview</p>
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
+                <p style={{ fontFamily:SF, fontWeight:700, fontSize:15, color:'#141413', margin:0, letterSpacing:'-0.2px' }}>Weekly Overview</p>
+                <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                  <p style={{ fontFamily:SF, fontSize:11, color:'rgba(20,20,19,0.45)', margin:0 }}>Apr 21 – 27</p>
+                  <div style={{ display:'flex', gap:4 }}>
+                    {['‹','›'].map((a,i) => (
+                      <div key={i} style={{ width:24, height:24, borderRadius:12, background:'rgba(20,20,19,0.07)', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}>
+                        <p style={{ fontFamily:SF, fontSize:13, color:'rgba(20,20,19,0.5)', margin:0, lineHeight:1 }}>{a}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
               <div style={{ display:'flex', gap:3 }}>
                 {pts.map((p, i) => (
-                  <div key={i} onClick={() => setSelDay(i)} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:5, cursor:'pointer' }}>
+                  <div key={i} onClick={() => setSelDay(i)} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:4, cursor:'pointer' }}>
+                    <p style={{ fontFamily:SF, fontSize:9, color:'rgba(20,20,19,0.40)', margin:0, letterSpacing:'0.3px' }}>{p.day.slice(0,3).toUpperCase()}</p>
                     <div style={{
-                      width:38, height:38, borderRadius:19,
+                      width:40, height:40, borderRadius:20,
                       background: FACE_BG[p.mood] || 'rgba(20,20,19,0.07)',
                       display:'flex', alignItems:'center', justifyContent:'center',
                       outline: i===selDay ? `2.5px solid ${FACE_RING[p.mood]||'#999'}` : 'none',
@@ -1252,9 +1265,8 @@
                       boxShadow: i===selDay ? `0 2px 10px ${FACE_RING[p.mood]||'#999'}40` : 'none',
                       transition:'outline 0.15s',
                     }}>
-                      <img alt="" src={faceImg(p.mood)} style={{ width:28, height:28, objectFit:'contain' }} onError={e=>e.target.style.display='none'} />
+                      <img alt="" src={faceImg(p.mood)} style={{ width:30, height:30, objectFit:'contain' }} onError={e=>e.target.style.display='none'} />
                     </div>
-                    <p style={{ fontFamily:SF, fontSize:9, color:'rgba(20,20,19,0.40)', margin:0, letterSpacing:'0.3px' }}>{p.day.slice(0,3).toUpperCase()}</p>
                     <p style={{ fontFamily:SF, fontSize:8, color:isPos(p.mood)?'#5aaa18':'#cc3820', fontWeight:700, margin:0, letterSpacing:'0.2px' }}>{p.mood.toUpperCase()}</p>
                   </div>
                 ))}
@@ -1266,13 +1278,18 @@
               <p style={{ fontFamily:SF, fontWeight:700, fontSize:15, color:'#141413', margin:'0 0 12px', letterSpacing:'-0.2px' }}>Pattern Insights</p>
               <div style={{ display:'flex', gap:8 }}>
                 {patternInsights.map((ins, i) => (
-                  <div key={i} style={{ flex:1, background:ins.bg, borderRadius:16, padding:'12px 10px 16px', display:'flex', flexDirection:'column', gap:5, cursor:'pointer', position:'relative', minHeight:114 }}>
-                    <div style={{ width:30, height:30, borderRadius:15, background:ins.iconBg, display:'flex', alignItems:'center', justifyContent:'center', marginBottom:2 }}>
-                      <span style={{ fontSize:15 }}>{ins.icon}</span>
+                  <div key={i} style={{ flex:1, background:ins.bg, borderRadius:16, padding:'13px 11px 18px', display:'flex', flexDirection:'column', gap:8, cursor:'pointer', position:'relative', minHeight:128 }}>
+                    {/* Icon + Title on same row — matches reference */}
+                    <div style={{ display:'flex', alignItems:'center', gap:7 }}>
+                      <div style={{ width:32, height:32, borderRadius:16, background:'white', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, boxShadow:'0 1px 6px rgba(0,0,0,0.08)' }}>
+                        <span style={{ fontSize:16 }}>{ins.icon}</span>
+                      </div>
+                      <p style={{ fontFamily:SF, fontWeight:700, fontSize:11, color:'#141413', margin:0, lineHeight:1.3 }}>{ins.title}</p>
                     </div>
-                    <p style={{ fontFamily:SF, fontWeight:700, fontSize:11, color:'#141413', margin:0, lineHeight:1.3 }}>{ins.title}</p>
-                    <p style={{ fontFamily:SF, fontSize:10, color:'rgba(20,20,19,0.50)', margin:0, lineHeight:1.4 }}>{ins.desc}</p>
-                    <p style={{ position:'absolute', bottom:8, right:10, fontSize:13, color:'rgba(20,20,19,0.32)', margin:0 }}>↗</p>
+                    <p style={{ fontFamily:SF, fontSize:11, color:'rgba(20,20,19,0.52)', margin:0, lineHeight:1.45 }}>{ins.desc}</p>
+                    <div style={{ position:'absolute', bottom:10, right:11, width:22, height:22, borderRadius:11, background:'white', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 1px 5px rgba(0,0,0,0.08)' }}>
+                      <p style={{ fontSize:11, color:'rgba(20,20,19,0.40)', margin:0 }}>↗</p>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -1283,15 +1300,22 @@
               <p style={{ fontFamily:SF, fontWeight:700, fontSize:15, color:'#141413', margin:'0 0 14px', letterSpacing:'-0.2px' }}>Stats Summary</p>
               <div style={{ display:'flex', gap:8 }}>
                 {[
-                  { emoji:'🟢', label:'Good Days',     value:7,     sub:'▲ 3 from last week', subC:'#5aaa18', bg:'#f0fce8' },
-                  { emoji:'🔴', label:'Low Days',      value:2,     sub:'▼ 1 from last week', subC:'#cc3820', bg:'#fff0ee' },
-                  { emoji:'🔥', label:'Day Streak',    value:3,     sub:'Keep it going!',      subC:'#e08020', bg:'#fff8ee' },
-                  { emoji:'📊', label:'Positive Days', value:'78%', sub:'▲ 12% from last week',subC:'#5aaa18', bg:'#eef2ff' },
+                  { img: imgDayGoodBlob,    imgBg:'#d6f0d6', label:'Good Days',     value:7,     sub:'▲ 3 from last week',  subC:'#5aaa18', bg:'#f0fce8' },
+                  { img: imgDaySadFace,     imgBg:'#cce8ff', label:'Low Days',      value:2,     sub:'▼ 1 from last week',  subC:'#cc3820', bg:'#fff0ee' },
+                  { emoji:'🔥',                              label:'Day Streak',    value:3,     sub:'Keep it going!',       subC:'#e08020', bg:'#fff8ee' },
+                  { img: imgDayAnxiousFace, imgBg:'#e8d4f8', label:'Positive Days', value:'78%', sub:'▲ 12% last week',     subC:'#5aaa18', bg:'#eef2ff' },
                 ].map((s, i) => (
-                  <div key={i} style={{ flex:1, background:s.bg, borderRadius:16, padding:'11px 9px', display:'flex', flexDirection:'column', gap:3 }}>
-                    <span style={{ fontSize:18 }}>{s.emoji}</span>
-                    <p style={{ fontFamily:SF, fontWeight:800, fontSize:20, color:'#141413', margin:0, lineHeight:1 }}>{s.value}</p>
-                    <p style={{ fontFamily:SF, fontSize:9.5, color:'rgba(20,20,19,0.50)', margin:0, lineHeight:1.3 }}>{s.label}</p>
+                  <div key={i} style={{ flex:1, background:s.bg, borderRadius:16, padding:'12px 9px', display:'flex', flexDirection:'column', gap:4 }}>
+                    {/* Character image or emoji */}
+                    {s.img ? (
+                      <div style={{ width:34, height:34, borderRadius:17, background:s.imgBg, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                        <img alt="" src={s.img} style={{ width:26, height:26, objectFit:'contain' }} onError={e=>e.target.style.display='none'} />
+                      </div>
+                    ) : (
+                      <span style={{ fontSize:22 }}>{s.emoji}</span>
+                    )}
+                    <p style={{ fontFamily:SF, fontWeight:800, fontSize:24, color:'#141413', margin:0, lineHeight:1 }}>{s.value}</p>
+                    <p style={{ fontFamily:SF, fontSize:10, color:'rgba(20,20,19,0.50)', margin:0, lineHeight:1.3 }}>{s.label}</p>
                     <p style={{ fontFamily:SF, fontSize:9, color:s.subC, fontWeight:600, margin:0, lineHeight:1.3 }}>{s.sub}</p>
                   </div>
                 ))}

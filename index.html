@@ -1069,14 +1069,18 @@
         ['Good','Happy','Grateful','Excited'].includes(m) ? imgDayGoodBlob :
         m === 'Sad' ? imgDaySadFace : imgDayAnxiousFace;
 
-      const CHART_W = 322;
-      const CHART_H = 165;
-      const MOOD_Y  = { Good:58, Happy:38, Grateful:42, Excited:35, Boring:95, Sad:135, Anxious:112, Angry:148, Exhausted:122 };
+      const Y_AXIS_W  = 34;               // left Y-axis width for mood icons
+      const CHART_W   = 322;              // total card inner width
+      const CW        = CHART_W - Y_AXIS_W; // actual SVG drawing width
+      const CHART_H   = 165;
+      const MOOD_Y  = { Good:46, Happy:25, Grateful:30, Excited:22, Boring:88, Sad:138, Anxious:108, Angry:148, Exhausted:118 };
       const weekMoods = ['Good','Sad', todayLabel||'Good', 'Anxious','Excited','Good','Boring'];
       const weekDays  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+      // Dot colors matching aurora gradient position left→right
+      const DOT_COLORS = ['rgb(240,140,175)','rgb(180,150,240)','rgb(100,200,195)','rgb(140,200,140)','rgb(200,210,110)','rgb(210,190,85)','rgb(220,175,80)'];
       const pts = weekDays.map((day, i) => {
         const mood = weekMoods[i];
-        return { x: 20 + i * (CHART_W - 40) / 6, y: MOOD_Y[mood] || 95, mood, day };
+        return { x: 12 + i * (CW - 24) / 6, y: MOOD_Y[mood] || 88, mood, day };
       });
       const buildPath = (ps) => {
         let d = `M ${ps[0].x} ${ps[0].y}`;
@@ -1142,80 +1146,89 @@
               {/* Pill bar chart (week) / dot grid (month) */}
               {/* Aurora line chart (week) or dot grid (month) */}
               {tab === 'week' ? (
-                <div style={{ position:'relative' }}>
-                  {/* Tooltip */}
-                  <div style={{
-                    position:'absolute',
-                    left: Math.max(4, Math.min(sel.x - 50, CHART_W - 112)),
-                    top: Math.max(0, sel.y - 62),
-                    background:'white', borderRadius:13, padding:'7px 12px',
-                    boxShadow:'0 4px 20px rgba(0,0,0,0.13)', zIndex:10, pointerEvents:'none',
-                    minWidth:102, border:'1px solid rgba(20,20,19,0.07)',
-                  }}>
-                    <p style={{ fontFamily:SF, fontSize:10, color:'rgba(20,20,19,0.42)', margin:'0 0 3px' }}>{sel.day}, Apr 25</p>
-                    <div style={{ display:'flex', alignItems:'center', gap:5 }}>
-                      <img alt="" src={faceImg(sel.mood)} style={{ width:17, height:17, objectFit:'contain' }} onError={e=>e.target.style.display='none'} />
-                      <p style={{ fontFamily:SF, fontSize:13, fontWeight:700, color:'#141413', margin:0 }}>{sel.mood}</p>
-                    </div>
-                    <div style={{ position:'absolute', bottom:-5, left:'50%', marginLeft:-5, width:10, height:10, background:'white', transform:'rotate(45deg)', borderRight:'1px solid rgba(20,20,19,0.07)', borderBottom:'1px solid rgba(20,20,19,0.07)' }} />
+                <div style={{ display:'flex', gap:0, position:'relative' }}>
+
+                  {/* ── Left Y-axis: 3 mood-level icons (matches reference exactly) ── */}
+                  <div style={{ width:Y_AXIS_W, position:'relative', height: CHART_H + 28, flexShrink:0 }}>
+                    {[
+                      { y:46,  img: imgDayGoodBlob    },   // top    = positive
+                      { y:95,  img: imgDaySadFace      },  // middle = neutral/sad
+                      { y:145, img: imgDayAnxiousFace  },  // bottom = negative
+                    ].map((lv, i) => (
+                      <div key={i} style={{ position:'absolute', left:0, top: lv.y - 11, width:22, height:22 }}>
+                        <img alt="" src={lv.img} style={{ width:22, height:22, objectFit:'contain' }} onError={e=>e.target.style.display='none'} />
+                      </div>
+                    ))}
                   </div>
 
-                  {/* SVG aurora chart — same mesh gradient palette as UrgentSupport card */}
-                  <svg width={CHART_W} height={CHART_H} style={{ display:'block', overflow:'visible' }}>
-                    <defs>
-                      <linearGradient id="auroraH" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%"   stopColor="rgb(255,175,200)" stopOpacity="0.62"/>
-                        <stop offset="18%"  stopColor="rgb(200,170,255)" stopOpacity="0.58"/>
-                        <stop offset="38%"  stopColor="rgb(136,216,205)" stopOpacity="0.60"/>
-                        <stop offset="62%"  stopColor="rgb(165,213,161)" stopOpacity="0.60"/>
-                        <stop offset="82%"  stopColor="rgb(230,220,120)" stopOpacity="0.58"/>
-                        <stop offset="100%" stopColor="rgb(224,200,109)" stopOpacity="0.62"/>
-                      </linearGradient>
-                      <linearGradient id="auroraFade" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="40%" stopColor="white" stopOpacity="0"/>
-                        <stop offset="100%" stopColor="white" stopOpacity="0.55"/>
-                      </linearGradient>
-                      <clipPath id="cc"><rect x="0" y="0" width={CHART_W} height={CHART_H}/></clipPath>
-                    </defs>
-                    {/* Guide lines */}
-                    {[CHART_H*0.22, CHART_H*0.55, CHART_H*0.85].map((y,i) => (
-                      <line key={i} x1={0} y1={y} x2={CHART_W} y2={y} stroke="rgba(20,20,19,0.05)" strokeWidth="1" strokeDasharray="4 4"/>
-                    ))}
-                    {/* Area fill */}
-                    <path d={areaPath} fill="url(#auroraH)" clipPath="url(#cc)"/>
-                    <path d={areaPath} fill="url(#auroraFade)" clipPath="url(#cc)"/>
-                    {/* Selected day vertical guide */}
-                    <line x1={sel.x} y1={0} x2={sel.x} y2={CHART_H} stroke="rgba(20,20,19,0.09)" strokeWidth="1" strokeDasharray="3 3"/>
-                    {/* Line stroke */}
-                    <path d={strokePath} fill="none" stroke="rgba(140,120,210,0.65)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
+                  {/* ── Right: SVG chart + tooltip + day labels ── */}
+                  <div style={{ flex:1, position:'relative' }}>
 
-                  {/* Mood face avatars at each data point — white circle, ring on select */}
-                  {pts.map((p, i) => (
-                    <div key={i} onClick={() => setSelDay(i)} style={{
-                      position:'absolute', left: p.x - 14, top: p.y - 14,
-                      width:28, height:28, borderRadius:14,
-                      background: 'white',
-                      display:'flex', alignItems:'center', justifyContent:'center',
-                      border: i===selDay ? `2.5px solid ${FACE_RING[p.mood]||'#999'}` : '1.5px solid rgba(20,20,19,0.09)',
-                      boxShadow: i===selDay ? `0 2px 12px ${FACE_RING[p.mood]||'#999'}50` : '0 1px 5px rgba(0,0,0,0.09)',
-                      transform: i===selDay ? 'scale(1.18)' : 'scale(1)',
-                      transition:'transform 0.15s, box-shadow 0.15s',
-                      cursor:'pointer', zIndex:5,
+                    {/* Tooltip */}
+                    <div style={{
+                      position:'absolute',
+                      left: Math.max(0, Math.min(sel.x - 52, CW - 108)),
+                      top: Math.max(0, sel.y - 60),
+                      background:'white', borderRadius:12, padding:'7px 12px',
+                      boxShadow:'0 4px 18px rgba(0,0,0,0.12)', zIndex:10, pointerEvents:'none',
+                      border:'1px solid rgba(20,20,19,0.06)', minWidth:100,
                     }}>
-                      <img alt="" src={faceImg(p.mood)} style={{ width:19, height:19, objectFit:'contain' }} onError={e=>e.target.style.display='none'} />
+                      <p style={{ fontFamily:SF, fontSize:10, color:'rgba(20,20,19,0.42)', margin:'0 0 3px' }}>{sel.day}, Apr 25</p>
+                      <div style={{ display:'flex', alignItems:'center', gap:5 }}>
+                        <img alt="" src={faceImg(sel.mood)} style={{ width:16, height:16, objectFit:'contain' }} onError={e=>e.target.style.display='none'} />
+                        <p style={{ fontFamily:SF, fontSize:13, fontWeight:700, color:'#141413', margin:0 }}>{sel.mood}</p>
+                      </div>
+                      <div style={{ position:'absolute', bottom:-5, left:'50%', marginLeft:-5, width:10, height:10, background:'white', transform:'rotate(45deg)', borderRight:'1px solid rgba(20,20,19,0.06)', borderBottom:'1px solid rgba(20,20,19,0.06)' }} />
                     </div>
-                  ))}
 
-                  {/* Day labels */}
-                  <div style={{ display:'flex', justifyContent:'space-between', paddingTop:9, paddingLeft:8, paddingRight:8 }}>
-                    {weekDays.map((d, i) => (
-                      <p key={i} onClick={() => setSelDay(i)} style={{
-                        fontFamily:SF, fontSize:11, cursor:'pointer', margin:0,
-                        color: i===selDay ? '#141413' : 'rgba(20,20,19,0.36)',
-                        fontWeight: i===selDay ? 700 : 400,
-                      }}>{d.slice(0,3).toUpperCase()}</p>
-                    ))}
+                    {/* SVG: aurora area + smooth line + small dots */}
+                    <svg width={CW} height={CHART_H} style={{ display:'block', overflow:'visible' }}>
+                      <defs>
+                        <linearGradient id="auroraH" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%"   stopColor="rgb(255,175,200)" stopOpacity="0.60"/>
+                          <stop offset="18%"  stopColor="rgb(200,170,255)" stopOpacity="0.56"/>
+                          <stop offset="38%"  stopColor="rgb(136,216,205)" stopOpacity="0.58"/>
+                          <stop offset="62%"  stopColor="rgb(165,213,161)" stopOpacity="0.58"/>
+                          <stop offset="82%"  stopColor="rgb(230,220,120)" stopOpacity="0.56"/>
+                          <stop offset="100%" stopColor="rgb(224,200,109)" stopOpacity="0.60"/>
+                        </linearGradient>
+                        <linearGradient id="auroraFade" x1="0%" y1="0%" x2="0%" y2="100%">
+                          <stop offset="35%" stopColor="white" stopOpacity="0"/>
+                          <stop offset="100%" stopColor="white" stopOpacity="0.50"/>
+                        </linearGradient>
+                        <clipPath id="cc"><rect x="0" y="0" width={CW} height={CHART_H}/></clipPath>
+                      </defs>
+                      {/* Subtle dashed guide lines */}
+                      {[46, 88, 138].map((y,i) => (
+                        <line key={i} x1={0} y1={y} x2={CW} y2={y} stroke="rgba(20,20,19,0.045)" strokeWidth="1" strokeDasharray="5 5"/>
+                      ))}
+                      {/* Aurora area fill */}
+                      <path d={areaPath} fill="url(#auroraH)" clipPath="url(#cc)"/>
+                      <path d={areaPath} fill="url(#auroraFade)" clipPath="url(#cc)"/>
+                      {/* Selected day vertical dashed line */}
+                      <line x1={sel.x} y1={0} x2={sel.x} y2={CHART_H} stroke="rgba(20,20,19,0.10)" strokeWidth="1" strokeDasharray="3 3"/>
+                      {/* Smooth line */}
+                      <path d={strokePath} fill="none" stroke="rgba(150,130,215,0.60)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+                      {/* Small data-point dots — aurora-matched colors */}
+                      {pts.map((p, i) => (
+                        <g key={i} onClick={() => setSelDay(i)} style={{ cursor:'pointer' }}>
+                          {i===selDay && <circle cx={p.x} cy={p.y} r={11} fill={DOT_COLORS[i]} fillOpacity="0.18"/>}
+                          <circle cx={p.x} cy={p.y} r={i===selDay ? 6 : 4.5} fill="white" stroke={DOT_COLORS[i]} strokeWidth="2"/>
+                          <circle cx={p.x} cy={p.y} r={i===selDay ? 3 : 2} fill={DOT_COLORS[i]}/>
+                        </g>
+                      ))}
+                    </svg>
+
+                    {/* Day labels */}
+                    <div style={{ display:'flex', justifyContent:'space-between', paddingTop:7, paddingLeft:6, paddingRight:6 }}>
+                      {weekDays.map((d, i) => (
+                        <p key={i} onClick={() => setSelDay(i)} style={{
+                          fontFamily:SF, fontSize:11, cursor:'pointer', margin:0,
+                          color: i===selDay ? '#141413' : 'rgba(20,20,19,0.35)',
+                          fontWeight: i===selDay ? 700 : 400,
+                        }}>{d.slice(0,3).toUpperCase()}</p>
+                      ))}
+                    </div>
                   </div>
                 </div>
               ) : (

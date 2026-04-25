@@ -1065,9 +1065,9 @@
         { s:'S', full:'Sat', mood: null     },
         { s:'S', full:'Sun', mood: null     },
       ];
-      // Pill bar fill heights (0–130)
-      const FILL_H = [72, 48, todayLabel ? 60 : 0, 90, 64, 0, 0];
-      const TRACK_H = 130;
+      // Pill bar fill heights (0–160)
+      const FILL_H = [100, 48, todayLabel ? 72 : 0, 148, 80, 0, 0];
+      const TRACK_H = 160;
 
       // Month dot grid data
       const monthMoods = ['Good','Sad','Good','Anxious','Boring','Good','Exhausted','Happy'];
@@ -1173,22 +1173,39 @@
 
               {/* Pill bar chart (week) / dot grid (month) */}
               {tab === 'week' ? (
-                <div style={{ display:'flex', gap:7, alignItems:'flex-end', height: TRACK_H + 36, marginBottom:0 }}>
+                <div style={{ display:'flex', gap:6, alignItems:'flex-end', height: TRACK_H + 30, marginBottom:2 }}>
                   {weekRows.map((d, i) => {
-                    const color = d.mood ? (isPos(d.mood) ? POS : NEG) : 'transparent';
+                    const isBarSel = i === selDay;
+                    const color = d.mood ? (isPos(d.mood) ? POS : NEG) : 'rgba(20,20,19,0.10)';
                     const fh = FILL_H[i];
+                    const pct = d.mood && fh > 0 ? Math.round(fh / TRACK_H * 100) : 0;
                     return (
-                      <div key={i} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:5 }}>
+                      <div key={i} onClick={() => d.mood && setSelDay(i)}
+                        style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:7, cursor: d.mood ? 'pointer' : 'default' }}>
                         {/* Track + fill */}
-                        <div style={{ width:'100%', maxWidth:38, height:TRACK_H, background:'rgba(20,20,19,0.065)', borderRadius:99, position:'relative', overflow:'hidden' }}>
+                        <div style={{ width:20, height:TRACK_H, background:'rgba(20,20,19,0.07)', borderRadius:99, position:'relative', overflow:'hidden', flexShrink:0,
+                          transition:'opacity 0.15s',
+                          opacity: (!d.mood || fh===0) ? 0.45 : 1,
+                        }}>
                           {d.mood && fh > 0 && (
-                            <div style={{ position:'absolute', bottom:0, left:0, right:0, height:fh, background:color, borderRadius:99,
-                              boxShadow:`0 -2px 8px ${color}50` }} />
+                            <div style={{
+                              position:'absolute', bottom:0, left:0, right:0, height:fh,
+                              background: isPos(d.mood)
+                                ? `linear-gradient(to top, #5aaa5a, #8fce6e)`
+                                : `linear-gradient(to top, #d4703a, #f0a870)`,
+                              borderRadius:99,
+                              boxShadow:`0 -6px 18px ${color}70`,
+                            }} />
                           )}
                         </div>
-                        {/* Bottom dot */}
-                        <div style={{ width:7, height:7, borderRadius:4, background: d.mood && fh>0 ? color : 'rgba(20,20,19,0.10)', flexShrink:0 }} />
-                        <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:500, fontSize:11, color:'rgba(20,20,19,0.42)', margin:0, letterSpacing:'0.2px' }}>{d.s}</p>
+                        {/* Day label */}
+                        <p style={{
+                          fontFamily:'Sofia Sans,sans-serif',
+                          fontWeight: isBarSel && d.mood ? 700 : 500,
+                          fontSize:11,
+                          color: isBarSel && d.mood ? (isPos(d.mood) ? '#4a8f4a' : '#c85820') : 'rgba(20,20,19,0.38)',
+                          margin:0, letterSpacing:'0.3px',
+                        }}>{d.s}</p>
                       </div>
                     );
                   })}

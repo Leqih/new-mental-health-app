@@ -169,12 +169,10 @@
     const imgExhaustedMthA= 'https://www.figma.com/api/mcp/asset/a3ca156f-bdfa-4858-bfa8-027db80a5730'; // wavy mouth left
     const imgExhaustedMthB= 'https://www.figma.com/api/mcp/asset/33266ffd-2fef-4106-8f34-8f41542cf5c7'; // wavy mouth right
     /* Boring mood (node 56-60) – fresh URLs */
-    const imgBoringChar1  = 'https://www.figma.com/api/mcp/asset/12fe1105-9849-4b8d-9364-aaf0f2551140'; // body piece A
-    const imgBoringChar2  = 'https://www.figma.com/api/mcp/asset/0cd28e45-6a47-4955-9a10-4758ad241406'; // body piece B
-    const imgBoringEyeL   = 'https://www.figma.com/api/mcp/asset/b7550d70-db5b-4839-be1b-2ac92cdef60e'; // left eyebrow dash
-    const imgBoringEyeR   = 'https://www.figma.com/api/mcp/asset/655f6fed-8bcc-4c2d-a3d2-a07b6d0f9cae'; // right eyebrow dash
-    const imgBoringMthA   = 'https://www.figma.com/api/mcp/asset/64e44a5e-8675-46cf-8b49-1c98abc4fa3c'; // mouth line
-    const imgBoringMthB   = 'https://www.figma.com/api/mcp/asset/5a2d8620-5ebd-41ba-b7c1-984d3c860658'; // mouth curve
+    const imgBoringChar1  = 'https://www.figma.com/api/mcp/asset/7c493bb1-1217-462e-9549-8ae268d9687c'; // body blob fill (slices 1+3)
+    const imgBoringChar2  = 'https://www.figma.com/api/mcp/asset/302cdd3b-6fc7-40b0-98aa-467993a1832f'; // body blob highlight (slices 2+4)
+    const imgBoringMthA   = 'https://www.figma.com/api/mcp/asset/d7ce2475-96fa-4ee1-b0e4-ca43b809505b'; // mouth frown line
+    const imgBoringMthB   = 'https://www.figma.com/api/mcp/asset/fcceb304-af11-4acf-a80a-f585bb935eaa'; // mouth accent curve
     /* Calm Mode card (node 30-2147) – fresh URLs */
     const imgMesshu       = 'https://www.figma.com/api/mcp/asset/4412b00a-8bb8-41a2-8528-fdfdecb20837';
     const imgHourglass    = 'https://www.figma.com/api/mcp/asset/82c4a6f8-649d-45e5-b608-6372f1ba9c5e';
@@ -722,33 +720,21 @@
                   </div>
                 </>}
                 {mbr && <>
-                  {/* Left eyebrow – outer container positions it; inner 17×1px div rotated; image expands via -7.5px / -44.12% insets */}
-                  <div style={{ position:'absolute', top:'41.96%', right:'54.25%', bottom:'56.37%', left:'40.07%', overflow:'visible', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                    <div style={{ position:'relative', width:17, height:1, transform:'rotate(-16.3deg)', flexShrink:0, overflow:'visible' }}>
-                      <div style={{ position:'absolute', top:-7.5, bottom:-7.5, left:'-44.12%', right:'-44.12%' }}>
-                        <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgBoringEyeL} onError={e=>e.target.style.display='none'} />
-                      </div>
-                    </div>
+                  {/* Left eye — Vector 21.svg inline */}
+                  <svg style={{ position:'absolute', left:65, top:105, width:55, height:34, overflow:'visible' }} viewBox="0 0 32 20" fill="none">
+                    <path d="M7.50195 12.2736L23.8186 7.50196" stroke="black" strokeWidth="15" strokeLinecap="round"/>
+                  </svg>
+                  {/* Right eye — Vector 32.svg inline */}
+                  <svg style={{ position:'absolute', left:165, top:105, width:55, height:34, overflow:'visible' }} viewBox="0 0 32 20" fill="none">
+                    <path d="M23.8186 12.2736L7.50199 7.50196" stroke="black" strokeWidth="15" strokeLinecap="round"/>
+                  </svg>
+                  {/* Mouth frown line */}
+                  <div style={{ position:'absolute', left:80, top:180, width:105, height:32 }}>
+                    <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgBoringMthA} onError={e=>e.target.style.display='none'} />
                   </div>
-                  {/* Right eyebrow – mirrored then rotated, matching Figma -scale-x-100 rotate-[16.3deg] */}
-                  <div style={{ position:'absolute', top:'41.96%', right:'37.52%', bottom:'56.37%', left:'56.79%', overflow:'visible', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                    <div style={{ position:'relative', width:17, height:1, transform:'scaleX(-1) rotate(-16.3deg)', flexShrink:0, overflow:'visible' }}>
-                      <div style={{ position:'absolute', top:-7.5, bottom:-7.5, left:'-44.12%', right:'-44.12%' }}>
-                        <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgBoringEyeR} onError={e=>e.target.style.display='none'} />
-                      </div>
-                    </div>
-                  </div>
-                  {/* Mouth line */}
-                  <div style={{ position:'absolute', top:'50.35%', right:'44.6%', bottom:'48.25%', left:'42.86%', overflow:'visible' }}>
-                    <div style={{ position:'absolute', top:'-187.5%', right:'-20.84%', bottom:'-187.55%', left:'-20.84%' }}>
-                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgBoringMthA} onError={e=>e.target.style.display='none'} />
-                    </div>
-                  </div>
-                  {/* Mouth curve */}
-                  <div style={{ position:'absolute', top:'48.6%', right:'40.42%', bottom:'44.76%', left:'57.84%', overflow:'visible' }}>
-                    <div style={{ position:'absolute', top:'-39.48%', right:'-150.04%', bottom:'-39.48%', left:'-150%' }}>
-                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgBoringMthB} onError={e=>e.target.style.display='none'} />
-                    </div>
+                  {/* Mouth accent blob */}
+                  <div style={{ position:'absolute', left:178, top:177, width:32, height:32 }}>
+                    <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgBoringMthB} onError={e=>e.target.style.display='none'} />
                   </div>
                 </>}
                 {!mg && !mh && !mgr && ec && <>

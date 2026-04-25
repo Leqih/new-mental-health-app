@@ -1046,84 +1046,60 @@
 
     /* ── STATS PAGE ── */
     function StatsPage({ onBack, onNav, todayMood, count }) {
-      const [tab, setTab]         = useState('week');
-      const [selDay, setSelDay]   = useState(4); // default Fri selected in mood history
+      const [tab, setTab]       = useState('week');
+      const [selDay, setSelDay] = useState(2); // Wed selected by default
 
-      const POS     = '#6dbd2c';  // positive – matches home Good gradient
-      const NEG     = '#e85040';  // negative – matches home Angry gradient
-      const POS_GRD = 'linear-gradient(to top, rgb(109,189,44), rgb(164,217,156))';   // exact home Good
-      const NEG_GRD = 'linear-gradient(to top, rgb(215,50,30),  rgb(255,105,80))';    // exact home Angry
+      const SF   = 'Sofia Sans,sans-serif';
       const CARD = { background:'white', borderRadius:22, padding:'18px 16px', boxShadow:'0 2px 16px rgba(0,0,0,0.05)', border:'1px solid rgba(20,20,19,0.06)', flexShrink:0 };
-      const isPos = m => ['Good','Happy','Grateful'].includes(m);
+      const isPos = m => ['Good','Happy','Grateful','Excited'].includes(m);
 
+      // ── Chart data ──
       const todayLabel = todayMood ? todayMood.mood.label : null;
-      // Week rows: day label, short label, full label, mood
-      const weekRows = [
-        { s:'M', full:'Mon', mood:'Good'    },
-        { s:'T', full:'Tue', mood:'Sad'     },
-        { s:'W', full:'Wed', mood: todayLabel },
-        { s:'T', full:'Thu', mood:'Good'    },
-        { s:'F', full:'Fri', mood:'Anxious' },
-        { s:'S', full:'Sat', mood: null     },
-        { s:'S', full:'Sun', mood: null     },
-      ];
-      // Pill bar fill heights (0–160)
-      const FILL_H = [100, 48, todayLabel ? 72 : 0, 148, 80, 0, 0];
-      const TRACK_H = 160;
-
-      // Month dot grid data
-      const monthMoods = ['Good','Sad','Good','Anxious','Boring','Good','Exhausted','Happy'];
-      const monthRows = Array.from({length:30}, (_,i) => ({ day:i+1, mood: i<8 ? monthMoods[i%8] : null }));
-
-      // Mood counts for summary
-      const moodCounts = {};
-      weekRows.forEach(d => { if(d.mood) moodCounts[d.mood] = (moodCounts[d.mood]||0)+1; });
-      const totalLogged = weekRows.filter(d => d.mood).length;
-      const topNeg = Object.entries(moodCounts).filter(([m])=>!isPos(m)).sort((a,b)=>b[1]-a[1])[0];
-
-      // Weekly insight
-      const insights = {
-        Sad:      { text:"You've had a heavy week. Try 5 mins of deep breathing tonight.", freq:0.65, charImg: imgLogCloudChar },
-        Anxious:  { text:"Anxiety showed up this week. A short walk can help reset your mind.", freq:0.55, charImg: imgAngryChar },
-        Angry:    { text:"Tension was high this week. Pause and breathe before reacting.", freq:0.50, charImg: imgAngryChar },
-        Boring:   { text:"Feeling stuck? Try one tiny new thing — it really helps.", freq:0.40, charImg: imgLogCloudChar },
-        Exhausted:{ text:"Your body needs rest. Prioritise sleep and be kind to yourself.", freq:0.72, charImg: imgExhaustedChar },
-      };
-      const insightKey = topNeg ? topNeg[0] : 'Sad';
-      const ins = insights[insightKey] || insights['Sad'];
-
-      // Keyword bubbles
-      const bubbles = [
-        { text:'Joy',        r:50, color:'#f5b8d4', cx:62,  cy:175 },
-        { text:'Happiness',  r:44, color:'#8fbb6e', cx:238, cy:76  },
-        { text:'Sadness',    r:40, color:'#e8956a', cx:184, cy:125 },
-        { text:'Hope',       r:25, color:'#94c5e8', cx:138, cy:64  },
-        { text:'Calm',       r:28, color:'#94d4d4', cx:295, cy:140 },
-        { text:'Body',       r:21, color:'#ffd966', cx:218, cy:38  },
-        { text:'Fear',       r:17, color:'#f5b8d4', cx:338, cy:90  },
-        { text:'Love',       r:16, color:'#b07070', cx:324, cy:148 },
-        { text:'Anger',      r:19, color:'#9b7070', cx:194, cy:178 },
-        { text:'Sun',        r:15, color:'#8fbb6e', cx:18,  cy:192 },
-        { text:'Lazy',       r:14, color:'#ffd966', cx:10,  cy:138 },
-        { text:'Stress',     r:19, color:'#c8a8e8', cx:84,  cy:75  },
-      ];
-
-      // Face cell: mood-specific pastel backgrounds
       const FACE_BG = {
-        Good:'#d6f0d6', Happy:'#fef4b8', Grateful:'#fde0b0',
+        Good:'#d6f0d6', Happy:'#fef4b8', Grateful:'#fde0b0', Excited:'#fef4b8',
         Sad:'#cce8ff', Angry:'#ffd6d6', Exhausted:'#ddd0f8',
         Boring:'#ccf4f0', Anxious:'#e8d4f8',
       };
       const FACE_RING = {
-        Good:'#5cb85c', Happy:'#c8a000', Grateful:'#d87830',
+        Good:'#5cb85c', Happy:'#c8a000', Grateful:'#d87830', Excited:'#e8a000',
         Sad:'#3ab4dc', Angry:'#e04040', Exhausted:'#8050c8',
         Boring:'#30b8b0', Anxious:'#9070cc',
       };
-      const faceColor = m => !m ? 'rgba(20,20,19,0.07)' : (FACE_BG[m] || 'rgba(20,20,19,0.07)');
-      const faceRing  = m => m ? (FACE_RING[m] || '#141413') : '#141413';
-      const faceImg   = m =>
-        m === 'Good' || m === 'Happy' || m === 'Grateful' ? imgDayGoodBlob :
-        m === 'Sad'  ? imgDaySadFace : imgDayAnxiousFace;
+      const faceImg = m =>
+        ['Good','Happy','Grateful','Excited'].includes(m) ? imgDayGoodBlob :
+        m === 'Sad' ? imgDaySadFace : imgDayAnxiousFace;
+
+      const CHART_W = 322;
+      const CHART_H = 165;
+      const MOOD_Y  = { Good:58, Happy:38, Grateful:42, Excited:35, Boring:95, Sad:135, Anxious:112, Angry:148, Exhausted:122 };
+      const weekMoods = ['Good','Sad', todayLabel||'Good', 'Anxious','Excited','Good','Boring'];
+      const weekDays  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+      const pts = weekDays.map((day, i) => {
+        const mood = weekMoods[i];
+        return { x: 20 + i * (CHART_W - 40) / 6, y: MOOD_Y[mood] || 95, mood, day };
+      });
+      const buildPath = (ps) => {
+        let d = `M ${ps[0].x} ${ps[0].y}`;
+        for (let i = 1; i < ps.length; i++) {
+          const cpx = (ps[i-1].x + ps[i].x) / 2;
+          d += ` C ${cpx} ${ps[i-1].y} ${cpx} ${ps[i].y} ${ps[i].x} ${ps[i].y}`;
+        }
+        return d;
+      };
+      const strokePath = buildPath(pts);
+      const areaPath   = strokePath + ` L ${pts[pts.length-1].x} ${CHART_H} L ${pts[0].x} ${CHART_H} Z`;
+      const sel = pts[selDay] || pts[0];
+
+      // Month grid
+      const monthMoods2 = ['Good','Sad','Good','Anxious','Boring','Good','Exhausted','Happy'];
+      const monthRows = Array.from({length:30}, (_,i) => ({ day:i+1, mood: i<8 ? monthMoods2[i%8] : null }));
+
+      // Pattern insights
+      const patternInsights = [
+        { bg:'#f0ecff', iconBg:'rgba(160,130,255,0.22)', icon:'📈', title:'Emotion Pattern', desc:'More anxious on Thursdays.' },
+        { bg:'#e5f5f8', iconBg:'rgba(100,200,220,0.22)', icon:'🌙', title:'Time Pattern',    desc:'Mood more stable in evenings.' },
+        { bg:'#fff8dc', iconBg:'rgba(255,200,60,0.22)',  icon:'✨', title:'Improvement',     desc:'3 more good days than last week.' },
+      ];
 
       return (
         <div style={{ position:'absolute', inset:0, background:'#f5f2ef', zIndex:200, borderRadius:'inherit', overflow:'hidden' }}>
@@ -1132,9 +1108,9 @@
           {/* Header */}
           <div style={{ position:'absolute', top:44, left:0, width:390, height:56, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 20px', boxSizing:'border-box' }}>
             <div onClick={onBack} style={{ cursor:'pointer', background:'rgba(20,20,19,0.08)', borderRadius:20, padding:'8px 14px' }}>
-              <p style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:13, fontWeight:500, color:'#141413', margin:0 }}>← Back</p>
+              <p style={{ fontFamily:SF, fontSize:13, fontWeight:500, color:'#141413', margin:0 }}>← Back</p>
             </div>
-            <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:700, fontSize:18, color:'#141413', margin:0, letterSpacing:'-0.3px' }}>Your Stats</p>
+            <p style={{ fontFamily:SF, fontWeight:700, fontSize:18, color:'#141413', margin:0, letterSpacing:'-0.3px' }}>Your Stats</p>
             <div style={{ width:64 }} />
           </div>
 
@@ -1144,197 +1120,202 @@
             {/* Tab switcher */}
             <div style={{ display:'flex', background:'rgba(20,20,19,0.07)', borderRadius:14, padding:4, gap:2, flexShrink:0 }}>
               {['week','month'].map(t => (
-                <div key={t} onClick={() => setTab(t)}
-                  style={{ flex:1, textAlign:'center', padding:'8px 0', borderRadius:10, background:tab===t?'white':'transparent', cursor:'pointer', boxShadow:tab===t?'0 2px 8px rgba(0,0,0,0.08)':'none' }}>
-                  <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:tab===t?600:400, fontSize:14, color:tab===t?'#141413':'rgba(20,20,19,0.45)', margin:0 }}>
-                    {t === 'week' ? 'This Week' : 'This Month'}
+                <div key={t} onClick={() => setTab(t)} style={{ flex:1, textAlign:'center', padding:'8px 0', borderRadius:10, background:tab===t?'white':'transparent', cursor:'pointer', boxShadow:tab===t?'0 2px 8px rgba(0,0,0,0.08)':'none' }}>
+                  <p style={{ fontFamily:SF, fontWeight:tab===t?600:400, fontSize:14, color:tab===t?'#141413':'rgba(20,20,19,0.45)', margin:0 }}>
+                    {t==='week' ? 'This Week' : 'This Month'}
                   </p>
                 </div>
               ))}
             </div>
 
-            {/* ── CARD 1: Positive / Negative pill chart + Mood History ── */}
+            {/* ── CARD 1: Mood Trend line chart ── */}
             <div style={CARD}>
-
-              {/* Legend + period pill */}
-              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:18 }}>
-                <div style={{ display:'flex', gap:14 }}>
-                  {[[POS_GRD,'Positive'],[NEG_GRD,'Negative']].map(([grd,l]) => (
-                    <div key={l} style={{ display:'flex', alignItems:'center', gap:6 }}>
-                      <div style={{ width:10, height:10, borderRadius:5, background:grd, flexShrink:0 }} />
-                      <p style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:12, color:'rgba(20,20,19,0.55)', margin:0 }}>{l}</p>
-                    </div>
-                  ))}
-                </div>
-                <div style={{ background:'rgba(20,20,19,0.06)', borderRadius:20, padding:'5px 13px', display:'flex', alignItems:'center', gap:5, cursor:'pointer' }}>
-                  <p style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:12, fontWeight:500, color:'rgba(20,20,19,0.55)', margin:0 }}>
-                    {tab === 'week' ? 'Weekly' : 'Monthly'} ˅
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
+                <p style={{ fontFamily:SF, fontWeight:700, fontSize:15, color:'#141413', margin:0 }}>Mood Trend</p>
+                <div style={{ background:'rgba(20,20,19,0.06)', borderRadius:20, padding:'5px 13px', cursor:'pointer' }}>
+                  <p style={{ fontFamily:SF, fontSize:12, fontWeight:500, color:'rgba(20,20,19,0.5)', margin:0 }}>
+                    {tab==='week' ? 'This Week' : 'This Month'} ˅
                   </p>
                 </div>
               </div>
 
               {/* Pill bar chart (week) / dot grid (month) */}
+              {/* Aurora line chart (week) or dot grid (month) */}
               {tab === 'week' ? (
-                <div style={{ display:'flex', gap:6, alignItems:'flex-end', height: TRACK_H + 30, marginBottom:2 }}>
-                  {weekRows.map((d, i) => {
-                    const isBarSel = i === selDay;
-                    const pos = d.mood ? isPos(d.mood) : null;
-                    const grd = pos === true ? POS_GRD : pos === false ? NEG_GRD : null;
-                    const glowColor = pos === true ? 'rgba(109,189,44,0.55)' : 'rgba(215,50,30,0.45)';
-                    const fh = FILL_H[i];
-                    return (
-                      <div key={i} onClick={() => d.mood && setSelDay(i)}
-                        style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:7, cursor: d.mood ? 'pointer' : 'default' }}>
-                        {/* Track + fill */}
-                        <div style={{ width:20, height:TRACK_H, background:'rgba(20,20,19,0.07)', borderRadius:99, position:'relative', overflow:'hidden', flexShrink:0,
-                          transition:'opacity 0.15s',
-                          opacity: (!d.mood || fh===0) ? 0.4 : 1,
-                        }}>
-                          {d.mood && fh > 0 && (
-                            <div style={{
-                              position:'absolute', bottom:0, left:0, right:0, height:fh,
-                              background: grd,
-                              borderRadius:99,
-                              boxShadow:`0 -8px 20px ${glowColor}`,
-                            }} />
-                          )}
-                        </div>
-                        {/* Day label */}
-                        <p style={{
-                          fontFamily:'Sofia Sans,sans-serif',
-                          fontWeight: isBarSel && d.mood ? 700 : 500,
-                          fontSize:11,
-                          color: isBarSel && d.mood ? (isPos(d.mood) ? '#5aaa18' : '#cc3820') : 'rgba(20,20,19,0.38)',
-                          margin:0, letterSpacing:'0.3px',
-                        }}>{d.s}</p>
-                      </div>
-                    );
-                  })}
+                <div style={{ position:'relative' }}>
+                  {/* Tooltip */}
+                  <div style={{
+                    position:'absolute',
+                    left: Math.max(4, Math.min(sel.x - 50, CHART_W - 112)),
+                    top: Math.max(0, sel.y - 62),
+                    background:'white', borderRadius:13, padding:'7px 12px',
+                    boxShadow:'0 4px 20px rgba(0,0,0,0.13)', zIndex:10, pointerEvents:'none',
+                    minWidth:102, border:'1px solid rgba(20,20,19,0.07)',
+                  }}>
+                    <p style={{ fontFamily:SF, fontSize:10, color:'rgba(20,20,19,0.42)', margin:'0 0 3px' }}>{sel.day}, Apr 25</p>
+                    <div style={{ display:'flex', alignItems:'center', gap:5 }}>
+                      <img alt="" src={faceImg(sel.mood)} style={{ width:17, height:17, objectFit:'contain' }} onError={e=>e.target.style.display='none'} />
+                      <p style={{ fontFamily:SF, fontSize:13, fontWeight:700, color:'#141413', margin:0 }}>{sel.mood}</p>
+                    </div>
+                    <div style={{ position:'absolute', bottom:-5, left:'50%', marginLeft:-5, width:10, height:10, background:'white', transform:'rotate(45deg)', borderRight:'1px solid rgba(20,20,19,0.07)', borderBottom:'1px solid rgba(20,20,19,0.07)' }} />
+                  </div>
+
+                  {/* SVG aurora chart — same mesh gradient palette as UrgentSupport card */}
+                  <svg width={CHART_W} height={CHART_H} style={{ display:'block', overflow:'visible' }}>
+                    <defs>
+                      <linearGradient id="auroraH" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%"   stopColor="rgb(255,175,200)" stopOpacity="0.62"/>
+                        <stop offset="18%"  stopColor="rgb(200,170,255)" stopOpacity="0.58"/>
+                        <stop offset="38%"  stopColor="rgb(136,216,205)" stopOpacity="0.60"/>
+                        <stop offset="62%"  stopColor="rgb(165,213,161)" stopOpacity="0.60"/>
+                        <stop offset="82%"  stopColor="rgb(230,220,120)" stopOpacity="0.58"/>
+                        <stop offset="100%" stopColor="rgb(224,200,109)" stopOpacity="0.62"/>
+                      </linearGradient>
+                      <linearGradient id="auroraFade" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="40%" stopColor="white" stopOpacity="0"/>
+                        <stop offset="100%" stopColor="white" stopOpacity="0.55"/>
+                      </linearGradient>
+                      <clipPath id="cc"><rect x="0" y="0" width={CHART_W} height={CHART_H}/></clipPath>
+                    </defs>
+                    {/* Guide lines */}
+                    {[CHART_H*0.22, CHART_H*0.55, CHART_H*0.85].map((y,i) => (
+                      <line key={i} x1={0} y1={y} x2={CHART_W} y2={y} stroke="rgba(20,20,19,0.05)" strokeWidth="1" strokeDasharray="4 4"/>
+                    ))}
+                    {/* Area fill */}
+                    <path d={areaPath} fill="url(#auroraH)" clipPath="url(#cc)"/>
+                    <path d={areaPath} fill="url(#auroraFade)" clipPath="url(#cc)"/>
+                    {/* Selected day vertical guide */}
+                    <line x1={sel.x} y1={0} x2={sel.x} y2={CHART_H} stroke="rgba(20,20,19,0.09)" strokeWidth="1" strokeDasharray="3 3"/>
+                    {/* Line stroke */}
+                    <path d={strokePath} fill="none" stroke="rgba(140,120,210,0.65)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+
+                  {/* Mood face avatars at each data point */}
+                  {pts.map((p, i) => (
+                    <div key={i} onClick={() => setSelDay(i)} style={{
+                      position:'absolute', left: p.x - 13, top: p.y - 13,
+                      width:26, height:26, borderRadius:13,
+                      background: FACE_BG[p.mood] || '#f0f0f0',
+                      display:'flex', alignItems:'center', justifyContent:'center',
+                      border: i===selDay ? `2px solid ${FACE_RING[p.mood]||'#999'}` : '1.5px solid rgba(255,255,255,0.95)',
+                      boxShadow: i===selDay ? `0 2px 14px ${FACE_RING[p.mood]||'#999'}55` : '0 1px 6px rgba(0,0,0,0.10)',
+                      transform: i===selDay ? 'scale(1.22)' : 'scale(1)',
+                      transition:'transform 0.15s, box-shadow 0.15s',
+                      cursor:'pointer', zIndex:5,
+                    }}>
+                      <img alt="" src={faceImg(p.mood)} style={{ width:17, height:17, objectFit:'contain' }} onError={e=>e.target.style.display='none'} />
+                    </div>
+                  ))}
+
+                  {/* Day labels */}
+                  <div style={{ display:'flex', justifyContent:'space-between', paddingTop:9, paddingLeft:8, paddingRight:8 }}>
+                    {weekDays.map((d, i) => (
+                      <p key={i} onClick={() => setSelDay(i)} style={{
+                        fontFamily:SF, fontSize:11, cursor:'pointer', margin:0,
+                        color: i===selDay ? '#141413' : 'rgba(20,20,19,0.36)',
+                        fontWeight: i===selDay ? 700 : 400,
+                      }}>{d.slice(0,3).toUpperCase()}</p>
+                    ))}
+                  </div>
                 </div>
               ) : (
-                <div style={{ display:'flex', flexWrap:'wrap', gap:5, marginBottom:8 }}>
+                /* Month dot grid */
+                <div style={{ display:'flex', flexWrap:'wrap', gap:5, marginBottom:4 }}>
                   {monthRows.map((d,i) => {
-                    const bg = d.mood ? (isPos(d.mood) ? POS_GRD : NEG_GRD) : 'rgba(20,20,19,0.07)';
+                    const bg = d.mood
+                      ? (isPos(d.mood)
+                          ? 'linear-gradient(135deg, rgb(165,213,161), rgb(136,216,205))'
+                          : 'linear-gradient(135deg, rgb(255,175,200), rgb(200,170,255))')
+                      : 'rgba(20,20,19,0.07)';
                     return (
                       <div key={i} style={{ width:28, height:28, borderRadius:9, background:bg, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                        <p style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:9, fontWeight:500, color:d.mood?'white':'rgba(20,20,19,0.28)', margin:0 }}>{d.day}</p>
+                        <p style={{ fontFamily:SF, fontSize:9, fontWeight:500, color:d.mood?'white':'rgba(20,20,19,0.28)', margin:0 }}>{d.day}</p>
                       </div>
                     );
                   })}
                 </div>
               )}
+            </div>
 
-              {/* Separator */}
-              <div style={{ height:1, background:'rgba(20,20,19,0.07)', margin:'12px 0 14px' }} />
-
-              {/* Mood History row */}
-              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
-                <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:700, fontSize:15, color:'#141413', margin:0, letterSpacing:'-0.2px' }}>Mood History</p>
-                <div style={{ display:'flex', gap:3 }}>
-                  {[0,1,2].map(i=><div key={i} style={{ width:4, height:4, borderRadius:2, background:'rgba(20,20,19,0.22)' }}/>)}
-                </div>
-              </div>
-              <div style={{ display:'flex', gap:4 }}>
-                {weekRows.map((d, i) => {
-                  const isSelected = i === selDay;
-                  const fc = faceColor(d.mood);
-                  const fr = faceRing(d.mood);
-                  return (
-                    <div key={i} onClick={() => setSelDay(i)} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:6, cursor:'pointer' }}>
-                      <div style={{
-                        width:44, height:44, borderRadius:22, background:fc,
-                        display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0,
-                        outline: isSelected ? `2.5px solid ${fr}` : 'none',
-                        outlineOffset:2,
-                        boxShadow: isSelected ? `0 3px 12px ${fr}40` : 'none',
-                        transition:'outline 0.15s, box-shadow 0.15s',
-                      }}>
-                        {d.mood ? (
-                          <img alt="" src={faceImg(d.mood)} style={{ width:34, height:34, objectFit:'contain' }} onError={e=>e.target.style.display='none'} />
-                        ) : (
-                          <p style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:12, color:'rgba(20,20,19,0.25)', margin:0 }}>–</p>
-                        )}
-                      </div>
-                      <p style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:10, color: isSelected?'#141413':'rgba(20,20,19,0.40)', fontWeight: isSelected?600:400, margin:0 }}>{d.full}</p>
+            {/* ── CARD 2: Weekly Overview ── */}
+            <div style={CARD}>
+              <p style={{ fontFamily:SF, fontWeight:700, fontSize:15, color:'#141413', margin:'0 0 14px', letterSpacing:'-0.2px' }}>Weekly Overview</p>
+              <div style={{ display:'flex', gap:3 }}>
+                {pts.map((p, i) => (
+                  <div key={i} onClick={() => setSelDay(i)} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:5, cursor:'pointer' }}>
+                    <div style={{
+                      width:38, height:38, borderRadius:19,
+                      background: FACE_BG[p.mood] || 'rgba(20,20,19,0.07)',
+                      display:'flex', alignItems:'center', justifyContent:'center',
+                      outline: i===selDay ? `2.5px solid ${FACE_RING[p.mood]||'#999'}` : 'none',
+                      outlineOffset:2,
+                      boxShadow: i===selDay ? `0 2px 10px ${FACE_RING[p.mood]||'#999'}40` : 'none',
+                      transition:'outline 0.15s',
+                    }}>
+                      <img alt="" src={faceImg(p.mood)} style={{ width:28, height:28, objectFit:'contain' }} onError={e=>e.target.style.display='none'} />
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* ── CARD 2: Weekly Summary ── */}
-            <div style={{ ...CARD, padding:'18px 16px 14px' }}>
-              {/* Character + text */}
-              <div style={{ display:'flex', gap:14, alignItems:'flex-start', marginBottom:14 }}>
-                <div style={{ width:58, height:58, borderRadius:29, background:'rgba(20,20,19,0.06)', flexShrink:0, overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                  <img alt="" src={ins.charImg} style={{ width:54, height:54, objectFit:'contain' }} onError={e=>{e.target.style.display='none';}} />
-                </div>
-                <div style={{ flex:1 }}>
-                  <p style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:10, color:'rgba(20,20,19,0.42)', margin:'0 0 5px', letterSpacing:'0.5px', textTransform:'uppercase' }}>Your Weekly Summary</p>
-                  <p style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:14, fontWeight:600, color:'#141413', margin:0, lineHeight:'20px' }}>{ins.text}</p>
-                </div>
-              </div>
-
-              {/* Frequency slider */}
-              <div style={{ height:22, background:'rgba(20,20,19,0.07)', borderRadius:11, position:'relative', overflow:'hidden', marginBottom:7 }}>
-                {/* Gradient fill – matches home page Good mood */}
-                <div style={{
-                  position:'absolute', left:0, top:0, bottom:0, width:`${ins.freq*100}%`,
-                  background:'linear-gradient(to right, rgb(109,189,44), rgb(164,217,156))',
-                  borderRadius:'11px 0 0 11px',
-                }} />
-                {/* Indicator line */}
-                <div style={{ position:'absolute', top:0, bottom:0, width:3, left:`calc(${ins.freq*100}% - 1.5px)`, background:'rgb(70,140,20)', borderRadius:2 }} />
-              </div>
-              <div style={{ display:'flex', justifyContent:'space-between' }}>
-                <p style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:11, color:'rgba(20,20,19,0.38)', margin:0 }}>Rarely</p>
-                <p style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:11, color:'rgba(20,20,19,0.38)', margin:0 }}>Often</p>
-              </div>
-            </div>
-
-            {/* ── CARD 3: Keyword Bubble Cloud ── */}
-            <div style={{ background:'#faf0ec', borderRadius:22, padding:'16px 16px 0', border:'1px solid rgba(20,20,19,0.05)', overflow:'hidden', flexShrink:0 }}>
-              <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:700, fontSize:15, color:'#141413', margin:'0 0 2px', letterSpacing:'-0.2px' }}>Your Mood Keywords</p>
-              <p style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:11, color:'rgba(20,20,19,0.40)', margin:'0 0 6px' }}>Based on your journal entries</p>
-              <div style={{ position:'relative', height:210, width:'100%', flexShrink:0 }}>
-                {bubbles.map((b, i) => (
-                  <div key={i} style={{
-                    position:'absolute',
-                    left: b.cx - b.r, top: b.cy - b.r,
-                    width: b.r*2, height: b.r*2, borderRadius: b.r,
-                    background: b.color,
-                    display:'flex', alignItems:'center', justifyContent:'center',
-                  }}>
-                    <p style={{
-                      fontFamily:'Sofia Sans,sans-serif',
-                      fontSize: Math.max(9, Math.round(b.r * 0.38)),
-                      fontWeight: b.r >= 40 ? 700 : 500,
-                      color:'white', margin:0, textAlign:'center',
-                      padding:'0 4px', lineHeight:1.2,
-                    }}>{b.text}</p>
+                    <p style={{ fontFamily:SF, fontSize:9, color:'rgba(20,20,19,0.40)', margin:0, letterSpacing:'0.3px' }}>{p.day.slice(0,3).toUpperCase()}</p>
+                    <p style={{ fontFamily:SF, fontSize:8, color:isPos(p.mood)?'#5aaa18':'#cc3820', fontWeight:700, margin:0, letterSpacing:'0.2px' }}>{p.mood.toUpperCase()}</p>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* ── Bottom row: Streak + Monthly Goal ── */}
-            <div style={{ display:'flex', gap:12, flexShrink:0 }}>
-              <div style={{ flex:1, background:'#fef3b4', borderRadius:20, padding:'16px 14px', display:'flex', flexDirection:'column', gap:5, minHeight:100 }}>
-                <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:500, fontSize:10, color:'rgba(20,20,19,0.42)', margin:0, letterSpacing:'0.7px', textTransform:'uppercase' }}>Log Streak</p>
-                <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:800, fontSize:24, color:'#141413', margin:0, letterSpacing:'-0.5px', lineHeight:1.1 }}>🔥 5 days</p>
-                <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:400, fontSize:12, color:'rgba(20,20,19,0.50)', margin:0 }}>Keep it going!</p>
+            {/* ── CARD 3: Pattern Insights ── */}
+            <div style={CARD}>
+              <p style={{ fontFamily:SF, fontWeight:700, fontSize:15, color:'#141413', margin:'0 0 12px', letterSpacing:'-0.2px' }}>Pattern Insights</p>
+              <div style={{ display:'flex', gap:8 }}>
+                {patternInsights.map((ins, i) => (
+                  <div key={i} style={{ flex:1, background:ins.bg, borderRadius:16, padding:'12px 10px 16px', display:'flex', flexDirection:'column', gap:5, cursor:'pointer', position:'relative', minHeight:114 }}>
+                    <div style={{ width:30, height:30, borderRadius:15, background:ins.iconBg, display:'flex', alignItems:'center', justifyContent:'center', marginBottom:2 }}>
+                      <span style={{ fontSize:15 }}>{ins.icon}</span>
+                    </div>
+                    <p style={{ fontFamily:SF, fontWeight:700, fontSize:11, color:'#141413', margin:0, lineHeight:1.3 }}>{ins.title}</p>
+                    <p style={{ fontFamily:SF, fontSize:10, color:'rgba(20,20,19,0.50)', margin:0, lineHeight:1.4 }}>{ins.desc}</p>
+                    <p style={{ position:'absolute', bottom:8, right:10, fontSize:13, color:'rgba(20,20,19,0.32)', margin:0 }}>↗</p>
+                  </div>
+                ))}
               </div>
-              <div style={{ flex:1, background:'white', borderRadius:20, padding:'16px 14px', display:'flex', flexDirection:'column', gap:8, minHeight:100, border:'1px solid rgba(20,20,19,0.06)' }}>
-                <div style={{ display:'flex', justifyContent:'space-between' }}>
-                  <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:500, fontSize:10, color:'rgba(20,20,19,0.42)', margin:0, letterSpacing:'0.7px', textTransform:'uppercase' }}>Monthly Goal</p>
-                  <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:700, fontSize:12, color:'#8050c8', margin:0 }}>{count}/30</p>
-                </div>
-                <div style={{ height:8, background:'rgba(20,20,19,0.07)', borderRadius:4, overflow:'hidden' }}>
-                  <div style={{ height:'100%', width:`${Math.min(100,count/30*100)}%`, background:'linear-gradient(90deg,#a06edc,#7040b8)', borderRadius:4 }} />
-                </div>
-                <p style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:11, color:'rgba(20,20,19,0.45)', margin:0 }}>
-                  {30-count > 0 ? `${30-count} more to go 🎯` : 'Goal reached! 🎉'}
-                </p>
+            </div>
+
+            {/* ── CARD 4: Stats Summary ── */}
+            <div style={CARD}>
+              <p style={{ fontFamily:SF, fontWeight:700, fontSize:15, color:'#141413', margin:'0 0 14px', letterSpacing:'-0.2px' }}>Stats Summary</p>
+              <div style={{ display:'flex', gap:8 }}>
+                {[
+                  { emoji:'🟢', label:'Good Days',     value:7,     sub:'▲ 3 from last week', subC:'#5aaa18', bg:'#f0fce8' },
+                  { emoji:'🔴', label:'Low Days',      value:2,     sub:'▼ 1 from last week', subC:'#cc3820', bg:'#fff0ee' },
+                  { emoji:'🔥', label:'Day Streak',    value:3,     sub:'Keep it going!',      subC:'#e08020', bg:'#fff8ee' },
+                  { emoji:'📊', label:'Positive Days', value:'78%', sub:'▲ 12% from last week',subC:'#5aaa18', bg:'#eef2ff' },
+                ].map((s, i) => (
+                  <div key={i} style={{ flex:1, background:s.bg, borderRadius:16, padding:'11px 9px', display:'flex', flexDirection:'column', gap:3 }}>
+                    <span style={{ fontSize:18 }}>{s.emoji}</span>
+                    <p style={{ fontFamily:SF, fontWeight:800, fontSize:20, color:'#141413', margin:0, lineHeight:1 }}>{s.value}</p>
+                    <p style={{ fontFamily:SF, fontSize:9.5, color:'rgba(20,20,19,0.50)', margin:0, lineHeight:1.3 }}>{s.label}</p>
+                    <p style={{ fontFamily:SF, fontSize:9, color:s.subC, fontWeight:600, margin:0, lineHeight:1.3 }}>{s.sub}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ── CARD 5: Recommended for You ── */}
+            <div style={{ ...CARD, padding:'18px 16px 14px' }}>
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
+                <p style={{ fontFamily:SF, fontWeight:700, fontSize:15, color:'#141413', margin:0, letterSpacing:'-0.2px' }}>Recommended for You</p>
+                <p style={{ fontFamily:SF, fontSize:12, color:'rgba(20,20,19,0.45)', margin:0, cursor:'pointer' }}>See All ›</p>
+              </div>
+              <div style={{ display:'flex', gap:9, overflowX:'auto', paddingBottom:2 }}>
+                {[
+                  { icon:'▶️', label:'10-min Calm Session', color:'#ede8ff' },
+                  { icon:'🌿', label:'Breathing Exercise',  color:'#e0f5e8' },
+                  { icon:'💬', label:'Talk to Someone',     color:'#ffe0ea' },
+                  { icon:'📓', label:'Gratitude Journal',   color:'#fff6d8' },
+                ].map((r, i) => (
+                  <div key={i} style={{ display:'flex', alignItems:'center', gap:7, background:r.color, borderRadius:20, padding:'9px 14px', flexShrink:0, cursor:'pointer' }}>
+                    <span style={{ fontSize:14 }}>{r.icon}</span>
+                    <p style={{ fontFamily:SF, fontSize:12, fontWeight:500, color:'#141413', margin:0, whiteSpace:'nowrap' }}>{r.label}</p>
+                  </div>
+                ))}
               </div>
             </div>
 

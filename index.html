@@ -201,6 +201,30 @@
     const imgWSadM   = 'https://www.figma.com/api/mcp/asset/5c8ada6d-441d-41a9-8798-3987a0a8655a'; /* TUE main sad face */
     const imgWSadS   = 'https://www.figma.com/api/mcp/asset/6f5cc69b-7beb-45a0-b703-d3a8ed9b5345'; /* TUE secondary sad face */
     const imgWSadT   = 'https://www.figma.com/api/mcp/asset/0d36dfb9-8dd0-466e-bd36-3c95ba369f6e'; /* TUE third sad face */
+    /* Exhausted sticker folder (208:2811) */
+    const imgExR82   = 'https://www.figma.com/api/mcp/asset/dc673232-bd6d-4d10-94de-ef307db00d2e'; /* folder bg */
+    const imgExMain  = 'https://www.figma.com/api/mcp/asset/0d26b654-3c40-4916-bb10-f7d9b6c92a02'; /* main char 28×28 */
+    const imgExFace2 = 'https://www.figma.com/api/mcp/asset/29ea76c4-cce1-475f-8fd7-d6605cc679e8'; /* secondary face 27×27 */
+    const imgExAccent= 'https://www.figma.com/api/mcp/asset/05f60ad1-8ad7-4085-9511-cd9060ec08c3'; /* small accent detail */
+    const imgExChar3 = 'https://www.figma.com/api/mcp/asset/41c80e97-f94c-4bfc-b4b9-9caf8276b03d'; /* third char blob body */
+    const imgExEye1  = 'https://www.figma.com/api/mcp/asset/c66ba247-0754-4362-a390-61b59757cf5c'; /* X-eye stroke A */
+    const imgExEye2  = 'https://www.figma.com/api/mcp/asset/ff229951-06d7-4bb6-8f9b-6b68e03556a4'; /* X-eye stroke B */
+    const imgExMth1  = 'https://www.figma.com/api/mcp/asset/b3fdbffd-ab2a-4e65-8724-aec805b3b6dc'; /* mouth A */
+    const imgExMth2  = 'https://www.figma.com/api/mcp/asset/faa79a49-e812-4b83-9080-612329c39914'; /* mouth B */
+    /* Boring sticker folder (208:2784) */
+    const imgBorR82  = 'https://www.figma.com/api/mcp/asset/99901c17-666a-4a54-b60e-0c30ecf652cf'; /* folder bg */
+    const imgBorMain = 'https://www.figma.com/api/mcp/asset/c0462ea5-d957-4080-9add-c4352145fedf'; /* main char 28×28 */
+    const imgBorCh2  = 'https://www.figma.com/api/mcp/asset/22563c98-5b3b-4c4b-b99b-e2398a5d8507'; /* second char body */
+    const imgBorCh2V27='https://www.figma.com/api/mcp/asset/55245eea-6e4b-4459-8230-790fe20d1f61';/* 2nd eye A */
+    const imgBorCh2V28='https://www.figma.com/api/mcp/asset/2c917b39-f806-4886-a42f-dad683affdf7';/* 2nd eye B */
+    const imgBorCh2V29='https://www.figma.com/api/mcp/asset/ba8fab93-27cd-4c24-a217-b6b2962a4940';/* 2nd mouth A */
+    const imgBorCh2V30='https://www.figma.com/api/mcp/asset/f58ebb27-426b-4ac2-8623-abb9ba39a64e';/* 2nd mouth B */
+    const imgBorCh3V1= 'https://www.figma.com/api/mcp/asset/6480e667-cf35-46aa-bdb7-2379d2ddd463'; /* 3rd char fill slices */
+    const imgBorCh3V2= 'https://www.figma.com/api/mcp/asset/df3db139-03d7-4642-a6bb-31869cdc8db6'; /* 3rd char highlight slices */
+    const imgBorEye1 = 'https://www.figma.com/api/mcp/asset/50555eaf-3698-4805-b7bd-5e33b46612c2'; /* 3rd char eye L */
+    const imgBorEye2 = 'https://www.figma.com/api/mcp/asset/8ffa7e79-5f09-4b30-ac16-cf8de76a820b'; /* 3rd char eye R */
+    const imgBorLine1= 'https://www.figma.com/api/mcp/asset/1e847969-4931-489b-9822-dd53acd1baae'; /* 3rd char nose line */
+    const imgBorMth  = 'https://www.figma.com/api/mcp/asset/41e8e733-522c-47dd-81ee-8cc115e6d0d4'; /* 3rd char mouth */
     const imgGroup8       = 'https://www.figma.com/api/mcp/asset/d086ffca-9f89-49d6-bb10-628b8e9fbcf1';
     const imgGroup15      = 'https://www.figma.com/api/mcp/asset/9b1313d9-1b85-49df-9777-f4fdd8a67628';
     /* Today card icons row — node 191-2465 fresh */
@@ -585,49 +609,245 @@
       );
     }
 
+    /* ── EXHAUSTED STICKER ZONE (Figma 208:2811) ── */
+    /* Coords normalized: subtract 15.5 from Figma y-values so folder bg starts at top:0 */
+    function ExhaustedStickerZone() {
+      return (
+        <div style={{ position:'relative', width:42, height:37, flexShrink:0 }}>
+          {/* Rectangle82 backing */}
+          <div style={{ position:'absolute', left:0.16, top:0, width:42, height:37 }}>
+            <img alt="" src={imgExR82} onError={e=>e.target.style.display='none'}
+              style={{ position:'absolute', top:0, right:'-9.52%', bottom:'-21.62%', left:'-9.52%', display:'block', width:'119.04%', height:'121.62%' }} />
+          </div>
+
+          {/* Third char body + X-eyes: left:6, top:4.5, 29.276×29.48 */}
+          <div style={{ position:'absolute', left:6, top:4.5, width:29.276, height:29.48 }}>
+            <img alt="" src={imgExChar3} onError={e=>e.target.style.display='none'}
+              style={{ position:'absolute', inset:0, display:'block', width:'100%', height:'100%' }} />
+            {/* Left X-eye: at left:10.1, top:10.1, 3.033×2.71 */}
+            <div style={{ position:'absolute', left:10.1, top:10.1, width:3.033, height:2.71 }}>
+              <div style={{ position:'absolute', top:'-29.85%', right:'-26.67%', bottom:'-29.85%', left:'-26.67%' }}>
+                <img alt="" src={imgExEye1} onError={e=>e.target.style.display='none'} style={{ display:'block', width:'100%', height:'100%' }} />
+              </div>
+            </div>
+            <div style={{ position:'absolute', left:10.1, top:10.1, width:3.033, height:2.71, display:'flex', alignItems:'center', justifyContent:'center' }}>
+              <div style={{ transform:'scaleY(-1) rotate(180deg)', flexShrink:0, width:'100%', height:'100%' }}>
+                <div style={{ position:'relative', width:'100%', height:'100%' }}>
+                  <div style={{ position:'absolute', top:'-29.85%', right:'-26.67%', bottom:'-29.85%', left:'-26.67%' }}>
+                    <img alt="" src={imgExEye2} onError={e=>e.target.style.display='none'} style={{ display:'block', width:'100%', height:'100%' }} />
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* Right X-eye: at left:16.25, top:10.1 */}
+            <div style={{ position:'absolute', left:16.25, top:10.1, width:3.033, height:2.71 }}>
+              <div style={{ position:'absolute', top:'-29.85%', right:'-26.67%', bottom:'-29.85%', left:'-26.67%' }}>
+                <img alt="" src={imgExEye1} onError={e=>e.target.style.display='none'} style={{ display:'block', width:'100%', height:'100%' }} />
+              </div>
+            </div>
+            <div style={{ position:'absolute', left:16.25, top:10.1, width:3.033, height:2.71, display:'flex', alignItems:'center', justifyContent:'center' }}>
+              <div style={{ transform:'scaleY(-1) rotate(180deg)', flexShrink:0, width:'100%', height:'100%' }}>
+                <div style={{ position:'relative', width:'100%', height:'100%' }}>
+                  <div style={{ position:'absolute', top:'-29.85%', right:'-26.67%', bottom:'-29.85%', left:'-26.67%' }}>
+                    <img alt="" src={imgExEye2} onError={e=>e.target.style.display='none'} style={{ display:'block', width:'100%', height:'100%' }} />
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* Mouth: left:10.61, top:14.69, 4.08×1.231 */}
+            <div style={{ position:'absolute', left:10.61, top:14.69, width:4.08, height:1.231 }}>
+              <div style={{ position:'absolute', top:'-52.64%', right:'-15.87%', bottom:'-52.64%', left:'-15.88%' }}>
+                <img alt="" src={imgExMth1} onError={e=>e.target.style.display='none'} style={{ display:'block', width:'100%', height:'100%' }} />
+              </div>
+            </div>
+            <div style={{ position:'absolute', left:14.69, top:14.69, width:4.08, height:1.231, display:'flex', alignItems:'center', justifyContent:'center' }}>
+              <div style={{ transform:'scaleY(-1) rotate(180deg)', flexShrink:0, width:'100%', height:'100%' }}>
+                <div style={{ position:'relative', width:'100%', height:'100%' }}>
+                  <div style={{ position:'absolute', top:'-52.64%', right:'-15.87%', bottom:'-52.64%', left:'-15.88%' }}>
+                    <img alt="" src={imgExMth2} onError={e=>e.target.style.display='none'} style={{ display:'block', width:'100%', height:'100%' }} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Main char (composed with X-eyes): left:-1.84, top:7, 28×28 */}
+          <div style={{ position:'absolute', left:-1.84, top:7, width:28, height:28 }}>
+            <img alt="" src={imgExMain} onError={e=>e.target.style.display='none'}
+              style={{ position:'absolute', inset:0, objectFit:'contain', display:'block', width:'100%', height:'100%' }} />
+          </div>
+
+          {/* Secondary face: left:14, top:5.5, 27×27 */}
+          <div style={{ position:'absolute', left:14, top:5.5, width:27, height:27 }}>
+            <img alt="" src={imgExFace2} onError={e=>e.target.style.display='none'}
+              style={{ position:'absolute', inset:0, display:'block', width:'100%', height:'100%' }} />
+          </div>
+          {/* Small accent: left:31.97, top:9.45, 7.056×8.655 */}
+          <div style={{ position:'absolute', left:31.97, top:9.45, width:7.056, height:8.655 }}>
+            <img alt="" src={imgExAccent} onError={e=>e.target.style.display='none'}
+              style={{ display:'block', width:'100%', height:'100%' }} />
+          </div>
+
+          {/* Frosted badge */}
+          <div style={{ position:'absolute', left:0.16, top:21, width:42, height:16, backdropFilter:'blur(2px)', WebkitBackdropFilter:'blur(2px)', background:'rgba(255,255,255,0.4)', border:'1px solid rgba(0,0,0,0.05)', borderRadius:5 }} />
+          <p style={{ position:'absolute', left:21, top:25.5, transform:'translateX(-50%)', fontFamily:'Sofia Sans,sans-serif', fontWeight:500, fontSize:8, color:'black', textAlign:'center', letterSpacing:'0.3px', textTransform:'uppercase', whiteSpace:'nowrap', lineHeight:'normal', margin:0 }}>Tired</p>
+        </div>
+      );
+    }
+
+    /* ── BORING STICKER ZONE (Figma 208:2784) ── */
+    /* Coords normalized: subtract 15.5 from Figma y-values */
+    function BoringStickerZone() {
+      return (
+        <div style={{ position:'relative', width:42, height:37, flexShrink:0 }}>
+          {/* Rectangle82 backing */}
+          <div style={{ position:'absolute', left:0.44, top:0, width:42, height:37 }}>
+            <img alt="" src={imgBorR82} onError={e=>e.target.style.display='none'}
+              style={{ position:'absolute', top:0, right:'-9.52%', bottom:'-21.62%', left:'-9.52%', display:'block', width:'119.04%', height:'121.62%' }} />
+          </div>
+
+          {/* Third char (4-slice blob body + face): left:7.14, top:5, 28.357×28.258 */}
+          <div style={{ position:'absolute', left:7.14, top:5, width:28.357, height:28.258 }}>
+            {/* 4-slice body: V1 at 0-25% & 50-75%, V2 at 25-50% & 75-100% */}
+            <img alt="" src={imgBorCh3V1} onError={e=>e.target.style.display='none'}
+              style={{ position:'absolute', top:0, left:0, right:'75%', bottom:0, display:'block', width:'25%', height:'100%', maxWidth:'none' }} />
+            <img alt="" src={imgBorCh3V2} onError={e=>e.target.style.display='none'}
+              style={{ position:'absolute', top:0, left:'25%', right:'50%', bottom:0, display:'block', width:'25%', height:'100%', maxWidth:'none' }} />
+            <img alt="" src={imgBorCh3V1} onError={e=>e.target.style.display='none'}
+              style={{ position:'absolute', top:0, left:'50%', right:'25%', bottom:0, display:'block', width:'25%', height:'100%', maxWidth:'none' }} />
+            <img alt="" src={imgBorCh3V2} onError={e=>e.target.style.display='none'}
+              style={{ position:'absolute', top:0, left:'75%', right:0, bottom:0, display:'block', width:'25%', height:'100%', maxWidth:'none' }} />
+            {/* Face overlay: inset[41.96%_37.52%_44.76%_40.07%] */}
+            <div style={{ position:'absolute', top:'41.96%', right:'37.52%', bottom:'44.76%', left:'40.07%' }}>
+              {/* Left eye: rotate(-16.3deg) */}
+              <div style={{ position:'absolute', top:0, right:'54.25%', bottom:'56.37%', left:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <div style={{ transform:'rotate(-16.3deg)', flexShrink:0, width:'100%', height:'100%', position:'relative' }}>
+                  <div style={{ position:'absolute', inset:0, left:'-44.12%' }}>
+                    <img alt="" src={imgBorEye1} onError={e=>e.target.style.display='none'} style={{ display:'block', width:'100%', height:'100%' }} />
+                  </div>
+                </div>
+              </div>
+              {/* Right eye: scaleX(-1) rotate(16.3deg) */}
+              <div style={{ position:'absolute', top:0, right:0, bottom:'56.37%', left:'56.79%', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <div style={{ transform:'scaleX(-1) rotate(16.3deg)', flexShrink:0, width:'100%', height:'100%', position:'relative' }}>
+                  <div style={{ position:'absolute', inset:0, left:'-44.12%' }}>
+                    <img alt="" src={imgBorEye2} onError={e=>e.target.style.display='none'} style={{ display:'block', width:'100%', height:'100%' }} />
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* Nose line: inset[50.35%_44.6%_48.25%_42.86%] */}
+            <div style={{ position:'absolute', top:'50.35%', right:'44.6%', bottom:'48.25%', left:'42.86%' }}>
+              <div style={{ position:'absolute', top:'-187.5%', right:'-20.84%', bottom:'-187.55%', left:'-20.84%' }}>
+                <img alt="" src={imgBorLine1} onError={e=>e.target.style.display='none'} style={{ display:'block', width:'100%', height:'100%' }} />
+              </div>
+            </div>
+            {/* Mouth: inset[48.6%_40.42%_44.76%_57.84%] */}
+            <div style={{ position:'absolute', top:'48.6%', right:'40.42%', bottom:'44.76%', left:'57.84%' }}>
+              <div style={{ position:'absolute', top:'-39.48%', right:'-150.04%', bottom:'-39.48%', left:'-150%' }}>
+                <img alt="" src={imgBorMth} onError={e=>e.target.style.display='none'} style={{ display:'block', width:'100%', height:'100%' }} />
+              </div>
+            </div>
+          </div>
+
+          {/* Second char: rotate(6.8deg), left:13.44, top:3, 27.611×27.762 */}
+          <div style={{ position:'absolute', left:13.44, top:3, width:27.611, height:27.762, display:'flex', alignItems:'center', justifyContent:'center' }}>
+            <div style={{ transform:'rotate(6.8deg)', flexShrink:0 }}>
+              <div style={{ position:'relative', width:24.827, height:25 }}>
+                <img alt="" src={imgBorCh2} onError={e=>e.target.style.display='none'}
+                  style={{ position:'absolute', inset:0, display:'block', width:'100%', height:'100%' }} />
+                {/* Left eye: at left:8.56, top:8.56, 2.572×2.298 */}
+                <div style={{ position:'absolute', left:8.56, top:8.56, width:2.572, height:2.298 }}>
+                  <div style={{ position:'absolute', top:'-29.85%', right:'-26.67%', bottom:'-29.85%', left:'-26.67%' }}>
+                    <img alt="" src={imgBorCh2V27} onError={e=>e.target.style.display='none'} style={{ display:'block', width:'100%', height:'100%' }} />
+                  </div>
+                </div>
+                <div style={{ position:'absolute', left:8.56, top:8.56, width:2.572, height:2.298, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                  <div style={{ transform:'scaleY(-1) rotate(180deg)', width:'100%', height:'100%', position:'relative' }}>
+                    <div style={{ position:'absolute', top:'-29.85%', right:'-26.67%', bottom:'-29.85%', left:'-26.67%' }}>
+                      <img alt="" src={imgBorCh2V28} onError={e=>e.target.style.display='none'} style={{ display:'block', width:'100%', height:'100%' }} />
+                    </div>
+                  </div>
+                </div>
+                {/* Right eye: at left:13.78, top:8.56 */}
+                <div style={{ position:'absolute', left:13.78, top:8.56, width:2.572, height:2.298 }}>
+                  <div style={{ position:'absolute', top:'-29.85%', right:'-26.67%', bottom:'-29.85%', left:'-26.67%' }}>
+                    <img alt="" src={imgBorCh2V27} onError={e=>e.target.style.display='none'} style={{ display:'block', width:'100%', height:'100%' }} />
+                  </div>
+                </div>
+                <div style={{ position:'absolute', left:13.78, top:8.56, width:2.572, height:2.298, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                  <div style={{ transform:'scaleY(-1) rotate(180deg)', width:'100%', height:'100%', position:'relative' }}>
+                    <div style={{ position:'absolute', top:'-29.85%', right:'-26.67%', bottom:'-29.85%', left:'-26.67%' }}>
+                      <img alt="" src={imgBorCh2V28} onError={e=>e.target.style.display='none'} style={{ display:'block', width:'100%', height:'100%' }} />
+                    </div>
+                  </div>
+                </div>
+                {/* Mouth: at left:9, top:12.46 */}
+                <div style={{ position:'absolute', left:9, top:12.46, width:3.46, height:1.044 }}>
+                  <div style={{ position:'absolute', top:'-52.64%', right:'-15.87%', bottom:'-52.64%', left:'-15.88%' }}>
+                    <img alt="" src={imgBorCh2V29} onError={e=>e.target.style.display='none'} style={{ display:'block', width:'100%', height:'100%' }} />
+                  </div>
+                </div>
+                <div style={{ position:'absolute', left:12.46, top:12.46, width:3.46, height:1.044, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                  <div style={{ transform:'scaleY(-1) rotate(180deg)', width:'100%', height:'100%', position:'relative' }}>
+                    <div style={{ position:'absolute', top:'-52.64%', right:'-15.87%', bottom:'-52.64%', left:'-15.88%' }}>
+                      <img alt="" src={imgBorCh2V30} onError={e=>e.target.style.display='none'} style={{ display:'block', width:'100%', height:'100%' }} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Main char: left:-1.56, top:7, 28×28 */}
+          <div style={{ position:'absolute', left:-1.56, top:7, width:28, height:28 }}>
+            <img alt="" src={imgBorMain} onError={e=>e.target.style.display='none'}
+              style={{ position:'absolute', inset:0, objectFit:'contain', display:'block', width:'100%', height:'100%' }} />
+          </div>
+
+          {/* Frosted badge */}
+          <div style={{ position:'absolute', left:0.44, top:21, width:42, height:16, backdropFilter:'blur(2px)', WebkitBackdropFilter:'blur(2px)', background:'rgba(255,255,255,0.4)', border:'1px solid rgba(0,0,0,0.05)', borderRadius:5 }} />
+          <p style={{ position:'absolute', left:21.94, top:25.5, transform:'translateX(-50%)', fontFamily:'Sofia Sans,sans-serif', fontWeight:500, fontSize:8, color:'black', textAlign:'center', letterSpacing:'0.3px', textTransform:'uppercase', whiteSpace:'nowrap', lineHeight:'normal', margin:0 }}>Boring</p>
+        </div>
+      );
+    }
+
     /* ── CALENDAR STICKER ZONE — mini sticker folder for calendar cells ── */
-    /* Scales the DayCard sticker-folder design (GoodStickerZone / SadStickerZone)
-       down to fit inside the narrow calendar day cell (~40px wide). */
+    /* Scales the Figma sticker-folder designs down to fit inside the narrow calendar cell. */
     function CalStickerZone({ mood }) {
       const m = (mood || '').toLowerCase();
       const sc = 0.72; // scale factor: 44→32px, 37→27px
 
-      if (m === 'good') {
+      const zones = {
+        good:      { comp: <GoodStickerZone />,      w:32, h:27 },
+        sad:       { comp: <SadStickerZone />,       w:30, h:27 },
+        exhausted: { comp: <ExhaustedStickerZone />, w:30, h:27 },
+        boring:    { comp: <BoringStickerZone />,    w:30, h:27 },
+      };
+      const zone = zones[m];
+      if (zone) {
         return (
-          <div style={{ width:32, height:27, position:'relative', overflow:'hidden', flexShrink:0 }}>
+          <div style={{ width:zone.w, height:zone.h, position:'relative', overflow:'hidden', flexShrink:0 }}>
             <div style={{ position:'absolute', top:0, left:0, transform:`scale(${sc})`, transformOrigin:'top left' }}>
-              <GoodStickerZone />
-            </div>
-          </div>
-        );
-      }
-      if (m === 'sad') {
-        return (
-          <div style={{ width:30, height:27, position:'relative', overflow:'hidden', flexShrink:0 }}>
-            <div style={{ position:'absolute', top:0, left:0, transform:`scale(${sc})`, transformOrigin:'top left' }}>
-              <SadStickerZone />
+              {zone.comp}
             </div>
           </div>
         );
       }
 
-      /* Generic folder sticker for Happy / Boring / Anxious / Exhausted / etc. */
+      /* Generic folder sticker for Happy / Anxious / Grateful / Angry / etc. */
       const badgeText = {
-        happy:'HAPPY', grateful:'GRTFL', angry:'ANGRY',
-        boring:'MELO', anxious:'ANXS', exhausted:'TIRED'
-      }[m] || (mood||'').slice(0,4).toUpperCase();
+        happy:'HAPPY', grateful:'GRTFL', angry:'ANGRY', anxious:'ANXS'
+      }[m] || (mood||'').slice(0,5).toUpperCase();
       const charSrc = moodCharSrc(mood);
       return (
         <div style={{ position:'relative', width:32, height:27, flexShrink:0 }}>
-          {/* Folder background */}
           <img alt="" src={imgW82} onError={e=>e.target.style.display='none'}
             style={{ position:'absolute', top:0, left:'-9.52%', width:'119.04%', height:'121.62%', display:'block' }} />
-          {/* Character */}
           <div style={{ position:'absolute', left:7, top:2, width:18, height:18, zIndex:1 }}>
             <img alt="" src={charSrc} onError={e=>e.target.style.display='none'}
               style={{ width:'100%', height:'100%', objectFit:'contain' }} />
           </div>
-          {/* Frosted badge */}
           <div style={{ position:'absolute', left:0, top:15, width:32, height:12, backdropFilter:'blur(2px)', WebkitBackdropFilter:'blur(2px)', background:'rgba(255,255,255,0.4)', border:'1px solid rgba(0,0,0,0.05)', borderRadius:4 }} />
           <p style={{ position:'absolute', left:0, top:17, width:32, textAlign:'center', fontFamily:'Sofia Sans,sans-serif', fontWeight:500, fontSize:6, color:'black', letterSpacing:'0.3px', textTransform:'uppercase', whiteSpace:'nowrap', lineHeight:'normal', margin:0 }}>{badgeText}</p>
         </div>

@@ -9,6 +9,7 @@
   <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { width: 100%; height: 100%; }
@@ -183,12 +184,35 @@
     const imgGoodFaceBody = 'https://www.figma.com/api/mcp/asset/0f3404e8-9733-4b3d-a806-4682944d73da';
     const imgGoodFaceSmile= 'https://www.figma.com/api/mcp/asset/9790efa6-7ab6-4eb1-a43c-3deea5491787';
     /* Day-card faces (node 70-91) – fresh URLs */
+    const imgRectangle82    = 'https://www.figma.com/api/mcp/asset/c83e53f9-a197-493d-b547-2911979b0f93'; /* sticker backing – fresh 24-685 */
     const imgDayGoodBlob    = 'https://www.figma.com/api/mcp/asset/89163802-f512-4042-ac30-08797cd46f13';
     const imgDayGoodSmile   = 'https://www.figma.com/api/mcp/asset/04c8dadb-d70f-43ed-b0a6-72f4a6849dd5';
     const imgDaySadFace     = 'https://www.figma.com/api/mcp/asset/7db808b7-1749-4d36-84b3-d81084ef6047';
     const imgDayAnxiousFace = 'https://www.figma.com/api/mcp/asset/397a5454-4058-4a8d-9965-2779926979dd';
+    /* Week strip exact assets — node 191-2586 fresh URLs */
+    const imgW82     = 'https://www.figma.com/api/mcp/asset/c591003e-d863-4f36-8514-99f0e51f581d'; /* Rectangle82 sticker backing */
+    const imgWV      = 'https://www.figma.com/api/mcp/asset/93604d04-d46e-4e0f-9fbe-5bc332e642c4'; /* MON main green blob body */
+    const imgWV24    = 'https://www.figma.com/api/mcp/asset/ffa31330-da64-4567-82f6-ec2ce23c093a'; /* MON left eye */
+    const imgWV25    = 'https://www.figma.com/api/mcp/asset/2ca8975a-ce81-4c03-8709-f0fde433351d'; /* MON right eye */
+    const imgWV34    = 'https://www.figma.com/api/mcp/asset/3de743f2-16f7-40a5-ae95-4a7520abf9c8'; /* MON smile */
+    const imgWV1     = 'https://www.figma.com/api/mcp/asset/22edc19d-81a8-4a74-a69a-6fa874e927e4'; /* MON secondary/third face body */
+    const imgWG6     = 'https://www.figma.com/api/mcp/asset/c34f808f-d0e7-4f84-9c09-fc3656707980'; /* MON secondary/third face eyes */
+    /* TUE sad faces (from 24-685) */
+    const imgWSadM   = 'https://www.figma.com/api/mcp/asset/5c8ada6d-441d-41a9-8798-3987a0a8655a'; /* TUE main sad face */
+    const imgWSadS   = 'https://www.figma.com/api/mcp/asset/6f5cc69b-7beb-45a0-b703-d3a8ed9b5345'; /* TUE secondary sad face */
+    const imgWSadT   = 'https://www.figma.com/api/mcp/asset/0d36dfb9-8dd0-466e-bd36-3c95ba369f6e'; /* TUE third sad face */
     const imgGroup8       = 'https://www.figma.com/api/mcp/asset/d086ffca-9f89-49d6-bb10-628b8e9fbcf1';
     const imgGroup15      = 'https://www.figma.com/api/mcp/asset/9b1313d9-1b85-49df-9777-f4fdd8a67628';
+    /* Today card icons row — node 191-2465 fresh */
+    const imgTdV    = 'https://www.figma.com/api/mcp/asset/6f0ec23f-8761-4580-bd38-21931c858384'; /* good blob body */
+    const imgTdG6   = 'https://www.figma.com/api/mcp/asset/e756d9f0-cf88-47be-8a6d-6dc0cfbdfd14'; /* good eyes A */
+    const imgTdG14  = 'https://www.figma.com/api/mcp/asset/e33e5393-a16a-4ca2-9247-caba7c5e0ace'; /* sad face body */
+    const imgTdG12  = 'https://www.figma.com/api/mcp/asset/0910d449-8fb7-40ef-99d6-0923ce3e2648'; /* sad accessory */
+    const imgTdG7   = 'https://www.figma.com/api/mcp/asset/bb0448a1-0241-4bed-aa7f-2027cf55bc0d'; /* good eyes B */
+    const imgTdV1   = 'https://www.figma.com/api/mcp/asset/8301ed50-6052-47d6-aad4-ecbe5022a22c'; /* good blob+face body */
+    const imgTdV24  = 'https://www.figma.com/api/mcp/asset/6e53d92f-eb5f-4ff2-8a6e-51447c59110b'; /* left eye */
+    const imgTdV25  = 'https://www.figma.com/api/mcp/asset/1fcdccd6-15b4-4eee-a2fa-ce74e922a799'; /* right eye */
+    const imgTdV34  = 'https://www.figma.com/api/mcp/asset/519c5187-5daa-4997-8d78-734b44a7efaf'; /* smile */
     const imgVector3      = 'https://www.figma.com/api/mcp/asset/951b8a11-03af-4db7-b0e2-77d99c3e0a9a';
     const imgHandCoin     = 'https://www.figma.com/api/mcp/asset/9a14edad-7210-4c45-aafa-8874e40ec466';
     const imgShield       = 'https://www.figma.com/api/mcp/asset/4f53258e-9bed-4a60-a303-aa79f3e8250c';
@@ -410,23 +434,347 @@
       );
     }
 
-    /* ── WEEK DAY CARD ── */
-    function DayCard({ label, faceContent, moodLabel, onClick }) {
-      return (
-        <div onClick={onClick}
-          style={{ background:'rgba(255,255,255,0.88)', border:'1px solid rgba(20,20,19,0.08)', height:92, position:'relative', borderRadius:20, boxShadow:'0 4px 24px rgba(0,0,0,0.04)', flexShrink:0, width:64, cursor: onClick ? 'pointer' : 'default' }}>
-          <div style={{ display:'flex', flexDirection:'column', gap:4, alignItems:'center', justifyContent:'flex-end', paddingBottom:11, paddingTop:1, paddingLeft:1, paddingRight:1, width:'100%', height:'100%' }}>
-            <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:600, lineHeight:'normal', flexShrink:0, fontSize:15, color:'black', letterSpacing:'-0.3px', whiteSpace:'nowrap', textAlign:'center' }}>{label}</p>
-            <div style={{ position:'relative', flexShrink:0 }}>
-              <div style={{ display:'flex', flexDirection:'column', gap:4, alignItems:'center', width:'100%', height:'100%' }}>
-                <div style={{ height:22, flexShrink:0, width:26, position:'relative' }}>
-                  {faceContent}
-                </div>
-                <div style={{ display:'flex', height:9, alignItems:'center', justifyContent:'center', flexShrink:0, minWidth:15 }}>
-                  <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:500, lineHeight:'normal', flexShrink:0, color:'#696969', fontSize:8, textAlign:'center', letterSpacing:'0.3px', textTransform:'uppercase', whiteSpace:'nowrap' }}>{moodLabel}</p>
+    /* ── WEEK DAY CARD — pixel-perfect from Figma 191-2586 ── */
+    function DayCard({ label, mood, onClick }) {
+      const isGood = mood === 'good';
+      const isSad  = mood === 'sad';
+
+      /* Sticker zone for MON (good) — exact structure from node 191:2586 */
+      function GoodStickerZone() {
+        return (
+          <div style={{ position:'relative', width:44, height:37, flexShrink:0 }}>
+            {/* Rectangle82 backing: left:2, top:0, w:42, h:37 — image bleeds via negative inset */}
+            <div style={{ position:'absolute', left:2, top:0, width:42, height:37 }}>
+              <img alt="" src={imgW82} onError={e=>e.target.style.display='none'}
+                style={{ position:'absolute', top:0, right:'-9.52%', bottom:'-21.62%', left:'-9.52%', display:'block', width:'119.04%', height:'121.62%' }} />
+            </div>
+
+            {/* Main green blob: left:0 top:7, size:28.851, rotate(-13.21deg) */}
+            <div style={{ position:'absolute', left:0, top:7, width:28.851, height:28.851, display:'flex', alignItems:'center', justifyContent:'center' }}>
+              <div style={{ transform:'rotate(-13.21deg)', flexShrink:0 }}>
+                <div style={{ position:'relative', width:24, height:24, flexShrink:0 }}>
+                  {/* Base blob body */}
+                  <img alt="" src={imgWV} onError={e=>e.target.style.display='none'}
+                    style={{ position:'absolute', inset:0, display:'block', width:'100%', height:'100%' }} />
+                  {/* Left eye: inset[35.54%_56.79%_55.75%_36.24%] */}
+                  <div style={{ position:'absolute', top:'35.54%', right:'56.79%', bottom:'55.75%', left:'36.24%' }}>
+                    <div style={{ position:'absolute', top:'-30%', right:'-28.63%', bottom:'-30%', left:'-37.51%' }}>
+                      <img alt="" src={imgWV24} onError={e=>e.target.style.display='none'}
+                        style={{ display:'block', width:'100%', height:'100%' }} />
+                    </div>
+                  </div>
+                  {/* Right eye (mirrored): inset[35.54%_36.24%_55.75%_56.79%] */}
+                  <div style={{ position:'absolute', top:'35.54%', right:'36.24%', bottom:'55.75%', left:'56.79%', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                    <div style={{ transform:'scaleX(-1)', flexShrink:0, width:'100%', height:'100%' }}>
+                      <div style={{ position:'relative', width:'100%', height:'100%' }}>
+                        <div style={{ position:'absolute', top:'-30%', right:'-28.63%', bottom:'-30%', left:'-37.51%' }}>
+                          <img alt="" src={imgWV25} onError={e=>e.target.style.display='none'}
+                            style={{ display:'block', width:'100%', height:'100%' }} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Smile: inset[46.34%_43.9%_45.47%_44.25%] */}
+                  <div style={{ position:'absolute', top:'46.34%', right:'43.9%', bottom:'45.47%', left:'44.25%' }}>
+                    <div style={{ position:'absolute', top:'-25.53%', right:'-13.01%', bottom:'-25.53%', left:'-13.01%' }}>
+                      <img alt="" src={imgWV34} onError={e=>e.target.style.display='none'}
+                        style={{ display:'block', width:'100%', height:'100%' }} />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
+
+            {/* Secondary face: left:15 top:3, w:28.81 h:25.406, rotate(8deg) */}
+            <div style={{ position:'absolute', left:15, top:3, width:28.81, height:25.406, display:'flex', alignItems:'center', justifyContent:'center' }}>
+              <div style={{ transform:'rotate(8deg)', flexShrink:0 }}>
+                <div style={{ position:'relative', width:26, height:22, flexShrink:0 }}>
+                  <div style={{ position:'absolute', left:4.8, top:5.38, width:26, height:22 }}>
+                    {/* Body: inset[-9.09%_9.39%_-3.74%_-6.55%] */}
+                    <div style={{ position:'absolute', top:'-9.09%', right:'9.39%', bottom:'-3.74%', left:'-6.55%' }}>
+                      <img alt="" src={imgWV1} onError={e=>e.target.style.display='none'}
+                        style={{ position:'absolute', inset:0, display:'block', width:'100%', height:'100%' }} />
+                    </div>
+                    {/* Eyes: inset[33.92%_42.23%_46.88%_26.63%] */}
+                    <div style={{ position:'absolute', top:'33.92%', right:'42.23%', bottom:'46.88%', left:'26.63%' }}>
+                      <div style={{ position:'absolute', top:0, right:0, bottom:'-11.63%', left:0 }}>
+                        <img alt="" src={imgWG6} onError={e=>e.target.style.display='none'}
+                          style={{ display:'block', width:'100%', height:'100%' }} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Third face: left:8.7 top:5, w:26 h:22 */}
+            <div style={{ position:'absolute', left:8.7, top:5, width:26, height:22 }}>
+              {/* Body: inset[-4.55%_-2.15%_-8.28%_4.99%] */}
+              <div style={{ position:'absolute', top:'-4.55%', right:'-2.15%', bottom:'-8.28%', left:'4.99%' }}>
+                <img alt="" src={imgWV1} onError={e=>e.target.style.display='none'}
+                  style={{ position:'absolute', inset:0, display:'block', width:'100%', height:'100%' }} />
+              </div>
+              {/* Eyes: inset[38.47%_30.69%_42.33%_38.17%] */}
+              <div style={{ position:'absolute', top:'38.47%', right:'30.69%', bottom:'42.33%', left:'38.17%' }}>
+                <div style={{ position:'absolute', top:0, right:0, bottom:'-11.63%', left:0 }}>
+                  <img alt="" src={imgWG6} onError={e=>e.target.style.display='none'}
+                    style={{ display:'block', width:'100%', height:'100%' }} />
+                </div>
+              </div>
+            </div>
+
+            {/* Frosted badge: left:2 top:21 w:42 h:16 */}
+            <div style={{ position:'absolute', left:2, top:21, width:42, height:16, backdropFilter:'blur(2px)', WebkitBackdropFilter:'blur(2px)', background:'rgba(255,255,255,0.4)', border:'1px solid rgba(0,0,0,0.05)', borderRadius:5 }} />
+            {/* "Good" text: left:23 top:24, centered via translateX(-50%) */}
+            <p style={{ position:'absolute', left:23, top:24, transform:'translateX(-50%)', fontFamily:'Sofia Sans,sans-serif', fontWeight:500, fontSize:8, color:'black', textAlign:'center', letterSpacing:'0.3px', textTransform:'uppercase', whiteSpace:'nowrap', lineHeight:'normal', margin:0 }}>Good</p>
+          </div>
+        );
+      }
+
+      /* Sticker zone for TUE (sad) */
+      function SadStickerZone() {
+        return (
+          <div style={{ position:'relative', width:42, height:37, flexShrink:0 }}>
+            {/* Rectangle82: left:0 top:0 */}
+            <div style={{ position:'absolute', left:0, top:0, width:42, height:37 }}>
+              <img alt="" src={imgW82} onError={e=>e.target.style.display='none'}
+                style={{ position:'absolute', top:0, right:'-9.52%', bottom:'-21.62%', left:'-9.52%', display:'block', width:'119.04%', height:'121.62%' }} />
+            </div>
+            {/* Main sad face: left:0.03 top:7, size:28.294×24.765, rotate(-6.41deg) */}
+            <div style={{ position:'absolute', left:0.03, top:7, width:28.294, height:24.765, display:'flex', alignItems:'center', justifyContent:'center' }}>
+              <div style={{ transform:'rotate(-6.41deg)', flexShrink:0 }}>
+                <div style={{ position:'relative', width:26, height:22, flexShrink:0 }}>
+                  <img alt="" src={imgWSadM} onError={e=>e.target.style.display='none'}
+                    style={{ position:'absolute', display:'block', left:0.2, top:-1, width:25.26, height:25.26 }} />
+                </div>
+              </div>
+            </div>
+            {/* Secondary sad face: left:13 top:3, w:28.81 h:25.406, rotate(8deg+3.74deg) */}
+            <div style={{ position:'absolute', left:13, top:3, width:28.81, height:25.406, display:'flex', alignItems:'center', justifyContent:'center' }}>
+              <div style={{ transform:'rotate(8deg)', flexShrink:0 }}>
+                <div style={{ position:'relative', width:26, height:22, flexShrink:0 }}>
+                  <div style={{ position:'absolute', left:0.98, top:2.69, width:27.38, height:23.649, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                    <div style={{ transform:'rotate(3.74deg)', flexShrink:0 }}>
+                      <div style={{ position:'relative', width:26, height:22 }}>
+                        <img alt="" src={imgWSadS} onError={e=>e.target.style.display='none'}
+                          style={{ position:'absolute', display:'block', left:0, top:0, width:24.398, height:24.398 }} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* Third sad face: left:6.7 top:5, w:26 h:22 */}
+            <div style={{ position:'absolute', left:6.7, top:5, width:26, height:22 }}>
+              <img alt="" src={imgWSadT} onError={e=>e.target.style.display='none'}
+                style={{ position:'absolute', display:'block', left:0, top:0, width:24.398, height:24.398 }} />
+            </div>
+            {/* Badge: left:0 top:21 */}
+            <div style={{ position:'absolute', left:0, top:21, width:42, height:16, backdropFilter:'blur(2px)', WebkitBackdropFilter:'blur(2px)', background:'rgba(255,255,255,0.4)', border:'1px solid rgba(0,0,0,0.05)', borderRadius:5 }} />
+            <p style={{ position:'absolute', left:14, top:24, fontFamily:'Sofia Sans,sans-serif', fontWeight:500, fontSize:8, color:'black', letterSpacing:'0.3px', textTransform:'uppercase', whiteSpace:'nowrap', lineHeight:'normal', margin:0 }}>SAD</p>
+          </div>
+        );
+      }
+
+      /* Sticker zone for empty (TODAY/WED/THUR) */
+      function EmptyStickerZone() {
+        return (
+          <div style={{ position:'relative', width:42, height:37, flexShrink:0 }}>
+            <div style={{ position:'absolute', left:0, top:0, width:42, height:37 }}>
+              <img alt="" src={imgW82} onError={e=>e.target.style.display='none'}
+                style={{ position:'absolute', top:0, right:'-9.52%', bottom:'-21.62%', left:'-9.52%', display:'block', width:'119.04%', height:'121.62%' }} />
+            </div>
+            <div style={{ position:'absolute', left:0, top:21, width:42, height:16, backdropFilter:'blur(2px)', WebkitBackdropFilter:'blur(2px)', background:'rgba(255,255,255,0.4)', border:'1px solid rgba(0,0,0,0.05)', borderRadius:5 }} />
+            <p style={{ position:'absolute', left:19, top:24, fontFamily:'Sofia Sans,sans-serif', fontWeight:500, fontSize:8, color:'black', letterSpacing:'0.3px', textTransform:'uppercase', whiteSpace:'nowrap', lineHeight:'normal', margin:0 }}>?</p>
+          </div>
+        );
+      }
+
+      return (
+        <div onClick={onClick} style={{
+          background:'rgba(255,255,255,0.88)', border:'1px solid rgba(20,20,19,0.08)',
+          boxShadow:'0px 4px 12px rgba(0,0,0,0.04)',
+          height:92, borderRadius:20, flexShrink:0, width:64,
+          cursor: onClick ? 'pointer' : 'default', position:'relative'
+        }}>
+          <div style={{ display:'flex', flexDirection:'column', gap:4, alignItems:'center', justifyContent:'flex-end', paddingBottom:11, paddingTop:1, paddingLeft:1, paddingRight:1, width:'100%', height:'100%', boxSizing:'border-box', backgroundClip:'padding-box' }}>
+            <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:600, lineHeight:'normal', flexShrink:0, fontSize:15, color:'black', letterSpacing:'-0.3px', textAlign:'center', whiteSpace:'nowrap', margin:0 }}>{label}</p>
+            {isGood ? <GoodStickerZone /> : isSad ? <SadStickerZone /> : <EmptyStickerZone />}
+          </div>
+        </div>
+      );
+    }
+
+    /* ── TODAY PHYSICS CARD ── */
+    function TodayPhysicsCard({ dateStr }) {
+      const containerRef = useRef(null);
+
+      /* Radius per icon (determines physics circle size) */
+      const RADII = [19, 18, 19, 18, 18];
+      const W = 346, H = 94;
+
+      /* Full Figma face structure for each icon, scaled to r*2 container */
+      function IconFace({ idx }) {
+        const hide = e => e.target.style.display = 'none';
+        if (idx === 0 || idx === 2) {
+          /* good blob (imgTdV) + eyes overlay (imgTdG6 / imgTdG7) */
+          const eyeSrc = idx === 0 ? imgTdG6 : imgTdG7;
+          return <>
+            <img alt="" src={imgTdV} onError={hide}
+              style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'contain', display:'block' }} />
+            {/* Eyes: ml:13.38 mt:14.68 w:12.56 h:6.55 within 39.17×38.49 → % */}
+            <div style={{ position:'absolute', left:'34.17%', top:'38.15%', width:'32.07%', height:'17.03%' }}>
+              <div style={{ position:'absolute', top:0, right:0, bottom:'-15.62%', left:0 }}>
+                <img alt="" src={eyeSrc} onError={hide} style={{ display:'block', width:'100%', height:'100%' }} />
+              </div>
+            </div>
+          </>;
+        }
+        if (idx === 1) {
+          /* sad face (imgTdG14) + tear accessory (imgTdG12) */
+          return <>
+            <img alt="" src={imgTdG14} onError={hide}
+              style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'contain', display:'block' }} />
+            {/* Accessory: ml:24.96 mt:5.49 w:9.8 h:12.02 within 37.5×37.5 → % */}
+            <div style={{ position:'absolute', left:'66.56%', top:'14.64%', width:'26.13%', height:'32.06%' }}>
+              <img alt="" src={imgTdG12} onError={hide}
+                style={{ position:'absolute', inset:0, display:'block', width:'100%', height:'100%' }} />
+            </div>
+          </>;
+        }
+        /* idx 3 & 4: star blob (imgTdV1) + left eye + right eye (mirrored) + smile */
+        return <>
+          <img alt="" src={imgTdV1} onError={hide}
+            style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'contain', display:'block' }} />
+          {/* Left eye */}
+          <div style={{ position:'absolute', top:'35.54%', right:'56.79%', bottom:'55.75%', left:'36.24%' }}>
+            <div style={{ position:'absolute', top:'-30%', right:'-28.63%', bottom:'-30%', left:'-37.51%' }}>
+              <img alt="" src={imgTdV24} onError={hide} style={{ display:'block', width:'100%', height:'100%' }} />
+            </div>
+          </div>
+          {/* Right eye (mirrored) */}
+          <div style={{ position:'absolute', top:'35.54%', right:'36.24%', bottom:'55.75%', left:'56.79%', display:'flex', alignItems:'center', justifyContent:'center' }}>
+            <div style={{ transform:'scaleX(-1)', width:'100%', height:'100%', flexShrink:0 }}>
+              <div style={{ position:'relative', width:'100%', height:'100%' }}>
+                <div style={{ position:'absolute', top:'-30%', right:'-28.63%', bottom:'-30%', left:'-37.51%' }}>
+                  <img alt="" src={imgTdV25} onError={hide} style={{ display:'block', width:'100%', height:'100%' }} />
+                </div>
+              </div>
+            </div>
+          </div>
+          {/* Smile */}
+          <div style={{ position:'absolute', top:'46.34%', right:'43.9%', bottom:'45.47%', left:'44.25%' }}>
+            <div style={{ position:'absolute', top:'-25.53%', right:'-13.01%', bottom:'-25.53%', left:'-13.01%' }}>
+              <img alt="" src={imgTdV34} onError={hide} style={{ display:'block', width:'100%', height:'100%' }} />
+            </div>
+          </div>
+        </>;
+      }
+
+      /* Icon definitions: src + radius for physics circle */
+      const ICONS = RADII.map(r => ({ r }));
+
+
+      useEffect(() => {
+        const container = containerRef.current;
+        if (!container || !window.Matter) return;
+        const { Engine, Bodies, Composite, Runner, Body } = window.Matter;
+
+        /* Engine */
+        const engine = Engine.create({ gravity: { x: 0, y: 1.2 } });
+
+        /* Walls (invisible, static) */
+        const wall = (x,y,w,h) => Bodies.rectangle(x,y,w,h,{ isStatic:true, restitution:0.5, friction:0.05 });
+        Composite.add(engine.world, [
+          wall(W/2, H+26, W+100, 52),  // floor
+          wall(W/2, -26,  W+100, 52),  // ceiling
+          wall(-26, H/2,  52, H+100),  // left
+          wall(W+26, H/2, 52, H+100),  // right
+        ]);
+
+        /* Icon bodies */
+        const bodies = ICONS.map((icon, i) => {
+          const x = 35 + i * ((W-70)/4) + (Math.random()-0.5)*12;
+          const y = 10 + Math.random()*20;
+          const b = Bodies.circle(x, y, icon.r, {
+            restitution: 0.65, friction: 0.04, frictionAir: 0.012,
+            density: 0.002,
+          });
+          Body.setAngularVelocity(b, (Math.random()-0.5)*0.15);
+          return b;
+        });
+        Composite.add(engine.world, bodies);
+
+        /* Runner */
+        const runner = Runner.create();
+        Runner.run(runner, engine);
+
+        /* DOM sync via RAF */
+        let rafId;
+        const elems = Array.from(container.children);
+        const tick = () => {
+          bodies.forEach((b, i) => {
+            const el = elems[i];
+            if (!el) return;
+            const r = ICONS[i].r;
+            el.style.left      = (b.position.x - r) + 'px';
+            el.style.top       = (b.position.y - r) + 'px';
+            el.style.transform = 'rotate(' + b.angle + 'rad)';
+          });
+          rafId = requestAnimationFrame(tick);
+        };
+        rafId = requestAnimationFrame(tick);
+
+        /* Device tilt → gravity */
+        const onOrient = (e) => {
+          const g = (e.gamma ?? 0);
+          const b = (e.beta  ?? 45);
+          engine.gravity.x = (g / 45) * 1.8;
+          engine.gravity.y = Math.max(-0.5, Math.min(2, (b - 45) / 45 * 1.5 + 0.3));
+        };
+        const setupOrient = () => window.addEventListener('deviceorientation', onOrient);
+        if (typeof DeviceOrientationEvent !== 'undefined' &&
+            typeof DeviceOrientationEvent.requestPermission === 'function') {
+          /* iOS 13+ — request on tap */
+          const tapHandler = () => {
+            DeviceOrientationEvent.requestPermission().then(s => {
+              if (s === 'granted') setupOrient();
+            }).catch(()=>{});
+            container.removeEventListener('click', tapHandler);
+          };
+          container.addEventListener('click', tapHandler);
+        } else {
+          setupOrient();
+        }
+
+        /* Mouse tilt for desktop demo */
+        const onMouse = (e) => {
+          const rect = container.getBoundingClientRect();
+          const cx = rect.left + rect.width / 2;
+          const cy = rect.top  + rect.height / 2;
+          engine.gravity.x = ((e.clientX - cx) / (window.innerWidth  / 2)) * 1.8;
+          engine.gravity.y = ((e.clientY - cy) / (window.innerHeight / 2)) * 1.5 + 0.4;
+        };
+        window.addEventListener('mousemove', onMouse);
+
+        return () => {
+          cancelAnimationFrame(rafId);
+          Runner.stop(runner);
+          window.removeEventListener('deviceorientation', onOrient);
+          window.removeEventListener('mousemove', onMouse);
+        };
+      }, []);
+
+      return (
+        <div style={{ background:'rgba(60,60,60,0.92)', border:'1px solid rgba(20,20,19,0.07)', height:H, borderRadius:20, boxShadow:'0 4px 24px rgba(0,0,0,0.04), 0 24px 48px rgba(0,0,0,0.08)', flexShrink:0, width:W, position:'relative', overflow:'hidden' }}>
+          <p style={{ position:'absolute', fontFamily:'Sofia Sans,sans-serif', fontWeight:500, lineHeight:'17.5px', left:13, fontSize:14, color:'white', top:11, letterSpacing:'-0.28px', whiteSpace:'nowrap', zIndex:2 }}>Today – {dateStr}</p>
+          {/* Physics icon container */}
+          <div ref={containerRef} style={{ position:'absolute', inset:0, zIndex:1 }}>
+            {ICONS.map((icon, i) => (
+              <div key={i} style={{ position:'absolute', width: icon.r*2, height: icon.r*2, pointerEvents:'none', willChange:'transform' }}>
+                <IconFace idx={i} />
+              </div>
+            ))}
           </div>
         </div>
       );
@@ -539,43 +887,15 @@
       const dragRef  = useRef({ startX:0, dragging:false });
       const timerRef = useRef(null);
       const [showTellMore, setShowTellMore] = useState(false);
-      const [showHelp, setShowHelp]         = useState(false);
       const [reason, setReason] = useState('');
       const [note, setNote]     = useState('');
+      const [activities, setActivities]   = useState([]);
+      const [companions, setCompanions]   = useState([]);
+      const [location, setLocation]       = useState([]);
+      const [bodyParts, setBodyParts]     = useState([]);
 
-      const helpContent = {
-        Sad:       { color:'#3ab4dc', items:[
-          { icon:'🌬️', title:'Breathing exercise',    desc:'Try 4-7-8 breathing to ease the heaviness' },
-          { icon:'📝', title:'Write it out',           desc:'Put your thoughts on paper, no filters needed' },
-        ]},
-        Angry:     { color:'#e04040', items:[
-          { icon:'🧊', title:'Ground yourself',        desc:'Name 5 things you can see around you right now' },
-          { icon:'🚶', title:'Take a short walk',      desc:'Even 5 minutes outside can reset your mind' },
-        ]},
-        Exhausted: { color:'#8050c8', items:[
-          { icon:'🎵', title:'Calm Mode',              desc:'10 mins of ambient sound to help you recharge' },
-          { icon:'🧘', title:'Gentle body scan',       desc:'Release the tension you\'ve been holding today' },
-        ]},
-        Boring:    { color:'#30b8b0', items:[
-          { icon:'🎯', title:'Do one tiny thing',      desc:'Pick something small you\'ve been putting off' },
-          { icon:'🌿', title:'Step outside',           desc:'Fresh air and a change of scenery can help' },
-        ]},
-        Good:      { color:'#5cb85c', items:[
-          { icon:'✨', title:'Capture this moment',    desc:'Write one thing that made today feel good' },
-          { icon:'💪', title:'Keep the momentum',      desc:'Set one small intention for tomorrow' },
-        ]},
-        Happy:     { color:'#c8a000', items:[
-          { icon:'🌟', title:'Spread the joy',         desc:'Tell someone you appreciate them today' },
-          { icon:'📖', title:'Journal this feeling',   desc:'Save this happy moment so you can revisit it' },
-        ]},
-        Grateful:  { color:'#d87830', items:[
-          { icon:'🙏', title:'Gratitude journal',      desc:'Write 3 things you\'re thankful for today' },
-          { icon:'💌', title:'Share your kindness',    desc:'A warm message can brighten someone\'s whole day' },
-        ]},
-      };
-      const currentHelp  = helpContent[selected] || helpContent['Good'];
-      const helpColor    = currentHelp.color;
-      const helpItems    = currentHelp.items;
+      const toggleTag = (arr, setArr, val) =>
+        arr.includes(val) ? setArr(arr.filter(v => v !== val)) : setArr([...arr, val]);
 
       const switchMood = (mood) => {
         if (mood === selected) return;
@@ -918,7 +1238,7 @@
                 })()}
               </div>
             {/* Submit */}
-            <div onClick={() => setShowTellMore(true)}
+            <div onClick={() => { setShowTellMore(true); }}
               style={{ position:'absolute', background: isGrateful?'#d87830':isHappy?'#c8a000':isGood?'#5cb85c':isSad?'#3ab4dc':isAngry?'#e04040':isBoring?'#30b8b0':isExhausted?'#8050c8':'#9070cc', height:45, left:19, borderRadius:20, top:328, width:352, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', transition:'background 0.3s ease' }}>
               <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:500, fontSize:16, color:'white', letterSpacing:'-0.2px' }}>Log Mood</p>
             </div>
@@ -937,95 +1257,126 @@
           <StatusBar />
           <div style={{ position:'absolute', inset:0, pointerEvents:'none', borderRadius:'inherit', boxShadow:'inset 0px 1px 0px 0px rgba(255,255,255,0.12)' }} />
 
-          {/* ── Tell us more overlay ── */}
-          {/* ── Here's what might help overlay ── */}
-          {showHelp && (
-            <div style={{ position:'absolute', inset:0, zIndex:400, borderRadius:'inherit' }}>
-              {/* Character behind panel */}
-              <div style={{ position:'absolute', top:0, left:0, right:0, height:500, overflow:'hidden', pointerEvents:'none' }}>
-                {renderSlot(selected)}
+          {showTellMore && (() => {
+            const accentColor = isGrateful?'#d87830':isHappy?'#c8a000':isGood?'#5cb85c':isSad?'#3ab4dc':isAngry?'#e04040':isBoring?'#30b8b0':isExhausted?'#8050c8':'#9070cc';
+            const accentLight = isGrateful?'rgba(216,120,48,0.12)':isHappy?'rgba(200,160,0,0.12)':isGood?'rgba(92,184,92,0.12)':isSad?'rgba(58,180,220,0.12)':isAngry?'rgba(224,64,64,0.12)':isBoring?'rgba(48,184,176,0.12)':isExhausted?'rgba(128,80,200,0.12)':'rgba(144,112,204,0.12)';
+
+            const TagChip = ({ label, selected, onToggle }) => (
+              <div onClick={onToggle} style={{ display:'inline-flex', alignItems:'center', gap:6, background: selected ? accentColor : 'white', border: `1px solid ${selected ? accentColor : 'rgba(20,20,19,0.10)'}`, borderRadius:999, padding:'7px 14px', cursor:'pointer', flexShrink:0, transition:'all 0.15s' }}>
+                <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:500, fontSize:13, color: selected ? 'white' : '#141413', margin:0, whiteSpace:'nowrap' }}>{label}</p>
               </div>
+            );
 
-              {/* Help panel */}
-              <div style={{ position:'absolute', background:'rgb(250,247,245)', left:0, top:400, width:390, height:444, borderRadius:'50px 50px 0 0', padding:'28px 20px 24px', display:'flex', flexDirection:'column', gap:14, boxSizing:'border-box', overflow:'hidden' }}>
-                {/* Header */}
-                <div style={{ textAlign:'center' }}>
-                  <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:700, fontSize:24, color:'#141413', margin:0, letterSpacing:'-0.4px' }}>Here's what might help</p>
-                  <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:400, fontSize:13, color:'rgba(20,20,19,0.50)', margin:'4px 0 0', letterSpacing:'-0.1px' }}>Based on how you're feeling today</p>
-                </div>
+            const AddChip = () => (
+              <div style={{ display:'inline-flex', alignItems:'center', justifyContent:'center', background:'rgba(20,20,19,0.06)', border:'1px solid rgba(20,20,19,0.10)', borderRadius:999, width:34, height:34, cursor:'pointer', flexShrink:0 }}>
+                <p style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:18, color:'#696969', margin:0, lineHeight:1 }}>+</p>
+              </div>
+            );
 
-                {/* Suggestion cards */}
-                {helpItems.map((item, i) => (
-                  <div key={i} style={{ display:'flex', alignItems:'center', gap:14, background:'white', borderRadius:20, padding:'16px 18px', boxShadow:'0 2px 12px rgba(0,0,0,0.04)', cursor:'pointer', flexShrink:0 }}>
-                    <div style={{ fontSize:30, flexShrink:0, width:44, height:44, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(20,20,19,0.04)', borderRadius:14 }}>{item.icon}</div>
-                    <div style={{ flex:1 }}>
-                      <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:600, fontSize:15, color:'#141413', margin:0, letterSpacing:'-0.2px' }}>{item.title}</p>
-                      <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:400, fontSize:13, color:'rgba(20,20,19,0.52)', margin:'2px 0 0', letterSpacing:'-0.1px', lineHeight:'17px' }}>{item.desc}</p>
-                    </div>
-                    <div style={{ fontSize:16, color:'rgba(20,20,19,0.25)', flexShrink:0 }}>›</div>
+            const SectionLabel = ({ text }) => (
+              <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:600, fontSize:15, color:'#141413', margin:'0 0 10px', letterSpacing:'-0.2px' }}>{text}</p>
+            );
+
+            const TagRow = ({ tags, state, setter }) => (
+              <div style={{ display:'flex', flexWrap:'wrap', gap:8, alignItems:'center' }}>
+                <AddChip />
+                {tags.map(t => <TagChip key={t} label={t} selected={state.includes(t)} onToggle={() => toggleTag(state, setter, t)} />)}
+              </div>
+            );
+
+            return (
+              <div style={{ position:'absolute', inset:0, zIndex:300, borderRadius:'inherit', background:'rgb(250,247,245)', overflow:'hidden', display:'flex', flexDirection:'column' }}>
+
+                {/* Fixed header: status bar + back button + title */}
+                <div style={{ flexShrink:0, position:'relative', paddingTop:100, paddingBottom:20, paddingLeft:22, paddingRight:22 }}>
+                  <StatusBar />
+                  {/* Back button */}
+                  <div onClick={() => setShowTellMore(false)}
+                    style={{ position:'absolute', left:20, top:56, zIndex:10, background:'rgba(255,255,255,0.82)', backdropFilter:'blur(10px)', borderRadius:20, padding:'7px 14px', cursor:'pointer', border:'1px solid rgba(20,20,19,0.10)', boxShadow:'0 2px 8px rgba(0,0,0,0.08)' }}>
+                    <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:500, fontSize:13, color:'#141413', letterSpacing:'-0.1px', margin:0 }}>← Back</p>
                   </div>
-                ))}
-
-                {/* Done button */}
-                <div
-                  onClick={() => onBack()}
-                  style={{ background:helpColor, height:48, borderRadius:22, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', marginTop:'auto', flexShrink:0 }}>
-                  <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:600, fontSize:16, color:'white', letterSpacing:'-0.2px', margin:0 }}>Got it, thanks! 👋</p>
-                </div>
-              </div>
-
-              <StatusBar />
-            </div>
-          )}
-
-          {showTellMore && (
-            <div style={{ position:'absolute', inset:0, zIndex:300, borderRadius:'inherit' }}>
-
-              {/* Character + bubble — rendered before panel so panel appears on top (matches How do you feel right now? layout) */}
-              <div style={{ position:'absolute', top:0, left:0, right:0, height:500, overflow:'hidden', pointerEvents:'none' }}>
-                {renderSlot(selected)}
-              </div>
-
-              {/* Form panel — identical to "How do you feel right now?" panel */}
-              <div style={{ position:'absolute', background:'rgb(250,247,245)', height:390, left:0, overflow:'hidden', borderRadius:50, top:454, width:390, padding:'24px 20px 20px', display:'flex', flexDirection:'column', gap:10, boxSizing:'border-box' }}>
-                <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:700, fontSize:26, color:'#141413', textAlign:'center', margin:0 }}>Tell us more</p>
-
-                <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
-                  <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:500, fontSize:14, color:'#141413', margin:0 }}>Why do you feel this way?</p>
-                  <input
-                    value={reason}
-                    onChange={e => setReason(e.target.value)}
-                    placeholder="Enter reason..."
-                    style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:14, color:'#141413', background:'white', border:'none', borderRadius:14, padding:'12px 16px', outline:'none', width:'100%', boxSizing:'border-box' }}
-                  />
+                  {/* Title */}
+                  <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:700, fontSize:24, color:'#141413', textAlign:'center', margin:0, letterSpacing:'-0.4px' }}>Tell us more</p>
                 </div>
 
-                <div style={{ display:'flex', flexDirection:'column', gap:6, flex:1 }}>
-                  <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:500, fontSize:14, color:'#141413', margin:0 }}>Add a note</p>
-                  <textarea
-                    value={note}
-                    onChange={e => setNote(e.target.value)}
-                    placeholder="Write your thoughts..."
-                    style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:14, color:'#141413', background:'white', border:'none', borderRadius:14, padding:'12px 16px', outline:'none', width:'100%', boxSizing:'border-box', resize:'none', flex:1, minHeight:90 }}
-                  />
+                {/* Scrollable form content */}
+                <div style={{ flex:1, overflowY:'scroll', WebkitOverflowScrolling:'touch' }}>
+                  <div style={{ padding:'4px 22px 48px', display:'flex', flexDirection:'column', gap:24, boxSizing:'border-box' }}>
+
+                    {/* What are you doing */}
+                    <div>
+                      <SectionLabel text="What are you doing?" />
+                      <TagRow tags={['Eating','Hanging Out','Fitness','Hobbies','Resting','Driving']} state={activities} setter={setActivities} />
+                    </div>
+
+                    {/* Divider */}
+                    <div style={{ height:1, background:'rgba(20,20,19,0.07)', flexShrink:0 }} />
+
+                    {/* Who are you with */}
+                    <div>
+                      <SectionLabel text="Who are you with?" />
+                      <TagRow tags={['By Myself','Friends','Family','Co-Workers','Pets']} state={companions} setter={setCompanions} />
+                    </div>
+
+                    {/* Divider */}
+                    <div style={{ height:1, background:'rgba(20,20,19,0.07)', flexShrink:0 }} />
+
+                    {/* Where are you */}
+                    <div>
+                      <SectionLabel text="Where are you?" />
+                      <TagRow tags={['Home','Work','School','Commuting','Outside']} state={location} setter={setLocation} />
+                    </div>
+
+                    {/* Divider */}
+                    <div style={{ height:1, background:'rgba(20,20,19,0.07)', flexShrink:0 }} />
+
+                    {/* Body sensations */}
+                    <div>
+                      <SectionLabel text="Where do you feel it?" />
+                      <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+                        {['Head','Chest','Stomach','Shoulders','Arms','Legs'].map(part => (
+                          <TagChip key={part} label={part} selected={bodyParts.includes(part)} onToggle={() => toggleTag(bodyParts, setBodyParts, part)} />
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* How does it feel */}
+                    <div>
+                      <SectionLabel text="How does it feel?" />
+                      <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+                        {['Tight','Heavy','Shaky','Numb','Warm','Cold','Tense'].map(s => (
+                          <TagChip key={s} label={s} selected={bodyParts.includes(s)} onToggle={() => toggleTag(bodyParts, setBodyParts, s)} />
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Divider */}
+                    <div style={{ height:1, background:'rgba(20,20,19,0.07)', flexShrink:0 }} />
+
+                    {/* Notes */}
+                    <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+                      <SectionLabel text="Add a note" />
+                      <textarea
+                        value={note}
+                        onChange={e => setNote(e.target.value)}
+                        placeholder="Write your thoughts..."
+                        style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:14, color:'#141413', background:'white', border:'1px solid rgba(20,20,19,0.08)', borderRadius:16, padding:'14px 16px', outline:'none', width:'100%', boxSizing:'border-box', resize:'none', height:100 }}
+                      />
+                    </div>
+
+                    {/* Save button */}
+                    <div
+                      onClick={() => { onSave(selected, { activities, companions, location, bodyParts, note }); onBack(); }}
+                      style={{ background:accentColor, height:52, borderRadius:26, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:`0 4px 20px ${accentLight}`, flexShrink:0 }}>
+                      <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:600, fontSize:16, color:'white', letterSpacing:'-0.2px', margin:0 }}>Complete check-in ✓</p>
+                    </div>
+
+                    </div>
                 </div>
 
-                <div
-                  onClick={() => { onSave(selected, { reason, note }); setShowTellMore(false); setShowHelp(true); }}
-                  style={{ background: isGrateful?'#d87830':isHappy?'#c8a000':isGood?'#5cb85c':isSad?'#3ab4dc':isAngry?'#e04040':isBoring?'#30b8b0':isExhausted?'#8050c8':'#9070cc', height:45, borderRadius:20, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                  <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:500, fontSize:16, color:'white', letterSpacing:'-0.2px', margin:0 }}>Save</p>
-                </div>
               </div>
-
-              {/* Back button */}
-              <div onClick={() => setShowTellMore(false)}
-                style={{ position:'absolute', left:20, top:56, zIndex:10, background:'rgba(255,255,255,0.82)', backdropFilter:'blur(10px)', borderRadius:20, padding:'7px 14px', cursor:'pointer', border:'1px solid rgba(20,20,19,0.10)', boxShadow:'0 2px 8px rgba(0,0,0,0.08)' }}>
-                <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:500, fontSize:13, color:'#141413', letterSpacing:'-0.1px', margin:0 }}>← Back</p>
-              </div>
-
-              <StatusBar />
-            </div>
-          )}
+            );
+          })()}
         </div>
       );
     }
@@ -1387,56 +1738,7 @@
         setCount(c => c + 1);
       };
 
-      /* TODAY face content */
-      const todayFace = <div style={{ position:'absolute', background:'white', border:'1px solid rgba(20,20,19,0.12)', left:1, borderRadius:28, width:25, height:25, top:-1 }} />;
-
-      const todayLabel = '?';
-
-      /* MON face (node 70-91 exact) */
-      const goodFace = (
-        <div style={{ position:'absolute', height:22, left:2, top:1, width:26 }}>
-          <div style={{ position:'absolute', top:'-9.09%', right:'9.39%', bottom:'-3.74%', left:'-6.55%' }}>
-            <img alt="" style={{ position:'absolute', display:'block', inset:0, maxWidth:'none', width:'100%', height:'100%' }} src={imgDayGoodBlob} onError={e=>e.target.style.display='none'} />
-          </div>
-          <div style={{ position:'absolute', top:'33.92%', right:'42.23%', bottom:'46.88%', left:'26.63%' }}>
-            <div style={{ position:'absolute', top:0, right:0, bottom:'-11.63%', left:0 }}>
-              <img alt="" style={{ display:'block', maxWidth:'none', width:'100%', height:'100%' }} src={imgDayGoodSmile} onError={e=>e.target.style.display='none'} />
-            </div>
-          </div>
-        </div>
-      );
-
-      /* TUE face (node 70-91 exact) */
-      const sadFace = (
-        <div style={{ position:'absolute', left:1.4, width:25, height:25, top:-1 }}>
-          <div style={{ position:'absolute', left:0, width:24.398, height:24.398, top:0 }}>
-            <img alt="" style={{ position:'absolute', display:'block', inset:0, maxWidth:'none', width:'100%', height:'100%' }} src={imgDaySadFace} onError={e=>e.target.style.display='none'} />
-          </div>
-          <div style={{ position:'absolute', background:'#58c2ff', height:0.935, left:15.56, borderRadius:20, top:11.31, width:1.785 }} />
-          <div style={{ position:'absolute', background:'#58c2ff', height:0.935, left:6.97, borderRadius:20, top:11.31, width:1.785 }} />
-        </div>
-      );
-
-      /* WED face (node 70-91 exact) */
-      const wedFace = (
-        <>
-          <div style={{ position:'absolute', top:'-3.96%', right:'1.54%', bottom:'-8.87%', left:'1.3%' }}>
-            <img alt="" style={{ position:'absolute', display:'block', inset:0, maxWidth:'none', width:'100%', height:'100%' }} src={imgDayGoodBlob} onError={e=>e.target.style.display='none'} />
-          </div>
-          <div style={{ position:'absolute', top:'39.05%', right:'34.38%', bottom:'41.74%', left:'34.47%' }}>
-            <div style={{ position:'absolute', top:0, right:0, bottom:'-11.63%', left:0 }}>
-              <img alt="" style={{ display:'block', maxWidth:'none', width:'100%', height:'100%' }} src={imgDayGoodSmile} onError={e=>e.target.style.display='none'} />
-            </div>
-          </div>
-        </>
-      );
-
-      /* THUR face (node 70-91 exact) */
-      const thurFace = (
-        <div style={{ position:'absolute', left:0.2, width:25.26, height:25.26, top:-1 }}>
-          <img alt="" style={{ position:'absolute', display:'block', inset:0, maxWidth:'none', width:'100%', height:'100%' }} src={imgDayAnxiousFace} onError={e=>e.target.style.display='none'} />
-        </div>
-      );
+      /* Week strip mood states */
 
 
       return (
@@ -1458,31 +1760,27 @@
             {/* ── MAIN CONTAINER ── */}
             <div style={{ position:'absolute', height:844, left:0, overflow:'hidden', top:0, width:390 }}>
 
-              {/* ── BOTTOM SHEET: top:451 ── */}
-              <div style={{ position:'absolute', background:'#faf7f5', display:'flex', flexDirection:'column', gap:32, height:492, alignItems:'center', left:0, paddingBottom:123, paddingTop:9, borderRadius:20, top:451, width:390 }}>
+              {/* ── BOTTOM SHEET: top:423 ── */}
+              <div style={{ position:'absolute', background:'#faf7f5', height:430, left:0, borderRadius:20, top:423, width:390, overflow:'hidden' }}>
+                <div style={{ display:'flex', flexDirection:'column', gap:10, alignItems:'center', padding:22 }}>
 
-                {/* Handle */}
-                <div style={{ background:'#696969', height:5, borderRadius:20, flexShrink:0, width:82 }} />
+                  {/* Today dark summary card — physics */}
+                  <TodayPhysicsCard dateStr={new Date().toLocaleDateString('en-US',{month:'numeric',day:'numeric',year:'numeric'})} />
 
-                {/* Cards section */}
-                <div style={{ display:'flex', flexDirection:'column', gap:18, alignItems:'center', position:'relative', flexShrink:0 }}>
-
-                  {/* Row 1: cards container */}
-                  <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-start', justifyContent:'flex-end', paddingLeft:22, flexShrink:0, width:390 }}>
-                    <div style={{ height:165, position:'relative', flexShrink:0, width:346 }}>
-                      <MoodLogCard count={count} />
-                      <UrgentCard />
-                    </div>
+                  {/* Mood Log + Urgent Support */}
+                  <div style={{ height:165, position:'relative', flexShrink:0, width:346 }}>
+                    <MoodLogCard count={count} />
+                    <UrgentCard />
                   </div>
 
-                  {/* Row 2: Calm Mode */}
-                  <CalmModeCard />
-                </div>
+                  {/* Pagination dots */}
+                  <div style={{ display:'flex', gap:10, alignItems:'center', flexShrink:0 }}>
+                    <div style={{ background:'#696969', height:5, borderRadius:20, width:47 }} />
+                    <div style={{ background:'#696969', height:5, borderRadius:20, width:14 }} />
+                    <div style={{ background:'#696969', height:5, borderRadius:20, width:8 }} />
+                  </div>
 
-                {/* Pagination dots */}
-                <div style={{ position:'absolute', background:'#696969', height:5, left:153, borderRadius:20, top:377, width:47 }} />
-                <div style={{ position:'absolute', background:'#696969', height:5, left:203, borderRadius:20, top:377, width:14 }} />
-                <div style={{ position:'absolute', background:'#696969', height:5, left:220, borderRadius:20, top:377, width:8 }} />
+                </div>
               </div>
 
               {/* ── HEADER: top:44 ── */}
@@ -1517,16 +1815,16 @@
               </div>
 
               {/* ── WEEK STRIP ── */}
-              <div style={{ position:'absolute', display:'flex', alignItems:'center', justifyContent:'space-between', left:0, paddingLeft:22.203, paddingRight:22.2, paddingTop:12, paddingBottom:12, top: 296, width:390 }}>
-                <DayCard label="MON"   faceContent={goodFace}   moodLabel="Good"    />
-                <DayCard label="TUE"   faceContent={sadFace}    moodLabel="SAD"     />
-                <DayCard label="TODAY" faceContent={todayFace}  moodLabel={todayLabel} onClick={() => setPage('logMood')} />
-                <DayCard label="WED"   faceContent={wedFace}    moodLabel="Good"    />
-                <DayCard label="THUR"  faceContent={thurFace}   moodLabel="Anxious" />
+              <div style={{ position:'absolute', display:'flex', alignItems:'center', justifyContent:'space-between', left:0, paddingLeft:22, paddingRight:22, paddingTop:12, paddingBottom:12, top:297, width:390 }}>
+                <DayCard label="MON"   mood="good" />
+                <DayCard label="TUE"   mood="sad"  />
+                <DayCard label="TODAY" mood={null}  onClick={() => setPage('logMood')} />
+                <DayCard label="WED"   mood={null}  />
+                <DayCard label="THUR"  mood={null}  />
               </div>
 
-              {/* ── DAILY CHECK-IN: top:198 ── */}
-              <div style={{ position:'absolute', display:'flex', flexDirection:'column', gap:10, alignItems:'flex-start', left:22, top:198, width:347 }}>
+              {/* ── DAILY CHECK-IN: top:193 ── */}
+              <div style={{ position:'absolute', display:'flex', flexDirection:'column', gap:10, alignItems:'flex-start', left:22, top:193, width:347 }}>
                 <div style={{ height:12, position:'relative', flexShrink:0, width:95 }}>
                   <div style={{ position:'absolute', background:'#fcec6a', left:0, borderRadius:3.5, width:7, height:7, top:2.5 }} />
                   <p style={{ position:'absolute', fontFamily:'Sofia Sans,sans-serif', fontWeight:700, lineHeight:'normal', left:14, color:'#141413', fontSize:10, top:0, letterSpacing:'0.7px', textTransform:'uppercase', whiteSpace:'nowrap' }}>Daily check-in</p>
@@ -1537,7 +1835,7 @@
               </div>
 
               {/* ── BOTTOM NAV: top:764 ── */}
-              <div style={{ position:'absolute', background:'rgba(255,237,229,0.5)', border:'1px solid rgba(20,20,19,0.06)', display:'flex', flexDirection:'column', height:62, alignItems:'center', left:52, padding:6, borderRadius:999, boxShadow:'0 4px 24px rgba(0,0,0,0.04), 0 24px 48px rgba(0,0,0,0.08)', top:764, width:294, zIndex:10 }}>
+              <div style={{ position:'absolute', background:'rgba(255,237,229,0.5)', border:'1px solid rgba(20,20,19,0.06)', display:'flex', flexDirection:'column', height:62, alignItems:'center', left:43, padding:6, borderRadius:999, boxShadow:'0 4px 24px rgba(0,0,0,0.04), 0 24px 48px rgba(0,0,0,0.08)', top:764, width:294, zIndex:10 }}>
                 <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', flexShrink:0, width:'100%' }}>
                   {/* Home (active) */}
                   <div style={{ background:'white', display:'flex', flexDirection:'column', height:51, alignItems:'center', justifyContent:'center', paddingLeft:11, paddingRight:18, paddingTop:10, paddingBottom:10, borderRadius:999, flexShrink:0, width:115, cursor:'pointer' }}>

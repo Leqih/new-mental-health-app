@@ -1348,23 +1348,36 @@
               </div>
             );
 
-            return (
-              <div style={{ position:'absolute', inset:0, zIndex:300, borderRadius:'inherit', background:'rgb(250,247,245)', overflow:'hidden', display:'flex', flexDirection:'column' }}>
+            const tellGradient =
+              isGrateful ? 'linear-gradient(160deg,#f8d090 0%,#fef0d0 100%)' :
+              isHappy    ? 'linear-gradient(160deg,#f8ec80 0%,#fef8d0 100%)' :
+              isGood     ? 'linear-gradient(160deg,#c8f0c0 0%,#e8f8e0 100%)' :
+              isSad      ? 'linear-gradient(160deg,#b8dff8 0%,#d8f0ff 100%)' :
+              isAngry    ? 'linear-gradient(160deg,#f8b0b0 0%,#fee8e8 100%)' :
+              isBoring   ? 'linear-gradient(160deg,#80e0d8 0%,#c0f0ec 100%)' :
+              isExhausted? 'linear-gradient(160deg,#d0c0f0 0%,#ece0ff 100%)' :
+                           'linear-gradient(160deg,#b8e8f8 0%,#d8f0ff 100%)';
 
-                {/* Fixed header: status bar + back button + mood badge */}
-                <div style={{ flexShrink:0, position:'relative', paddingTop:100, paddingBottom:16, paddingLeft:22, paddingRight:22 }}>
+            return (
+              <div style={{ position:'absolute', inset:0, zIndex:300, borderRadius:'inherit', background:'rgba(250,247,245,0.99)', overflow:'hidden', display:'flex', flexDirection:'column' }}>
+
+                {/* Mood-gradient header */}
+                <div style={{ flexShrink:0, position:'relative', background: tellGradient, paddingBottom:22 }}>
                   <StatusBar />
                   {/* Back button */}
                   <div onClick={() => setShowTellMore(false)}
-                    style={{ position:'absolute', left:20, top:56, zIndex:10, background:'rgba(255,255,255,0.82)', backdropFilter:'blur(10px)', borderRadius:20, padding:'7px 14px', cursor:'pointer', border:'1px solid rgba(20,20,19,0.10)', boxShadow:'0 2px 8px rgba(0,0,0,0.08)' }}>
+                    style={{ position:'absolute', left:20, top:56, zIndex:10, background:'rgba(255,255,255,0.72)', backdropFilter:'blur(10px)', WebkitBackdropFilter:'blur(10px)', borderRadius:20, padding:'7px 14px', cursor:'pointer', border:'1px solid rgba(255,255,255,0.55)', boxShadow:'0 2px 8px rgba(0,0,0,0.07)' }}>
                     <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:500, fontSize:13, color:'#141413', letterSpacing:'-0.1px', margin:0 }}>← Back</p>
                   </div>
-                  {/* Mood badge — matches detail sheet style */}
-                  <div style={{ background:accentLight.replace('0.12','0.18'), borderRadius:16, padding:'14px 18px', display:'flex', alignItems:'center', gap:12 }}>
-                    <div style={{ fontSize:28 }}>{isGood?'😊':isHappy?'😄':isSad?'😔':isGrateful?'🙏':isAngry?'😠':isBoring?'😑':isExhausted?'😩':'🙂'}</div>
-                    <div>
-                      <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:700, fontSize:18, color:'#141413', margin:0, letterSpacing:'-0.3px' }}>I feel {selected}</p>
-                      <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:400, fontSize:13, color:'#696969', margin:'2px 0 0', letterSpacing:'-0.1px' }}>Tell us more about your moment</p>
+                  {/* Character + title row */}
+                  <div style={{ display:'flex', alignItems:'center', gap:14, paddingLeft:24, paddingRight:24, marginTop:60 }}>
+                    <div style={{ width:72, height:72, position:'relative', flexShrink:0 }}
+                      dangerouslySetInnerHTML={{ __html: buildIconHTML(selected) }} />
+                    <div style={{ flex:1 }}>
+                      <div style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:11, fontWeight:600, letterSpacing:'1px', textTransform:'uppercase', color:'rgba(20,20,19,0.40)', marginBottom:5 }}>TELL US MORE</div>
+                      <div style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:26, fontWeight:700, color:'#141413', letterSpacing:'-0.4px', lineHeight:1.1 }}>
+                        I feel <span style={{ color:accentColor }}>{selected}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -2153,7 +2166,7 @@
               </div>
 
               {/* ── DAILY CHECK-IN: top:193 ── */}
-              <div style={{ position:'absolute', display:'flex', flexDirection:'column', gap:10, alignItems:'flex-start', left:22, top:193, width:347 }}>
+              <div style={{ position:'absolute', display:'flex', flexDirection:'column', gap:10, alignItems:'flex-start', left:22, top:193, width:347, pointerEvents:'none' }}>
                 <div style={{ height:12, position:'relative', flexShrink:0, width:95 }}>
                   <div style={{ position:'absolute', background:'#fcec6a', left:0, borderRadius:3.5, width:7, height:7, top:2.5 }} />
                   <p style={{ position:'absolute', fontFamily:'Sofia Sans,sans-serif', fontWeight:700, lineHeight:'normal', left:14, color:'#141413', fontSize:10, top:0, letterSpacing:'0.7px', textTransform:'uppercase', whiteSpace:'nowrap' }}>Daily check-in</p>

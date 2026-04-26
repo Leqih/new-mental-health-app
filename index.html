@@ -1626,9 +1626,10 @@
                           }}>
                             {/* Day number */}
                             <p style={{ fontFamily:SF, fontSize:7, fontWeight: isToday ? 800 : 500, color: isToday ? ring : (mood ? '#141413' : 'rgba(20,20,19,0.3)'), margin:0, lineHeight:1, alignSelf:'flex-end', paddingRight:2 }}>{day}</p>
-                            {/* Character image */}
+                            {/* Character with face overlays */}
                             {mood
-                              ? <img alt="" src={faceImg(mood)} style={{ width:28, height:28, objectFit:'contain', flexShrink:0 }} onError={e=>e.target.style.display='none'} />
+                              ? <div style={{ width:28, height:28, position:'relative', flexShrink:0 }}
+                                  dangerouslySetInnerHTML={{ __html: buildIconHTML(mood) }} />
                               : <div style={{ height:28 }} />
                             }
                           </div>

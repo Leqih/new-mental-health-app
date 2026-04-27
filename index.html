@@ -1872,6 +1872,20 @@
           wall(-25,H/2,50,H+100), wall(W+25,H/2,50,H+100),
         ]);
         const bodies = [], elems = [];
+        // Body-only HTML for chart bubbles — no face overlay, text label carries the mood
+        const bubbleBodyHTML = (mood) => {
+          const s = mood.toLowerCase();
+          const img = (src) => `<img alt="" src="${src}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;pointer-events:none">`;
+          if (s === 'boring') return `
+            <img alt="" src="${imgBoringChar1}" style="position:absolute;top:0;bottom:0;left:0;right:75%;width:25%;height:100%;display:block;object-fit:cover;pointer-events:none">
+            <img alt="" src="${imgBoringChar2}" style="position:absolute;top:0;bottom:0;left:24.99%;right:50%;width:25.01%;height:100%;display:block;object-fit:cover;pointer-events:none">
+            <img alt="" src="${imgBoringChar1}" style="position:absolute;top:0;bottom:0;left:50%;right:24.99%;width:25.01%;height:100%;display:block;object-fit:cover;pointer-events:none">
+            <img alt="" src="${imgBoringChar2}" style="position:absolute;top:0;bottom:0;left:75%;right:0;width:25%;height:100%;display:block;object-fit:cover;pointer-events:none">`;
+          const src = s==='good' ? imgGoodChar : s==='happy'||s==='excited' ? imgHappyChar :
+                      s==='grateful' ? imgGratefulChar : s==='angry' ? imgAngryChar :
+                      s==='exhausted' ? imgExhaustedChar : s==='anxious' ? imgAnxiousChar : imgLogCloudChar;
+          return img(src);
+        };
         bubbleData.forEach(({ label, r }) => {
           const x = W/2 + (Math.random()-0.5)*W*0.5;
           const y = H/2 + (Math.random()-0.5)*H*0.5;
@@ -1883,7 +1897,7 @@
           el.style.cssText = `position:absolute;width:${d}px;height:${d}px;cursor:pointer;user-select:none;transition:transform .15s;`;
           el.innerHTML = `
             <div style="position:relative;width:100%;height:100%;">
-              ${buildIconHTML(label)}
+              ${bubbleBodyHTML(label)}
               <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Sofia Sans',sans-serif;font-weight:700;color:#141413;text-align:center;font-size:${fs}px;line-height:1;padding:0 6px;pointer-events:none;">${label}</span>
             </div>`;
           el.onmouseenter = () => { el.style.transform='scale(1.08)'; };

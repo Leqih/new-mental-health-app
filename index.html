@@ -1872,19 +1872,21 @@
           wall(-25,H/2,50,H+100), wall(W+25,H/2,50,H+100),
         ]);
         const bodies = [], elems = [];
-        // Body-only HTML for chart bubbles — no face overlay, text label carries the mood
+        // Solid gradient bubbles for chart — no images/faces, text label identifies mood
+        const BUBBLE_GRAD = {
+          good:      'linear-gradient(135deg,#c8f0a8,#86d85a)',
+          sad:       'linear-gradient(135deg,#b8dff8,#7ab8f0)',
+          boring:    'linear-gradient(135deg,#a8f0e8,#5cd0c8)',
+          anxious:   'linear-gradient(135deg,#f8b8cc,#f07898)',
+          excited:   'linear-gradient(135deg,#fef5a0,#f5d830)',
+          happy:     'linear-gradient(135deg,#fdf0a0,#f5c820)',
+          grateful:  'linear-gradient(135deg,#fdd8a8,#f5a840)',
+          angry:     'linear-gradient(135deg,#f8b0a8,#f06858)',
+          exhausted: 'linear-gradient(135deg,#d8c0f8,#a878f0)',
+        };
         const bubbleBodyHTML = (mood) => {
-          const s = mood.toLowerCase();
-          const img = (src) => `<img alt="" src="${src}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;pointer-events:none">`;
-          if (s === 'boring') return `
-            <img alt="" src="${imgBoringChar1}" style="position:absolute;top:0;bottom:0;left:0;right:75%;width:25%;height:100%;display:block;object-fit:cover;pointer-events:none">
-            <img alt="" src="${imgBoringChar2}" style="position:absolute;top:0;bottom:0;left:24.99%;right:50%;width:25.01%;height:100%;display:block;object-fit:cover;pointer-events:none">
-            <img alt="" src="${imgBoringChar1}" style="position:absolute;top:0;bottom:0;left:50%;right:24.99%;width:25.01%;height:100%;display:block;object-fit:cover;pointer-events:none">
-            <img alt="" src="${imgBoringChar2}" style="position:absolute;top:0;bottom:0;left:75%;right:0;width:25%;height:100%;display:block;object-fit:cover;pointer-events:none">`;
-          const src = s==='good' ? imgGoodChar : s==='happy'||s==='excited' ? imgHappyChar :
-                      s==='grateful' ? imgGratefulChar : s==='angry' ? imgAngryChar :
-                      s==='exhausted' ? imgExhaustedChar : s==='anxious' ? imgAnxiousChar : imgLogCloudChar;
-          return img(src);
+          const grad = BUBBLE_GRAD[mood.toLowerCase()] || 'linear-gradient(135deg,#e0e0e0,#c0c0c0)';
+          return `<div style="position:absolute;inset:0;border-radius:50%;background:${grad};pointer-events:none"></div>`;
         };
         bubbleData.forEach(({ label, r }) => {
           const x = W/2 + (Math.random()-0.5)*W*0.5;

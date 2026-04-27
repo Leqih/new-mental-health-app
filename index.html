@@ -1872,25 +1872,25 @@
           wall(-25,H/2,50,H+100), wall(W+25,H/2,50,H+100),
         ]);
         const bodies = [], elems = [];
-        // Gradient colors per mood
+        // Colors matched to actual Figma character body tones
         const BUBBLE_GRAD = {
-          good:      'linear-gradient(135deg,#c8f0a8,#86d85a)',
-          sad:       'linear-gradient(135deg,#b8dff8,#7ab8f0)',
-          boring:    'linear-gradient(135deg,#a8f0e8,#5cd0c8)',
-          anxious:   'linear-gradient(135deg,#f8b8cc,#f07898)',
-          excited:   'linear-gradient(135deg,#fef5a0,#f5d830)',
-          happy:     'linear-gradient(135deg,#fdf0a0,#f5c820)',
-          grateful:  'linear-gradient(135deg,#fdd8a8,#f5a840)',
-          angry:     'linear-gradient(135deg,#f8b0a8,#f06858)',
-          exhausted: 'linear-gradient(135deg,#d8c0f8,#a878f0)',
+          good:      'linear-gradient(160deg,#d6f0d6,#96d860)',
+          sad:       'linear-gradient(160deg,#cce8ff,#7ab8f0)',
+          boring:    'linear-gradient(160deg,#b8f4f0,#3ec8c0)',
+          anxious:   'linear-gradient(160deg,#ffb8d0,#f06080)',
+          excited:   'linear-gradient(160deg,#fef5b0,#f8d030)',
+          happy:     'linear-gradient(160deg,#fef0a0,#f8c820)',
+          grateful:  'linear-gradient(160deg,#fde0b0,#f0a030)',
+          angry:     'linear-gradient(160deg,#ffc0b8,#f05848)',
+          exhausted: 'linear-gradient(160deg,#ddd0f8,#a060c8)',
         };
         // Use Figma image as CSS mask → distinctive shape preserved, face invisible
         const bubbleBodyHTML = (mood) => {
           const s = mood.toLowerCase();
-          const grad = BUBBLE_GRAD[s] || 'linear-gradient(135deg,#e0e0e0,#c0c0c0)';
+          const grad = BUBBLE_GRAD[s] || 'linear-gradient(160deg,#e0e0e0,#c0c0c0)';
           if (s === 'boring') {
-            // Rounded rect blob — 4-segment boring body approximation
-            return `<div style="position:absolute;inset:8% 4%;background:${grad};border-radius:40% 40% 36% 36% / 30% 30% 26% 26%;pointer-events:none"></div>`;
+            // Squircle — boxy & blocky, fitting for "boring"
+            return `<div style="position:absolute;inset:0;background:${grad};border-radius:28%;pointer-events:none"></div>`;
           }
           const src = s==='good' ? imgGoodChar : s==='happy'||s==='excited' ? imgHappyChar :
                       s==='grateful' ? imgGratefulChar : s==='angry' ? imgAngryChar :

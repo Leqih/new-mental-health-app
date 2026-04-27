@@ -2592,7 +2592,7 @@
         setCheckin(false);
       };
 
-      const MAX_MOODS_PER_DAY = 3;
+      const MAX_MOODS_PER_DAY = 6;
       const handleLogMoodSave = (moodLabel, details) => {
         setTodayEntries(prev => {
           if (prev.length >= MAX_MOODS_PER_DAY) return prev; // cap at 3 per day

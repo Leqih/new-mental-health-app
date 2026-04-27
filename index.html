@@ -43,9 +43,13 @@
       60%      { transform: translateY(-4px) rotate(-3deg) scale(1.01); }
     }
     @keyframes cloudGrateful {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      40%      { transform: translateY(-8px) rotate(4deg); }
-      70%      { transform: translateY(-3px) rotate(-2deg); }
+      0%   { transform: translateY(0px) rotate(0deg) scale(1); }
+      18%  { transform: translateY(7px) rotate(11deg) scale(0.94); }
+      28%  { transform: translateY(7px) rotate(11deg) scale(0.94); }
+      50%  { transform: translateY(-16px) rotate(-5deg) scale(1.08); }
+      65%  { transform: translateY(-11px) rotate(3deg) scale(1.04); }
+      80%  { transform: translateY(-6px) rotate(-1deg) scale(1.02); }
+      100% { transform: translateY(0px) rotate(0deg) scale(1); }
     }
     @keyframes cloudAngry {
       0%, 100% { transform: rotate(0deg) scale(1); }
@@ -1349,7 +1353,7 @@
                    man ? imgAngryChar : mex ? imgExhaustedChar : mbr ? '' : max ? imgAnxiousChar : imgLogCloudChar;
         const cf = mg || mh || mgr || man || mex || mbr || max ? 'none' : !ms ? 'saturate(0.2) brightness(0.85) hue-rotate(250deg)' : 'none';
         const ca = mh  ? 'cloudHappy 2s ease-in-out infinite' :
-                   mgr ? 'cloudGrateful 3s ease-in-out infinite' :
+                   mgr ? 'cloudGrateful 5s ease-in-out infinite' :
                    man ? 'cloudAngry 1.5s ease-in-out infinite' :
                    mbr ? 'cloudBoring 7s ease-in-out infinite' :
                    mex ? 'cloudExhausted 5s ease-in-out infinite' :

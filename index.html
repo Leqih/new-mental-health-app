@@ -1065,7 +1065,15 @@
         <img alt="" src="${imgBoringChar1}" style="position:absolute;top:0;bottom:0;left:0;right:75%;width:25%;height:100%;display:block;object-fit:cover">
         <img alt="" src="${imgBoringChar2}" style="position:absolute;top:0;bottom:0;left:24.99%;right:50%;width:25.01%;height:100%;display:block;object-fit:cover">
         <img alt="" src="${imgBoringChar1}" style="position:absolute;top:0;bottom:0;left:50%;right:24.99%;width:25.01%;height:100%;display:block;object-fit:cover">
-        <img alt="" src="${imgBoringChar2}" style="position:absolute;top:0;bottom:0;left:75%;right:0;width:25%;height:100%;display:block;object-fit:cover">`;
+        <img alt="" src="${imgBoringChar2}" style="position:absolute;top:0;bottom:0;left:75%;right:0;width:25%;height:100%;display:block;object-fit:cover">
+        <svg style="position:absolute;left:37.6%;top:39.4%;width:10.8%;height:7%;overflow:visible" viewBox="0 0 32 20" fill="none">
+          <path d="M7.50195 12.2736L23.8186 7.50196" stroke="black" stroke-width="15" stroke-linecap="round"/>
+        </svg>
+        <svg style="position:absolute;left:54.4%;top:39.4%;width:10.8%;height:7%;overflow:visible" viewBox="0 0 32 20" fill="none">
+          <path d="M23.8186 12.2736L7.50199 7.50196" stroke="black" stroke-width="15" stroke-linecap="round"/>
+        </svg>
+        <img alt="" src="${imgBoringMthA}" style="position:absolute;left:40.4%;top:47.7%;width:17.8%;height:6.6%;display:block">
+        <img alt="" src="${imgBoringMthB}" style="position:absolute;left:55.4%;top:46%;width:7%;height:11.8%;display:block">`;
 
       if (s === 'anxious') return `
         ${base(imgAnxiousChar)}
@@ -2584,15 +2592,19 @@
         setCheckin(false);
       };
 
+      const MAX_MOODS_PER_DAY = 3;
       const handleLogMoodSave = (moodLabel, details) => {
-        const now = new Date();
-        const time = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-        const newEntry = { mood: moodLabel, dayLabel: 'Today', time, ...details };
-        setTodayEntries(prev => [...prev, newEntry]);
-        setMoodEntries(prev => ({ ...prev, TODAY: newEntry }));
-        setTodayMood({ mood: { label: moodLabel } });
-        setCount(c => c + 1);
-        setTodayMoods(m => [...m, moodLabel.toLowerCase()]);
+        setTodayEntries(prev => {
+          if (prev.length >= MAX_MOODS_PER_DAY) return prev; // cap at 3 per day
+          const now = new Date();
+          const time = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+          const newEntry = { mood: moodLabel, dayLabel: 'Today', time, ...details };
+          setMoodEntries(p => ({ ...p, TODAY: newEntry }));
+          setTodayMood({ mood: { label: moodLabel } });
+          setCount(c => c + 1);
+          setTodayMoods(m => [...m, moodLabel.toLowerCase()]);
+          return [...prev, newEntry];
+        });
       };
 
       /* Week strip mood states */
@@ -2681,7 +2693,7 @@
               </div>
 
               {/* ── DAILY CHECK-IN: top:193 ── */}
-              <div onClick={() => setPage('logMood')} style={{ position:'absolute', display:'flex', flexDirection:'column', gap:10, alignItems:'flex-start', left:22, top:193, width:347, cursor:'pointer' }}>
+              <div onClick={() => todayEntries.length < MAX_MOODS_PER_DAY && setPage('logMood')} style={{ position:'absolute', display:'flex', flexDirection:'column', gap:10, alignItems:'flex-start', left:22, top:193, width:347, cursor: todayEntries.length < MAX_MOODS_PER_DAY ? 'pointer' : 'default', opacity: todayEntries.length >= MAX_MOODS_PER_DAY ? 0.45 : 1 }}>
                 <div style={{ height:12, position:'relative', flexShrink:0, width:95 }}>
                   <div style={{ position:'absolute', background:'#fcec6a', left:0, borderRadius:3.5, width:7, height:7, top:2.5 }} />
                   <p style={{ position:'absolute', fontFamily:'Sofia Sans,sans-serif', fontWeight:700, lineHeight:'normal', left:14, color:'#141413', fontSize:10, top:0, letterSpacing:'0.7px', textTransform:'uppercase', whiteSpace:'nowrap' }}>Daily check-in</p>

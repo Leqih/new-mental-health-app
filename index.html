@@ -2466,12 +2466,15 @@
 
     /* ── TODAY MOODS SHEET (lists all today entries) ── */
     function TodayMoodsSheet({ entries, onClose, onViewEntry, onLogMood }) {
-      const moodColor = {
-        good: '#a8d8a8', sad: '#a8c4e0', happy: '#f9e4a0',
-        grateful: '#f7c6d0', angry: '#f4a0a0', boring: '#c8c8d8', exhausted: '#c0b8d0',
-      };
-      const moodEmoji = {
-        good: '😊', sad: '😔', happy: '😄', grateful: '🙏', angry: '😠', boring: '😑', exhausted: '😩',
+      const moodGrad = {
+        good:      ['#b8f070','#60d888','#a0f0c8'],
+        sad:       ['#90c8f8','#6098f0','#a0d0ff'],
+        happy:     ['#ffe060','#ffb830','#ffe8a0'],
+        grateful:  ['#ffb860','#f08030','#ffd0a0'],
+        angry:     ['#ff8870','#f04060','#ff90b8'],
+        boring:    ['#60e0d0','#30c8b8','#80e8f8'],
+        exhausted: ['#c090f8','#9060e0','#d0a8ff'],
+        anxious:   ['#ff90b8','#f04878','#ffb0d0'],
       };
       return (
         <div style={{ position:'absolute', inset:0, zIndex:50, display:'flex', flexDirection:'column', justifyContent:'flex-end' }}
@@ -2480,29 +2483,52 @@
             style={{ background:'#faf7f5', borderRadius:'20px 20px 0 0', padding:'0 0 40px',
               boxShadow:'0 -8px 32px rgba(0,0,0,0.12)',
               animation:'slideUp 0.3s cubic-bezier(0.32,0.72,0,1)' }}>
+            {/* drag pill */}
             <div style={{ display:'flex', justifyContent:'center', padding:'12px 0 8px' }}>
               <div style={{ width:36, height:4, borderRadius:2, background:'rgba(20,20,19,0.2)' }} />
             </div>
-            <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:700, fontSize:17, color:'#141413', margin:'4px 22px 16px', letterSpacing:'-0.3px' }}>
+            <style>{`
+              @keyframes blob1 { 0%,100%{transform:translate(0%,0%) scale(1)} 33%{transform:translate(30%,-20%) scale(1.15)} 66%{transform:translate(-10%,25%) scale(0.9)} }
+              @keyframes blob2 { 0%,100%{transform:translate(0%,0%) scale(1)} 33%{transform:translate(-25%,15%) scale(0.88)} 66%{transform:translate(20%,-18%) scale(1.12)} }
+              @keyframes blob3 { 0%,100%{transform:translate(0%,0%) scale(1)} 33%{transform:translate(15%,22%) scale(1.1)} 66%{transform:translate(-20%,-10%) scale(0.92)} }
+            `}</style>
+            <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:700, fontSize:17, color:'#141413', margin:'4px 22px 14px', letterSpacing:'-0.3px' }}>
               Today's Moods
             </p>
+            {/* Entry cards — same fluid blob style as MoodDetailSheet */}
             <div style={{ display:'flex', flexDirection:'column', gap:10, padding:'0 22px' }}>
-              {entries.map((entry, i) => (
-                <div key={i} onClick={() => onViewEntry(entry)}
-                  style={{ display:'flex', alignItems:'center', gap:12, background: moodColor[entry.mood.toLowerCase()] || '#eee',
-                    borderRadius:14, padding:'12px 16px', cursor:'pointer' }}>
-                  <span style={{ fontSize:24 }}>{moodEmoji[entry.mood.toLowerCase()] || '🙂'}</span>
-                  <div style={{ flex:1 }}>
-                    <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:700, fontSize:15, color:'#141413', margin:0 }}>{entry.mood}</p>
-                    <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:400, fontSize:12, color:'#696969', margin:'2px 0 0' }}>{entry.time}</p>
+              {entries.map((entry, i) => {
+                const m = entry.mood.toLowerCase();
+                const [c1, c2, c3] = moodGrad[m] || ['#d0c8c0','#b8b0a8','#c8c0b8'];
+                return (
+                  <div key={i} onClick={() => onViewEntry(entry)}
+                    style={{ borderRadius:18, height:80, position:'relative', overflow:'hidden', background:'#f0f0ee', cursor:'pointer' }}>
+                    {/* fluid blobs */}
+                    <div style={{ position:'absolute', inset:0, filter:'blur(20px) saturate(1.1)', pointerEvents:'none' }}>
+                      <div style={{ position:'absolute', width:100, height:100, borderRadius:'50%', background:c1, top:'-30%', left:'-5%', animation:'blob1 7s ease-in-out infinite' }} />
+                      <div style={{ position:'absolute', width:90,  height:90,  borderRadius:'50%', background:c2, top:'10%',  left:'35%', animation:'blob2 9s ease-in-out infinite' }} />
+                      <div style={{ position:'absolute', width:110, height:110, borderRadius:'50%', background:c3, top:'-40%', left:'62%', animation:'blob3 8s ease-in-out infinite' }} />
+                    </div>
+                    {/* frosted glass */}
+                    <div style={{ position:'absolute', inset:0, backdropFilter:'blur(10px) saturate(1.4)', WebkitBackdropFilter:'blur(10px) saturate(1.4)', background:'rgba(255,255,255,0.28)', borderRadius:18, border:'1px solid rgba(255,255,255,0.55)', boxShadow:'inset 0 1px 0 rgba(255,255,255,0.6)', pointerEvents:'none' }} />
+                    {/* content */}
+                    <div style={{ position:'relative', display:'flex', alignItems:'center', gap:14, padding:'12px 16px', height:'100%', boxSizing:'border-box' }}>
+                      <div style={{ width:52, height:52, flexShrink:0, borderRadius:'50%', background:'rgba(255,255,255,0.72)', boxShadow:'0 0 0 2px rgba(255,255,255,0.9), 0 2px 10px rgba(0,0,0,0.08)', padding:3, boxSizing:'border-box', position:'relative' }}>
+                        <div style={{ position:'relative', width:'100%', height:'100%' }} dangerouslySetInnerHTML={{ __html: buildIconHTML(entry.mood) }} />
+                      </div>
+                      <div style={{ flex:1 }}>
+                        <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:800, fontSize:18, color:'#141413', margin:0, lineHeight:1, letterSpacing:'-0.3px' }}>{entry.mood}</p>
+                        <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:500, fontSize:12, color:'rgba(20,20,19,0.5)', margin:'4px 0 0' }}>{entry.time}</p>
+                      </div>
+                      {(entry.activities?.length > 0 || entry.note) && (
+                        <p style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:16, color:'rgba(20,20,19,0.35)', margin:0, flexShrink:0 }}>›</p>
+                      )}
+                    </div>
                   </div>
-                  {(entry.activities?.length > 0 || entry.note) && (
-                    <p style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:12, color:'rgba(20,20,19,0.4)', margin:0 }}>›</p>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
-            <div style={{ padding:'18px 22px 0', display:'flex', flexDirection:'column', gap:10 }}>
+            <div style={{ padding:'16px 22px 0', display:'flex', flexDirection:'column', gap:10 }}>
               <button onClick={onLogMood} style={{ width:'100%', fontFamily:'Sofia Sans,sans-serif', fontWeight:600, fontSize:15, color:'white', background:'#141413', border:'none', borderRadius:999, padding:'13px 0', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>
                 <span style={{ fontSize:17, lineHeight:1 }}>＋</span> Log Mood
               </button>

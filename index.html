@@ -1814,33 +1814,15 @@
     /* ── WEEKLY BUBBLES (physics) ── */
     function WeeklyBubblesChart({ pts }) {
       const containerRef = useRef(null);
-      // src: body-only image (no face baked in); filter: CSS hue shift for moods without a unique body image
-      const MOOD_CHARS = {
-        Good:      { src: imgGoodChar,      filter: '' },
-        Happy:     { src: imgHappyChar,     filter: '' },
-        Grateful:  { src: imgGratefulChar,  filter: '' },
-        Excited:   { src: imgHappyChar,     filter: 'hue-rotate(-15deg) saturate(1.1)' },
-        Angry:     { src: imgAngryChar,     filter: '' },
-        Exhausted: { src: imgExhaustedChar, filter: '' },
-        Boring:    { src: imgBoringChar1,   filter: '' },
-        Sad:       { src: imgGoodChar,      filter: 'hue-rotate(90deg) saturate(0.8) brightness(1.1)' },
-        Anxious:   { src: imgGoodChar,      filter: 'hue-rotate(160deg) saturate(1.0) brightness(0.9)' },
-      };
-      const MOOD_COLORS = {
-        Good:'#7bcf7b', Sad:'#5ab8f5', Happy:'#f0d040',
-        Grateful:'#f0a040', Excited:'#f5c430', Boring:'#20c8c0',
-        Anxious:'#a060e8', Exhausted:'#8060c8', Angry:'#ff6060',
-      };
       useEffect(() => {
         const container = containerRef.current;
         if (!container || !pts || pts.length === 0) return;
         const counts = {};
         pts.forEach(p => { if (p.mood) counts[p.mood] = (counts[p.mood] || 0) + 1; });
         const maxCount = Math.max(...Object.values(counts), 1);
-        const bubbleData = Object.entries(counts).map(([mood, cnt]) => {
-          const ch = MOOD_CHARS[mood] || { src: imgGoodChar, filter: '' };
-          return { label: mood, src: ch.src, filter: ch.filter, color: MOOD_COLORS[mood] || '#aaa', r: Math.round(28 + (cnt / maxCount) * 48), cnt };
-        });
+        const bubbleData = Object.entries(counts).map(([mood, cnt]) => ({
+          label: mood, r: Math.round(28 + (cnt / maxCount) * 48), cnt
+        }));
         const W = container.clientWidth || 346;
         const H = container.clientHeight || 260;
         const { Engine, Runner, Bodies, Body, World } = Matter;
@@ -1851,7 +1833,7 @@
           wall(-25,H/2,50,H+100), wall(W+25,H/2,50,H+100),
         ]);
         const bodies = [], elems = [];
-        bubbleData.forEach(({ label, src, filter, r }) => {
+        bubbleData.forEach(({ label, r }) => {
           const x = W/2 + (Math.random()-0.5)*W*0.5;
           const y = H/2 + (Math.random()-0.5)*H*0.5;
           const body = Bodies.circle(x, y, r, { restitution:0.4, friction:0.05, frictionAir:0.03 });
@@ -1862,7 +1844,7 @@
           el.style.cssText = `position:absolute;width:${d}px;height:${d}px;cursor:pointer;user-select:none;transition:transform .15s;`;
           el.innerHTML = `
             <div style="position:relative;width:100%;height:100%;">
-              <img src="${src}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;${filter ? 'filter:'+filter+';' : ''}" />
+              ${buildIconHTML(label)}
               <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Sofia Sans',sans-serif;font-weight:700;color:#141413;text-align:center;font-size:${fs}px;line-height:1;padding:0 6px;pointer-events:none;">${label}</span>
             </div>`;
           el.onmouseenter = () => { el.style.transform='scale(1.08)'; };

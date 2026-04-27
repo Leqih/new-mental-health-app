@@ -1890,29 +1890,36 @@
       );
     }
 
-    /* ── WEEKLY BUBBLES (physics) ── */
+    /* ── WEEKLY BUBBLES (physics — same engine as TodayPhysicsCard) ── */
     function WeeklyBubblesChart({ pts }) {
       const containerRef = useRef(null);
       useEffect(() => {
         const container = containerRef.current;
         if (!container || !pts || pts.length === 0) return;
+
+        /* Count moods, compute bubble radii */
         const counts = {};
         pts.forEach(p => { if (p.mood) counts[p.mood] = (counts[p.mood] || 0) + 1; });
         const maxCount = Math.max(...Object.values(counts), 1);
         const bubbleData = Object.entries(counts).map(([mood, cnt]) => ({
           label: mood, r: Math.round(20 + (cnt / maxCount) * 32), cnt
         }));
+
         const W = container.clientWidth || 346;
-        const H = container.clientHeight || 260;
+        const H = container.clientHeight || 240;
         const { Engine, Runner, Bodies, Body, World } = Matter;
-        const engine = Engine.create({ gravity: { x:0, y:1 } });
-        const wall = (x,y,w,h) => Bodies.rectangle(x,y,w,h,{ isStatic:true, restitution:0.3, friction:0.1 });
+
+        /* Physics engine — same params as TodayPhysicsCard */
+        const engine = Engine.create({ gravity: { x:0, y:1.2 } });
+        const wall = (x,y,w,h) => Bodies.rectangle(x,y,w,h,{ isStatic:true, restitution:0.5, friction:0.05 });
         World.add(engine.world, [
-          wall(W/2,-25,W+100,50), wall(W/2,H+25,W+100,50),
-          wall(-25,H/2,50,H+100), wall(W+25,H/2,50,H+100),
+          wall(W/2, H+26, W+100, 52),
+          wall(W/2, -26,  W+100, 52),
+          wall(-26, H/2,  52, H+100),
+          wall(W+26, H/2, 52, H+100),
         ]);
-        const bodies = [], elems = [];
-        // Gradients only for Sad/Anxious (faces baked into their Figma images)
+
+        /* Bubble body HTML — shapes without faces */
         const FACE_BAKED_GRAD = {
           sad:     'linear-gradient(160deg,#cce8ff,#80b8f0)',
           anxious: 'linear-gradient(160deg,#ffb8d0,#f06888)',
@@ -1920,74 +1927,99 @@
         const bubbleBodyHTML = (mood) => {
           const s = mood.toLowerCase();
           const img = (src) => `<img alt="" src="${src}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;pointer-events:none">`;
-
-          // Boring: 4-slice tiled body — correct Figma shape + color, no face overlay
           if (s === 'boring') return `
             <img alt="" src="${imgBoringChar1}" style="position:absolute;top:0;bottom:0;left:0;right:75%;width:25%;height:100%;display:block;object-fit:cover;pointer-events:none">
             <img alt="" src="${imgBoringChar2}" style="position:absolute;top:0;bottom:0;left:24.99%;right:50%;width:25.01%;height:100%;display:block;object-fit:cover;pointer-events:none">
             <img alt="" src="${imgBoringChar1}" style="position:absolute;top:0;bottom:0;left:50%;right:24.99%;width:25.01%;height:100%;display:block;object-fit:cover;pointer-events:none">
             <img alt="" src="${imgBoringChar2}" style="position:absolute;top:0;bottom:0;left:75%;right:0;width:25%;height:100%;display:block;object-fit:cover;pointer-events:none">`;
-
-          // Sad & Anxious: face baked in → CSS mask gives shape without face
           if (s === 'sad' || s === 'anxious') {
             const src = s === 'sad' ? imgLogCloudChar : imgAnxiousChar;
             const grad = FACE_BAKED_GRAD[s];
             const mask = `url(${src}) center/contain no-repeat`;
             return `<div style="position:absolute;inset:0;background:${grad};-webkit-mask:${mask};mask:${mask};pointer-events:none"></div>`;
           }
-
-          // All others: use Figma body image directly — exact Log Mood colors, no face
           const src = s==='good' ? imgGoodChar : s==='happy'||s==='excited' ? imgHappyChar :
-                      s==='grateful' ? imgGratefulChar : s==='angry' ? imgAngryChar :
-                      imgExhaustedChar;
+                      s==='grateful' ? imgGratefulChar : s==='angry' ? imgAngryChar : imgExhaustedChar;
           return img(src);
         };
-        bubbleData.forEach(({ label, r }) => {
-          const x = W/2 + (Math.random()-0.5)*W*0.5;
-          const y = H/2 + (Math.random()-0.5)*H*0.5;
-          const body = Bodies.circle(x, y, r, { restitution:0.55, friction:0.02, frictionAir:0.04 });
-          World.add(engine.world, body);
-          const el = document.createElement('div');
-          const d = r * 2;
-          const fs = r >= 40 ? 13 : r >= 28 ? 11 : 9;
-          el.style.cssText = `position:absolute;width:${d}px;height:${d}px;cursor:pointer;user-select:none;transition:transform .15s;`;
-          el.innerHTML = `
-            <div style="position:relative;width:100%;height:100%;">
-              ${bubbleBodyHTML(label)}
-              <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Sofia Sans',sans-serif;font-weight:700;color:#141413;text-align:center;font-size:${fs}px;line-height:1;padding:0 6px;pointer-events:none;">${label}</span>
-            </div>`;
-          el.onmouseenter = () => { el.style.transform='scale(1.08)'; };
-          el.onmouseleave = () => { el.style.transform=''; };
-          container.appendChild(el);
-          bodies.push(body); elems.push({ el, r });
+
+        /* Spawn bubbles from top-inside the container, staggered */
+        const bodies = [], elems = [];
+        bubbleData.forEach(({ label, r }, idx) => {
+          setTimeout(() => {
+            const x = r + Math.random() * (W - r * 2);
+            const body = Bodies.circle(x, r + 5, r, {
+              restitution: 0.65, friction: 0.04, frictionAir: 0.012, density: 0.002
+            });
+            Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.15);
+            World.add(engine.world, body);
+            const d = r * 2;
+            const fs = r >= 40 ? 13 : r >= 28 ? 11 : 9;
+            const el = document.createElement('div');
+            el.style.cssText = `position:absolute;width:${d}px;height:${d}px;cursor:pointer;user-select:none;will-change:transform;`;
+            el.innerHTML = `
+              <div style="position:relative;width:100%;height:100%;">
+                ${bubbleBodyHTML(label)}
+                <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Sofia Sans',sans-serif;font-weight:700;color:#141413;text-align:center;font-size:${fs}px;line-height:1;padding:0 6px;pointer-events:none;">${label}</span>
+              </div>`;
+            container.appendChild(el);
+            bodies.push(body);
+            elems.push({ el, r });
+          }, idx * 120);
         });
 
-        // Device tilt → gravity direction
-        const onTilt = (e) => {
-          const gamma = e.gamma || 0; // left/right tilt (-90 to 90)
-          const beta  = e.beta  || 0; // front/back tilt (-180 to 180)
-          const scale = 1 / 90;
-          engine.gravity.x = Math.max(-1, Math.min(1, gamma * scale));
-          engine.gravity.y = Math.max(-1, Math.min(1, (beta - 45) * scale));
-        };
-        window.addEventListener('deviceorientation', onTilt);
-
+        /* RAF DOM sync — position + rotation, same as TodayPhysicsCard */
         const runner = Runner.create();
         Runner.run(runner, engine);
         let rafId;
         const tick = () => {
           bodies.forEach((b, i) => {
-            const { x, y } = b.position;
             const { el, r } = elems[i];
-            el.style.left = `${x-r}px`;
-            el.style.top  = `${y-r}px`;
+            if (!el) return;
+            el.style.left      = (b.position.x - r) + 'px';
+            el.style.top       = (b.position.y - r) + 'px';
+            el.style.transform = 'rotate(' + b.angle + 'rad)';
           });
           rafId = requestAnimationFrame(tick);
         };
         tick();
+
+        /* Device tilt → gravity — same formula as TodayPhysicsCard */
+        const onOrient = (e) => {
+          const g  = (e.gamma ?? 0);
+          const b2 = (e.beta  ?? 45);
+          engine.gravity.x = (g / 45) * 1.8;
+          engine.gravity.y = Math.max(-0.5, Math.min(2, (b2 - 45) / 45 * 1.5 + 0.3));
+        };
+        const setupOrient = () => window.addEventListener('deviceorientation', onOrient);
+        if (typeof DeviceOrientationEvent !== 'undefined' &&
+            typeof DeviceOrientationEvent.requestPermission === 'function') {
+          const tapH = () => {
+            DeviceOrientationEvent.requestPermission().then(s => {
+              if (s === 'granted') setupOrient();
+            }).catch(()=>{});
+            container.removeEventListener('click', tapH);
+          };
+          container.addEventListener('click', tapH);
+        } else {
+          setupOrient();
+        }
+
+        /* Mouse tilt — use phone frame as reference so gravity stays sensible */
+        const onMouse = (e) => {
+          const frame = container.closest('.phone-frame') || document.body;
+          const fr = frame.getBoundingClientRect();
+          const cx = fr.left + fr.width  / 2;
+          const cy = fr.top  + fr.height / 2;
+          engine.gravity.x = ((e.clientX - cx) / (fr.width  / 2)) * 1.5;
+          engine.gravity.y = ((e.clientY - cy) / (fr.height / 2)) * 1.5 + 0.3;
+        };
+        window.addEventListener('mousemove', onMouse);
+
         return () => {
           cancelAnimationFrame(rafId);
-          window.removeEventListener('deviceorientation', onTilt);
+          window.removeEventListener('deviceorientation', onOrient);
+          window.removeEventListener('mousemove', onMouse);
           Runner.stop(runner);
           World.clear(engine.world);
           Engine.clear(engine);

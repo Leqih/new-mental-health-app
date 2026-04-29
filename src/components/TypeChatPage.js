@@ -152,7 +152,7 @@
       );
     }
 
-    function TypeChatPage({ onBack, userName }) {
+    function TypeChatPage({ onBack, userName, initialTopic }) {
       const SF = 'Sofia Sans,sans-serif';
       const R = UIUC_RESOURCES;
       const [input, setInput] = useState('');
@@ -166,6 +166,7 @@
       const [widgetAnswers, setWidgetAnswers] = useState({});
       const widgetCount = useRef(0);
       const messagesRef = useRef(null);
+      const didAutoSend = useRef(false);
 
       const AI_AVATAR = (
         <div style={{ width:26, height:26, borderRadius:13, background:'linear-gradient(145deg,#c4a8f8,#9b72e8)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginBottom:2, boxShadow:'0 2px 8px rgba(140,100,220,0.32)' }}>
@@ -276,6 +277,14 @@
           messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
         }
       }, [messages, typing]);
+
+      useEffect(() => {
+        if (initialTopic && !didAutoSend.current) {
+          didAutoSend.current = true;
+          const t = setTimeout(() => sendMessage(initialTopic), 700);
+          return () => clearTimeout(t);
+        }
+      }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
       return (
         <div

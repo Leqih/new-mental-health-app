@@ -4,6 +4,7 @@
       const [section, setSection] = useState(0);
       const [voiceMode, setVoiceMode] = useState(false);
       const [typeChat, setTypeChat] = useState(false);
+      const [chatTopic, setChatTopic] = useState(null);
       const touchStartY = useRef(null);
       const mouseStartY = useRef(null);
       const SECTIONS = ['AI Chat', 'Peer Support', 'Resource Center'];
@@ -55,7 +56,7 @@
           {/* Voice mode overlay */}
           {voiceMode && <VoiceModeOverlay onClose={() => setVoiceMode(false)} />}
           {/* Type chat overlay */}
-          {typeChat && <TypeChatPage onBack={() => setTypeChat(false)} userName={userName} />}
+          {typeChat && <TypeChatPage onBack={() => { setTypeChat(false); setChatTopic(null); }} userName={userName} initialTopic={chatTopic} />}
           {/* Shared warp filter — one instance, referenced by all GrainientBg canvases */}
           <svg style={{ position:'absolute', width:0, height:0, overflow:'hidden' }}>
             <defs>
@@ -107,16 +108,35 @@
               </div>
 
               {/* Greeting */}
-              <div style={{ position:'absolute', top:278, left:28, right:28, zIndex:2 }}>
+              <div style={{ position:'absolute', top:265, left:28, right:28, zIndex:2 }}>
                 <p style={{ color:'rgba(20,20,19,0.42)', fontSize:13, fontWeight:600, margin:'0 0 4px', fontFamily:'Sofia Sans,sans-serif', letterSpacing:'0.2px' }}>Hey, {userName} 👋</p>
                 <p style={{ color:'#141413', fontSize:26, fontWeight:800, lineHeight:1.22, fontFamily:'Sofia Sans,sans-serif', letterSpacing:'-0.5px', margin:'0 0 14px' }}>Where should<br/>we start today?</p>
-                {/* Chips — home card style */}
-                <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
-                  {["I'm anxious","I feel lonely","I'm overwhelmed","Need to vent"].map(t => (
-                    <div key={t} style={{ background:'rgba(255,255,255,0.90)', border:'1px solid rgba(20,20,19,0.07)', borderRadius:20, padding:'7px 16px', cursor:'pointer', boxShadow:'0 2px 8px rgba(20,20,19,0.06)' }}>
-                      <span style={{ color:'#141413', fontSize:13, fontFamily:'Sofia Sans,sans-serif', fontWeight:600 }}>{t}</span>
+                {/* Topic cards — horizontal swipe row */}
+                <div style={{ position:'relative' }}>
+                <div style={{ display:'flex', gap:10, overflowX:'auto', marginLeft:-28, marginRight:-28, paddingLeft:28, paddingRight:28, scrollbarWidth:'none', WebkitOverflowScrolling:'touch' }}>
+                  <style>{`.topic-scroll::-webkit-scrollbar{display:none}`}</style>
+                  {[
+                    { emoji:'😮‍💨', label:"I'm anxious",    tease:"What's keeping you on edge?",           color:'#9b72f5', bg:'rgba(155,114,245,0.09)', border:'rgba(155,114,245,0.22)', intent:"I've been feeling really anxious lately" },
+                    { emoji:'🫂',  label:"I feel lonely",   tease:"Tell me what connection feels missing",  color:'#60a5fa', bg:'rgba(96,165,250,0.09)',  border:'rgba(96,165,250,0.22)',  intent:"I feel really lonely" },
+                    { emoji:'🌀',  label:"I'm overwhelmed", tease:"Too much on your plate?",                color:'#f472b6', bg:'rgba(244,114,182,0.09)', border:'rgba(244,114,182,0.22)', intent:"I'm feeling overwhelmed by everything" },
+                    { emoji:'💬',  label:"Need to vent",    tease:"No filters, no judgment — just talk",    color:'#34d399', bg:'rgba(52,211,153,0.09)',  border:'rgba(52,211,153,0.22)',  intent:"I just need to vent about something" },
+                  ].map(t => (
+                    <div key={t.label}
+                      onClick={() => { setChatTopic(t.intent); setTypeChat(true); }}
+                      style={{ flexShrink:0, width:150, background:t.bg, border:`1.5px solid ${t.border}`, borderRadius:18, padding:'14px 13px 15px', cursor:'pointer', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', boxShadow:'0 2px 14px rgba(20,20,19,0.06)', display:'flex', flexDirection:'column', gap:6 }}>
+                      <span style={{ fontSize:24 }}>{t.emoji}</span>
+                      <p style={{ margin:0, fontSize:14, fontWeight:800, color:'#141413', fontFamily:'Sofia Sans,sans-serif', lineHeight:1.2, letterSpacing:'-0.2px' }}>{t.label}</p>
+                      <p style={{ margin:0, fontSize:11.5, color:'rgba(20,20,19,0.48)', fontFamily:'Sofia Sans,sans-serif', lineHeight:1.4 }}>{t.tease}</p>
+                      <div style={{ marginTop:2, height:2.5, width:22, borderRadius:99, background:t.color, opacity:0.7 }} />
                     </div>
                   ))}
+                  {/* trailing spacer so last card doesn't get clipped */}
+                  <div style={{ flexShrink:0, width:4 }} />
+                </div>
+                {/* left fade to white */}
+                <div style={{ position:'absolute', top:0, left:-28, bottom:0, width:56, background:'linear-gradient(to left, transparent, rgba(245,242,255,0.96))', pointerEvents:'none', zIndex:1 }} />
+                {/* right fade to white */}
+                <div style={{ position:'absolute', top:0, right:-28, bottom:0, width:56, background:'linear-gradient(to right, transparent, rgba(245,242,255,0.96))', pointerEvents:'none', zIndex:1 }} />
                 </div>
               </div>
 

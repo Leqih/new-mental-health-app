@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "IlliniCare (root)",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", ".", "--listen", "3000", "--no-clipboard"],
+      "port": 3000
+    },
+    {
+      "name": "new-mental-health-app",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "new-mental-health-app", "--listen", "3001", "--no-clipboard"],
+      "port": 3001
+    }
+  ]
+}

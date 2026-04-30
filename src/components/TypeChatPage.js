@@ -295,18 +295,20 @@
           onTouchStart={e => e.stopPropagation()}
           onTouchEnd={e => e.stopPropagation()}
         >
-          {/* Orb + pattern — non-scrolling overlay at top */}
-          <div style={{ position:'absolute', top:0, left:0, right:0, height:262, zIndex:3, pointerEvents:'none' }}>
-            <div style={{ position:'absolute', left:'50%', top:102, transform:'translateX(-50%)', width:343, height:335, opacity:0.55 }}>
+          {/* Orb + pattern — non-scrolling overlay at top, overflow:hidden clips shadow */}
+          <div style={{ position:'absolute', top:0, left:0, right:0, height:270, zIndex:3, pointerEvents:'none', overflow:'hidden' }}>
+            <div style={{ position:'absolute', left:'50%', top:102, transform:'translateX(-50%)', width:343, height:335, opacity:0.45 }}>
               <img alt="" src={imgTcPattern} style={{ width:'100%', height:'100%', objectFit:'contain', display:'block' }} />
             </div>
+            {/* Subtle ambient glow — contained within the overlay height */}
+            <div style={{ position:'absolute', left:'50%', top:160, transform:'translateX(-50%)', width:280, height:140, borderRadius:'50%', background:'radial-gradient(ellipse at center, rgba(239,140,90,0.18) 0%, rgba(204,235,255,0.12) 50%, transparent 100%)', filter:'blur(24px)' }} />
             <div style={{ position:'absolute', left:'50%', top:102, transform:'translateX(-50%)', width:155, height:155 }}>
-              <div style={{ position:'absolute', left:18.5, top:18.5, width:117.5, height:117.5, borderRadius:58.75, background:'rgba(255,255,255,0.72)', border:'2px solid rgba(255,255,255,0.5)', overflow:'hidden', boxShadow:'0 64px 250px 0 #ef8c5a, 0 24px 54px 0 rgba(255,255,255,0.1), 0 3px 120px 0 #ccebff' }}>
+              <div style={{ position:'absolute', left:18.5, top:18.5, width:117.5, height:117.5, borderRadius:58.75, background:'rgba(255,255,255,0.72)', border:'2px solid rgba(255,255,255,0.5)', overflow:'hidden', boxShadow:'0 8px 32px 0 rgba(239,140,90,0.28), 0 2px 12px 0 rgba(204,235,255,0.4)' }}>
                 <img alt="" src={imgTcOrbMask} style={{ position:'absolute', left:8, top:22, width:102, height:75, objectFit:'contain', display:'block' }} />
                 <div style={{ position:'absolute', inset:0, background:'linear-gradient(145deg,rgba(255,255,255,0.22) 6%,transparent 46%)', borderRadius:58.75 }} />
               </div>
             </div>
-            <div style={{ position:'absolute', bottom:0, left:0, right:0, height:80, background:'linear-gradient(to bottom,transparent,white)' }} />
+            <div style={{ position:'absolute', bottom:0, left:0, right:0, height:60, background:'linear-gradient(to bottom,transparent,white)' }} />
           </div>
 
           {/* Header */}
@@ -392,7 +394,7 @@
           </div>
 
           {/* Chips + input panel */}
-          <div style={{ position:'relative', zIndex:3, flexShrink:0, background:'rgba(255,255,255,0.92)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', borderTop:'1px solid rgba(0,0,0,0.06)' }}>
+          <div style={{ position:'relative', zIndex:3, flexShrink:0, background:'white' }}>
             <div style={{ padding:'10px 16px 0', display:'flex', gap:6, overflowX:'auto' }}>
               {chips.map(s => (
                 <div key={s} onClick={() => sendMessage(s)} style={{ background:'white', border:'1px solid rgba(0,0,0,0.08)', borderRadius:99, padding:'6px 13px', cursor:'pointer', flexShrink:0, boxShadow:'0 1px 3px rgba(0,0,0,0.04)' }}>
@@ -401,7 +403,7 @@
               ))}
             </div>
             <div style={{ padding:'8px 18px 34px', display:'flex', alignItems:'center', gap:8 }}>
-              <div style={{ flex:1, background:'white', borderRadius:8, padding:'9px 12px', boxShadow:'0 0 0 1px rgba(3,7,18,0.04),0 1px 3px rgba(3,7,18,0.03)', display:'flex', alignItems:'center' }}>
+              <div style={{ flex:1, background:'white', borderRadius:8, padding:'9px 12px', boxShadow:'0 0 0 1px rgba(3,7,18,0.04),0 1px 3px rgba(3,7,18,0.03)', display:'flex', alignItems:'center', border:'none' }}>
                 <textarea
                   value={input}
                   onChange={e => setInput(e.target.value)}

@@ -340,7 +340,7 @@
           </div>
 
           {/* Messages — scrolls under the orb overlay */}
-          <div ref={messagesRef} style={{ position:'relative', zIndex:2, flex:1, overflowY:'auto', display:'flex', flexDirection:'column', gap:4, paddingTop:168, paddingLeft:20, paddingRight:20 }}>
+          <div ref={messagesRef} style={{ position:'relative', zIndex:2, flex:1, overflowY:'auto', display:'flex', flexDirection:'column', gap:4, paddingTop:168, paddingLeft:20, paddingRight:20, background:'white' }}>
 
             {messages.map((msg, i) => {
               const prevFrom = i > 0 ? messages[i-1].from : null;

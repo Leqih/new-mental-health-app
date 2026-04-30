@@ -3,1677 +3,192 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>IlliniCare · Mental Wellness</title>
+  <title>MindCare · Mental Wellness</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Sofia+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-    :root {
-      --sage:        #8A9E88;
-      --sage-mid:    #A8B8A5;
-      --sage-light:  #C5D0C2;
-      --cream:       #EBE6DC;
-      --stone:       #C8BEB0;
-      /* text tokens — near-black for 4.5:1 contrast (WCAG AA) */
-      --deep:        #111110;
-      --deep-80:     rgba(15,15,12,0.88);
-      --deep-60:     rgba(15,15,12,0.72);
-      --deep-40:     rgba(15,15,12,0.52);
-      --deep-20:     rgba(15,15,12,0.20);
-      /* glass tokens */
-      --glass:       rgba(255,255,255,0.52);
-      --glass-mid:   rgba(255,255,255,0.64);
-      --glass-hi:    rgba(255,255,255,0.76);
-      --glass-bdr:   rgba(255,255,255,0.55);
-      --orange:      #C85000;
-      --r:           24px;
-      --display:     'Cormorant Garamond', Georgia, serif;
-      --body:        'Jost', system-ui, sans-serif;
-    }
-
-    html {
-      width: 100%; height: 100%;
-    }
-
+    html, body { width: 100%; height: 100%; overflow: hidden; }
     body {
-      width: 100%; min-height: 100%;
-      background: linear-gradient(160deg, #D8DDD4 0%, #C8D0C4 50%, #B8C8CC 100%);
+      background: #ddd7ce;
       display: flex; align-items: center; justify-content: center;
-      font-family: var(--body);
+      font-family: 'Sofia Sans', system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
       padding: 24px 0;
     }
-
-    /* ── PHONE FRAME ── */
-    .phone {
-      width: 390px; height: 844px;
-      flex-shrink: 0;
-      position: relative; overflow: hidden;
-      border-radius: 52px;
-      box-shadow:
-        0 0 0 1px rgba(255,255,255,0.18),
-        0 0 0 11px #1A1A18,
-        0 0 0 12px rgba(255,255,255,0.08),
-        0 40px 90px rgba(0,0,0,0.55),
-        inset 0 1px 0 rgba(255,255,255,0.12);
-    }
-    @media (max-width: 450px) {
-      body { padding: 0; overflow: hidden; height: 100vh; }
-      .phone {
-        width: 100vw;
-        height: 100vh;
-        height: 100dvh;
-        border-radius: 0;
-        box-shadow: none;
-      }
-    }
-
-    /* ── VIDEO BACKGROUND ── */
-    .video-bg {
-      position: absolute; inset: 0; z-index: 0;
-      overflow: hidden;
-      /* gradient fallback shown instantly while video loads or if blocked */
-      background: linear-gradient(170deg,
-        #f5c5b0 0%, #f0b8a8 15%, #e8c4b8 30%,
-        #d4cfe8 50%, #bfd0e8 65%,
-        #ccd8e8 80%, #d8e4ec 100%);
-    }
-    .video-bg video {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      /* show the top of the video — where the pink sunset horizon lives */
-      object-position: center 20%;
-      /* let the warm sunset tones breathe */
-      filter: saturate(0.95) brightness(1.04);
-    }
-    /* fade cards into the sky — bottom-heavy overlay only */
-    .video-bg::after {
-      content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(
-        to bottom,
-        transparent 0%,
-        transparent 52%,
-        rgba(230,228,224,0.30) 72%,
-        rgba(224,222,218,0.50) 100%
-      );
-      pointer-events: none;
-    }
-
-    /* open-sky spacer — tuned so everything fits without scroll */
-    .sky-spacer { height: 52px; }
-
-    /* ── APP SHELL ── */
-    .shell {
-      position: absolute; inset: 0; z-index: 2;
-      display: flex; flex-direction: column; overflow: hidden;
-    }
-
-    /* ── STATUS BAR ── */
-    .status-bar {
-      flex-shrink: 0;
-      padding: 14px 28px 0;
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .status-time { font-weight: 600; font-size: 15px; color: rgba(44,42,36,0.80); letter-spacing: -.3px; }
-    .status-icons { display: flex; gap: 6px; align-items: center; }
-
-    /* ── SCREEN CONTAINER ── */
-    .screens { flex: 1; position: relative; overflow: hidden; }
-
-    /* ── SCREEN (default scrollable) ── */
-    .screen {
-      position: absolute; inset: 0;
-      overflow-y: auto; overflow-x: hidden;
-      padding-bottom: 96px;
-      scrollbar-width: none;
-    }
-    .screen::-webkit-scrollbar { display: none; }
-    /* home screen: no scroll, fits the full frame */
-    .screen-home {
-      overflow: hidden;
-      padding-bottom: 0;
-      display: flex; flex-direction: column;
-    }
-
-    /* ── SCREEN (chat layout — flex column, no outer scroll) ── */
-    .screen-chat {
-      position: absolute; top: 0; left: 0; right: 0; bottom: 72px;
-      overflow: hidden;
-      display: flex; flex-direction: column;
-    }
-
-    /* ── GLASS CARDS — true frosted glass, lower opacity = more blur visible ── */
-    .glass {
-      background: rgba(255,255,255,0.38);
-      border: 1px solid rgba(255,255,255,0.60);
-      backdrop-filter: blur(48px) saturate(140%);
-      -webkit-backdrop-filter: blur(48px) saturate(140%);
-      border-radius: var(--r);
-      box-shadow: 0 2px 12px rgba(44,42,36,0.06), 0 10px 40px rgba(44,42,36,0.08);
-    }
-    .glass-hi {
-      background: rgba(255,255,255,0.48);
-      border: 1px solid rgba(255,255,255,0.70);
-      backdrop-filter: blur(56px) saturate(150%);
-      -webkit-backdrop-filter: blur(56px) saturate(150%);
-      border-radius: var(--r);
-      box-shadow: 0 2px 16px rgba(44,42,36,0.07), 0 12px 48px rgba(44,42,36,0.09);
-    }
-
-    /* ── BOTTOM NAV — floating pill ── */
-    .bottom-nav {
-      position: absolute; bottom: 18px; left: 18px; right: 18px;
-      height: 62px;
-      background: rgba(245,242,236,0.90);
-      border: none;
-      backdrop-filter: blur(40px) saturate(130%);
-      -webkit-backdrop-filter: blur(40px) saturate(130%);
-      border-radius: 32px;
-      display: flex; align-items: center; justify-content: space-around;
-      padding: 0 10px;
-      z-index: 100;
-      box-shadow:
-        0 2px 8px rgba(44,42,36,0.08),
-        0 8px 32px rgba(44,42,36,0.12),
-        inset 0 1px 0 rgba(255,255,255,0.70);
-    }
-    .nav-btn {
-      display: flex; flex-direction: column; align-items: center; gap: 2px;
-      padding: 6px 8px; cursor: pointer;
-      border-radius: 20px; border: none; background: none;
-      transition: all .22s ease;
-      min-width: 52px;
-    }
-    .nav-btn.active { background: rgba(44,42,36,0.08); }
-    .nav-emoji {
-      font-size: 19px; line-height: 1;
-      filter: grayscale(0.4) opacity(0.4);
-      transition: filter .22s, transform .22s;
-    }
-    .nav-btn.active .nav-emoji {
-      filter: grayscale(0) opacity(1);
-      transform: scale(1.10);
-    }
-    .nav-label {
-      font-size: 9px; font-weight: 500; letter-spacing: .2px;
-      color: rgba(44,42,36,0.35); transition: color .22s;
-    }
-    .nav-btn.active .nav-label { color: rgba(44,42,36,0.82); }
-    /* active dot indicator */
-    .nav-btn.active .nav-label {
-      position: relative;
-    }
-    .nav-dot {
-      width: 4px; height: 4px; border-radius: 50%;
-      background: rgba(44,42,36,0.55);
-      margin: 0 auto; margin-top: 2px;
-      opacity: 0; transition: opacity .22s;
-    }
-    .nav-btn.active .nav-dot { opacity: 1; }
-
-    /* ── ANIMATIONS ── */
-    @keyframes fadeUp   { from { transform: translateY(18px); opacity: 0; } to { transform: none; opacity: 1; } }
-    @keyframes slideUp  { from { transform: translateY(100%); } to { transform: none; } }
-    @keyframes spin     { to { transform: rotate(360deg); } }
-    @keyframes typeBounce {
-      0%, 60%, 100% { transform: translateY(0); }
-      30%           { transform: translateY(-5px); }
-    }
-
-    .fade-up { animation: fadeUp .45s ease-out both; }
-    .d1 { animation-delay: .06s; } .d2 { animation-delay: .12s; }
-    .d3 { animation-delay: .18s; } .d4 { animation-delay: .24s; }
-    .d5 { animation-delay: .30s; } .d6 { animation-delay: .36s; }
-
-    /* ── HOME ── */
-    .home-header {
-      padding: 18px 26px 0;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .avatar-wrap { display: flex; align-items: center; gap: 12px; }
-    .avatar {
-      width: 46px; height: 46px; border-radius: 50%;
-      background: rgba(255,255,255,0.72);
-      border: none;
-      display: flex; align-items: center; justify-content: center; font-size: 22px;
-      box-shadow: 0 2px 16px rgba(44,42,36,0.12);
-    }
-    /* streak pill */
-    .streak-badge {
-      padding: 5px 11px; border-radius: 18px;
-      background: rgba(255,190,60,0.18); border: 1px solid rgba(255,170,40,0.28);
-      font-size: 12px; font-weight: 600; color: rgba(44,38,10,0.80);
-      display: flex; align-items: center; gap: 3px; letter-spacing: .1px;
-    }
-
-    .greet-sub  {
-      font-size: 11px; color: var(--deep-40); font-weight: 400;
-      letter-spacing: .3px; margin-bottom: 2px;
-    }
-    .greet-name { font-family: var(--display); font-size: 22px; font-weight: 600; color: var(--deep); line-height: 1.2; letter-spacing: -.2px; }
-    .header-right { display: flex; gap: 10px; align-items: center; }
-    .menu-btn {
-      width: 40px; height: 40px; border-radius: 50%;
-      background: rgba(255,255,255,0.62); border: none;
-      backdrop-filter: blur(20px);
-      box-shadow: 0 2px 12px rgba(44,42,36,0.10);
-      display: flex; align-items: center; justify-content: center; cursor: pointer;
-    }
-
-    /* (sky-spacer defined in grain section above) */
-
-    .daily-thought { padding: 0 28px 20px; }
-    .thought-label {
-      font-size: 11px; font-weight: 500; letter-spacing: .8px;
-      text-transform: uppercase;
-      color: rgba(44,42,36,0.42); margin-bottom: 8px;
-    }
-    .thought-quote {
-      font-family: var(--display);
-      font-size: 42px; font-weight: 600;
-      color: var(--deep); line-height: 1.08; letter-spacing: -.3px;
-    }
-
-    /* condition card */
-    .cond-card   { margin: 0 22px 2px; padding: 10px 16px 8px; }
-    .cond-head   { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .cond-title  { font-size: 10.5px; font-weight: 600; color: var(--deep-40);
-                   letter-spacing: .8px; text-transform: uppercase; }
-    .toggle-grp  { display: flex; background: rgba(44,42,36,0.06); border-radius: 22px; padding: 3px; }
-    .tog {
-      padding: 5px 14px; border-radius: 18px; font-size: 11px; font-weight: 500;
-      border: none; cursor: pointer; color: var(--deep-40); background: transparent;
-      font-family: var(--body); transition: all .22s;
-    }
-    .tog.on { background: rgba(255,255,255,0.88); color: var(--deep);
-              box-shadow: 0 1px 8px rgba(44,42,36,0.10); }
-    .cond-body   { display: flex; gap: 18px; align-items: flex-start; }
-    .cond-date   {
-      text-align: center; min-width: 44px;
-      padding-right: 16px;
-      border-right: 1px solid rgba(44,42,36,0.08);
-    }
-    .cond-day    { font-family: var(--display); font-size: 40px; font-weight: 300;
-                   color: var(--deep); line-height: 1; }
-    .cond-month  { font-size: 10px; color: var(--deep-40); font-weight: 600;
-                   text-transform: uppercase; letter-spacing: .6px; margin-top: 2px; }
-    .cond-text   { flex: 1; font-size: 12px; line-height: 1.65; color: var(--deep-60); }
-    /* soft pill CTA */
-    .sol-btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      margin-top: 8px; padding: 7px 16px;
-      background: rgba(44,42,36,0.06); color: var(--deep-60);
-      border: none; border-radius: 22px; font-family: var(--body);
-      font-size: 12px; font-weight: 500; letter-spacing: .2px;
-      cursor: pointer; transition: background .22s;
-    }
-    .sol-btn::after { content: '→'; font-size: 13px; color: var(--deep-40); }
-    .sol-btn:hover { background: rgba(44,42,36,0.11); }
-
-    /* ── ESSENTIALS SECTION ── */
-    .essentials-wrap {
-      padding: 6px 18px 100px;
-      display: flex; flex-direction: column;
-    }
-    .essentials-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 10px;
-    }
-    .essentials-title {
-      font-family: var(--display);
-      font-size: 18px; font-weight: 600;
-      color: var(--deep); letter-spacing: -.2px;
-    }
-    .essentials-more {
-      width: 32px; height: 32px; border-radius: 50%; border: none;
-      background: rgba(44,42,36,0.07);
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; color: var(--deep);
-    }
-    .feats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-    .feat-card {
-      background: rgba(255,255,255,0.52);
-      border: 1px solid rgba(255,255,255,0.72);
-      backdrop-filter: blur(48px) saturate(130%);
-      -webkit-backdrop-filter: blur(48px) saturate(130%);
-      border-radius: 22px;
-      padding: 18px 16px 16px;
-      box-shadow: 0 2px 10px rgba(44,42,36,0.05), 0 8px 28px rgba(44,42,36,0.07);
-      cursor: pointer; transition: transform .20s ease, box-shadow .20s ease;
-      display: flex; flex-direction: column;
-      justify-content: space-between;
-      min-height: 158px;
-      overflow: hidden;
-      position: relative;
-    }
-    .feat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(44,42,36,0.09), 0 14px 40px rgba(44,42,36,0.10); }
-    .feat-card:active { transform: scale(.97); }
-    /* card top: title + desc */
-    .feat-card-top { flex: 1; }
-    .feat-card-name {
-      font-family: var(--display);
-      font-size: 20px; font-weight: 600;
-      color: var(--deep); line-height: 1.18;
-      letter-spacing: -.2px; margin-bottom: 6px;
-    }
-    .feat-card-desc {
-      font-size: 11.5px; font-weight: 400;
-      color: rgba(44,42,36,0.50); line-height: 1.48;
-    }
-    /* card bottom: arrow left, illustration right */
-    .feat-card-footer {
-      display: flex; align-items: flex-end;
-      justify-content: space-between;
-      margin-top: 14px;
-    }
-    .feat-arrow {
-      width: 30px; height: 30px; border-radius: 50%; border: none;
-      background: rgba(44,42,36,0.09);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px; color: var(--deep); line-height: 1;
-      flex-shrink: 0;
-    }
-    .feat-illus {
-      font-size: 44px; line-height: 1;
-      opacity: 0.55; margin-bottom: -4px;
-      filter: saturate(0.6);
-    }
-
-    /* ── MOOD CHECK-IN ── */
-    .sheet-overlay {
-      position: absolute; inset: 0; z-index: 200;
-      background: rgba(0,0,0,.35); backdrop-filter: blur(4px);
-      display: flex; align-items: flex-end;
-    }
-    .sheet {
-      width: 100%; padding: 20px 28px 48px;
-      border-radius: 32px 32px 0 0;
-      background: rgba(242,240,236,0.97);
-      border-top: none;
-      box-shadow: 0 -4px 32px rgba(44,42,36,0.10);
-      animation: slideUp .38s cubic-bezier(.32,.72,0,1);
-    }
-    .sheet-handle { width: 36px; height: 4px; background: rgba(40,38,30,.2); border-radius: 2px; margin: 0 auto 20px; }
-    .sheet-title  { font-family: var(--display); font-size: 28px; font-weight: 400; color: var(--deep); margin-bottom: 4px; }
-    .sheet-sub    { font-size: 12px; color: var(--deep-60); margin-bottom: 22px; }
-
-    .mood-row   { display: flex; justify-content: space-between; margin-bottom: 22px; }
-    .mood-opt   {
-      display: flex; flex-direction: column; align-items: center; gap: 6px;
-      padding: 10px 6px; border-radius: 16px; border: 2px solid transparent;
-      cursor: pointer; background: transparent; transition: all .2s; min-width: 56px;
-    }
-    .mood-opt.sel { background: rgba(255,255,255,.52); border-color: rgba(255,255,255,.82); }
-    .m-emoji { font-size: 28px; }
-    .m-label { font-size: 10px; font-weight: 500; color: var(--deep-60); }
-
-    .tags-lbl  { font-size: 11px; font-weight: 600; letter-spacing: .6px; text-transform: uppercase; color: var(--deep-40); margin-bottom: 9px; }
-    .tags-wrap { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 18px; }
-    .tag-pill  {
-      padding: 6px 13px; border-radius: 20px;
-      border: 1px solid rgba(40,38,30,.2); background: transparent;
-      font-family: var(--body); font-size: 12px; color: var(--deep-60);
-      cursor: pointer; transition: all .2s;
-    }
-    .tag-pill.on { background: rgba(36,34,26,.74); border-color: transparent; color: rgba(255,255,255,.92); }
-
-    .note-ta {
-      width: 100%; background: rgba(255,255,255,.34);
-      border: 1px solid rgba(255,255,255,.52); border-radius: 14px;
-      padding: 11px 14px; font-family: var(--body); font-size: 13px;
-      color: var(--deep); resize: none; outline: none; margin-bottom: 18px;
-    }
-    .note-ta::placeholder { color: var(--deep-40); }
-
-    .primary-btn {
-      width: 100%; padding: 16px;
-      background: rgba(44,42,36,0.78); color: rgba(255,255,255,.94);
-      border: none; border-radius: 20px; font-family: var(--body);
-      font-size: 15px; font-weight: 500; cursor: pointer; transition: all .2s;
-      letter-spacing: .2px;
-    }
-    .primary-btn:hover { background: rgba(44,42,36,0.90); }
-
-    /* ── GENERIC HEADER ── */
-    .scr-header { padding: 18px 24px 0; display: flex; align-items: center; justify-content: space-between; }
-    .scr-title  { font-family: var(--display); font-size: 30px; font-weight: 400; color: var(--deep); }
-    .back-btn   {
-      width: 36px; height: 36px; border-radius: 12px;
-      background: var(--glass-mid); border: 1px solid var(--glass-bdr);
-      display: flex; align-items: center; justify-content: center; cursor: pointer;
-    }
-    .chat-head-title { flex: 1; margin-left: 12px; }
-    .cht-main { font-size: 16px; font-weight: 600; color: var(--deep); }
-    .cht-sub  { font-size: 11px; color: var(--deep-60); }
-
-    /* ── INSIGHTS ── */
-    .stats-row { display: flex; gap: 10px; padding: 0 24px; margin: 14px 0 0; }
-    .stat-card { flex: 1; padding: 14px; text-align: center; }
-    .stat-num  { font-family: var(--display); font-size: 32px; font-weight: 400; color: var(--deep); line-height: 1; }
-    .stat-lbl  { font-size: 10px; font-weight: 500; color: var(--deep-60); margin-top: 3px; letter-spacing: .2px; }
-
-    .chart-card { margin: 14px 24px; padding: 16px; }
-    .chart-sub  { font-size: 11px; color: var(--deep-60); margin-bottom: 12px; font-weight: 500; letter-spacing: .2px; }
-
-    /* ── MOOD CALENDAR ── */
-    .cal-card   { margin: 14px 24px; padding: 16px 14px 14px; }
-    .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-    .cal-title  { font-size: 13px; font-weight: 600; color: var(--deep); }
-    .cal-count  { font-size: 11px; color: var(--deep-60); }
-    .cal-plus   { width: 28px; height: 28px; border-radius: 50%; background: rgba(44,42,36,0.10);
-                  border: none; cursor: pointer; font-size: 16px; color: var(--deep);
-                  display: flex; align-items: center; justify-content: center; }
-    .cal-dow    { display: grid; grid-template-columns: repeat(7,1fr); margin-bottom: 4px; }
-    .cal-dow span { text-align: center; font-size: 10px; font-weight: 600; color: var(--deep-40);
-                    letter-spacing: .3px; padding: 2px 0; }
-    .cal-grid   { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; }
-    .cal-cell   { aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
-                  border-radius: 50%; font-size: 11px; color: rgba(44,42,36,0.35); font-weight: 600;
-                  position: relative; cursor: default; }
-    .cal-cell.today { background: rgba(44,42,36,0.12); box-shadow: 0 0 0 2.5px rgba(44,42,36,0.70); }
-    .cal-cell.has-entry { font-size: 22px; color: rgba(0,0,0,1); }
-    .cal-cell.today.has-entry { box-shadow: 0 0 0 2.5px rgba(44,42,36,0.80); }
-    .cal-cell.empty { opacity: 0; pointer-events: none; }
-    .cal-cell.has-entry { cursor: pointer; transition: transform .15s; }
-    .cal-cell.has-entry:active { transform: scale(0.85); }
-    .cal-cell.selected { box-shadow: 0 0 0 2.5px var(--deep); background: rgba(44,42,36,0.08); }
-
-    /* ── DAY DETAIL CARD ── */
-    .day-detail {
-      margin: 10px 0 0; padding: 12px 14px;
-      background: rgba(255,255,255,0.55); border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.65);
-      display: flex; align-items: center; gap: 14px;
-      animation: fadeUp .25s ease both;
-    }
-    .day-detail-emoji { font-size: 32px; flex-shrink: 0; }
-    .day-detail-info  { flex: 1; }
-    .day-detail-date  { font-size: 11px; color: var(--deep-40); font-weight: 600; letter-spacing: .3px; }
-    .day-detail-label { font-size: 16px; font-weight: 600; color: var(--deep); margin: 2px 0; }
-    .day-detail-tags  { font-size: 11px; color: var(--deep-60); }
-    .day-detail-note  { font-size: 11px; color: var(--deep-60); font-style: italic; margin-top: 3px; }
-
-    .sec-label { font-size: 11px; font-weight: 600; letter-spacing: .8px; text-transform: uppercase; color: var(--deep-40); padding: 14px 24px 6px; }
-
-    .history-list { padding: 0 24px; display: flex; flex-direction: column; gap: 9px; }
-    .hist-row { display: flex; align-items: center; gap: 14px; padding: 12px 15px; }
-    .hist-date { text-align: center; min-width: 34px; }
-    .hist-d  { font-family: var(--display); font-size: 22px; font-weight: 400; color: var(--deep); line-height: 1; }
-    .hist-m  { font-size: 9px; color: var(--deep-60); font-weight: 500; text-transform: uppercase; }
-    .hist-emoji { font-size: 22px; }
-    .hist-info  { flex: 1; }
-    .hist-name  { font-size: 13px; font-weight: 500; color: var(--deep); }
-    .hist-tags  { font-size: 11px; color: var(--deep-60); }
-
-    /* ── CHAT ── */
-    .msgs-wrap { flex: 1; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; }
-    .msgs-wrap::-webkit-scrollbar { display: none; }
-    .msgs-inner { padding: 8px 20px; display: flex; flex-direction: column; gap: 11px; }
-
-    .bubble {
-      max-width: 78%; padding: 11px 15px;
-      font-size: 13px; line-height: 1.55;
-      border-radius: 18px;
-      animation: fadeUp .28s ease-out both;
-    }
-    .bubble.bot {
-      align-self: flex-start; border-bottom-left-radius: 5px;
-      background: rgba(255,255,255,.44); border: 1px solid rgba(255,255,255,.62);
-      backdrop-filter: blur(12px); color: var(--deep);
-    }
-    .bubble.me {
-      align-self: flex-end; border-bottom-right-radius: 5px;
-      background: rgba(36,34,26,.76); color: rgba(255,255,255,.94);
-    }
-
-    .typing-ind { display: flex; gap: 4px; align-items: center; padding: 12px 14px; }
-    .typing-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--deep-40); animation: typeBounce 1.4s infinite; }
-    .typing-dot:nth-child(2) { animation-delay: .2s; }
-    .typing-dot:nth-child(3) { animation-delay: .4s; }
-
-    /* ── AI CHAT LANDING ── */
-    .ai-landing {
-      padding: 0; display: flex; flex-direction: column; flex: 1; min-height: 0;
-    }
-    .ai-top-bar {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 10px 20px 8px; flex-shrink: 0;
-    }
-    .ai-top-back { width: 34px; height: 34px; border-radius: 50%;
-      background: rgba(255,255,255,0.35); border: 1px solid rgba(44,42,36,0.06);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px; color: var(--deep); cursor: pointer; }
-    .ai-top-title { font-family: var(--display); font-size: 18px; font-weight: 600;
-      color: var(--deep); letter-spacing: -.2px; }
-    .ai-top-plus { width: 34px; height: 34px; border-radius: 50%;
-      background: rgba(255,255,255,0.35); border: 1px solid rgba(44,42,36,0.06);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px; color: var(--deep); cursor: pointer; }
-
-    /* greeting card */
-    .ai-greet-card {
-      margin: 6px 18px 14px; padding: 22px 20px 18px;
-      background: rgba(255,255,255,0.32);
-      backdrop-filter: blur(28px) saturate(130%);
-      -webkit-backdrop-filter: blur(28px) saturate(130%);
-      border-radius: 22px; border: 1px solid rgba(255,255,255,0.50);
-    }
-    .ai-greet-row {
-      display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
-    }
-    .ai-greet-text {
-      font-family: var(--body); font-size: 13px; font-weight: 500; color: var(--deep);
-      letter-spacing: .1px;
-    }
-    .ai-greet-avatar {
-      width: 28px; height: 28px; border-radius: 50%;
-      background: linear-gradient(135deg, rgba(255,200,180,0.6), rgba(255,160,140,0.3));
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px;
-    }
-    .ai-greet-msg {
-      font-family: var(--display); font-size: 24px; font-weight: 600;
-      color: var(--deep); line-height: 1.18;
-      letter-spacing: -.3px;
-    }
-    .ai-greet-msg .ai-highlight {
-      display: inline-flex; align-items: center; gap: 4px;
-      background: rgba(255,200,180,0.30); border-radius: 8px; padding: 1px 6px;
-    }
-    .ai-greet-meta {
-      display: flex; align-items: center; gap: 12px;
-      margin-top: 14px; font-family: var(--body); font-size: 10px; color: var(--deep-40);
-      font-weight: 500; letter-spacing: .3px;
-    }
-    .ai-greet-meta span { display: flex; align-items: center; gap: 3px; }
-
-    /* combined greeting + insight card */
-    .ai-combined-card {
-      margin: 6px 18px 12px;
-      background: rgba(255,255,255,0.32);
-      backdrop-filter: blur(28px) saturate(130%);
-      -webkit-backdrop-filter: blur(28px) saturate(130%);
-      border-radius: 22px; border: 1px solid rgba(255,255,255,0.50);
-      overflow: hidden;
-      display: flex; flex-direction: column;
-    }
-    .ai-combined-top {
-      padding: 22px 20px 0;
-    }
-    /* expand toggle button */
-    .ai-expand-btn {
-      display: flex; align-items: center; justify-content: center;
-      padding: 10px 0 12px; cursor: pointer;
-      border: none; background: transparent; width: 100%;
-      color: var(--deep-40); transition: color .2s;
-    }
-    .ai-expand-btn:hover { color: var(--deep-60); }
-    .ai-expand-chevron {
-      display: flex; align-items: center; justify-content: center;
-      width: 26px; height: 26px; border-radius: 50%;
-      background: rgba(44,42,36,0.06);
-      transition: transform .32s cubic-bezier(.32,.72,0,1);
-    }
-    .ai-expand-chevron.open { transform: rotate(180deg); }
-
-    /* insight card */
-    .ai-insight-card {
-      background: linear-gradient(165deg, rgba(255,225,200,0.30), rgba(255,200,180,0.15), rgba(255,240,230,0.20));
-      border-top: 1px solid rgba(255,255,255,0.40);
-      display: flex; flex-direction: column;
-      overflow: hidden;
-      max-height: 0;
-      padding: 0 18px;
-      transition: max-height .38s cubic-bezier(.32,.72,0,1), padding .28s ease;
-    }
-    .ai-insight-card.expanded {
-      max-height: 280px;
-      padding: 14px 18px 14px;
-    }
-    .ai-insight-journal {
-      font-family: var(--body); font-size: 11.5px; color: var(--deep-60);
-      line-height: 1.55; margin-bottom: 10px; font-weight: 400;
-    }
-    .ai-insight-quote {
-      font-family: var(--display); font-size: 16px; font-weight: 600;
-      color: var(--deep); line-height: 1.28;
-      letter-spacing: -.1px; opacity: 0.78; margin-bottom: 12px;
-    }
-    .ai-insight-tips {
-      font-family: var(--body); font-size: 11px; color: var(--deep-60);
-      line-height: 1.5; margin-bottom: 6px; font-weight: 400;
-    }
-    .ai-insight-tip {
-      display: flex; align-items: flex-start; gap: 7px; margin-bottom: 6px;
-    }
-    .ai-insight-tip .tip-ic { flex-shrink: 0; font-size: 12px; margin-top: 0px; }
-    .ai-action-row {
-      display: flex; gap: 8px; margin-top: auto;
-    }
-    .ai-action-pill {
-      display: flex; align-items: center; gap: 6px;
-      padding: 8px 14px; border-radius: 20px;
-      background: rgba(255,255,255,0.45); border: 1px solid rgba(255,255,255,0.55);
-      font-family: var(--body); font-size: 11px; font-weight: 500;
-      color: var(--deep); cursor: pointer; transition: transform .15s;
-      letter-spacing: .2px;
-    }
-    .ai-action-pill:active { transform: scale(.96); }
-    .ai-action-pill .pill-ic { font-size: 14px; }
-
-    /* bottom: pills + input anchored together */
-    .ai-bottom-anchor {
-      margin-top: auto; flex-shrink: 0;
-    }
-    .ai-bottom-bar {
-      padding: 6px 18px 14px;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .ai-bottom-plus {
-      width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
-      background: rgba(255,255,255,0.35); border: 1px solid rgba(44,42,36,0.08);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px; color: var(--deep-40); cursor: pointer;
-    }
-    .ai-bottom-input {
-      flex: 1; height: 40px; border-radius: 22px;
-      background: rgba(255,255,255,0.30); border: 1px solid rgba(44,42,36,0.08);
-      padding: 0 16px; font-family: var(--body); font-size: 13px;
-      color: var(--deep); outline: none;
-    }
-    .ai-bottom-input::placeholder { color: var(--deep-40); font-style: italic; font-family: var(--display); font-size: 13px; }
-    .ai-bottom-send {
-      width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
-      background: linear-gradient(135deg, rgba(255,180,160,0.6), rgba(255,140,120,0.4));
-      border: none; display: flex; align-items: center; justify-content: center;
-      font-size: 16px; color: #fff; cursor: pointer; transition: transform .15s;
-    }
-    .ai-bottom-send:active { transform: scale(.92); }
-
-    /* quick-start pills row */
-    .ai-qs-row {
-      display: flex; gap: 8px; overflow-x: auto; padding: 0 18px 12px;
-      scrollbar-width: none; flex-shrink: 0;
-    }
-    .ai-qs-row::-webkit-scrollbar { display: none; }
-    .ai-qs-pill {
-      flex-shrink: 0; padding: 7px 14px; border-radius: 18px;
-      background: rgba(255,255,255,0.35); border: 1px solid rgba(255,255,255,0.50);
-      font-family: var(--body); font-size: 11px; font-weight: 500;
-      color: var(--deep); cursor: pointer; white-space: nowrap;
-      transition: transform .15s;
-    }
-    .ai-qs-pill:active { transform: scale(.95); }
-
-    .crisis-banner {
-      flex-shrink: 0; margin: 0 20px 8px;
-      padding: 9px 14px; border-radius: 12px;
-      background: rgba(232,88,0,.10); border: 1px solid rgba(232,88,0,.20);
-      display: flex; align-items: center; gap: 10px;
-    }
-    .crisis-banner-text { flex: 1; font-size: 11px; color: var(--deep-60); }
-    .crisis-banner-link { font-size: 11px; font-weight: 600; color: var(--orange); cursor: pointer; }
-
-    .input-bar {
-      flex-shrink: 0; padding: 10px 20px 14px;
-      background: rgba(185,200,183,.85); backdrop-filter: blur(24px);
-      border-top: 1px solid rgba(255,255,255,.32);
-      display: flex; gap: 10px; align-items: center;
-    }
-    .chat-inp {
-      flex: 1; background: rgba(255,255,255,.40);
-      border: 1px solid rgba(255,255,255,.62); border-radius: 22px;
-      padding: 10px 16px; font-family: var(--body); font-size: 13px;
-      color: var(--deep); outline: none;
-    }
-    .chat-inp::placeholder { color: var(--deep-40); }
-    .send-btn {
-      width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
-      background: rgba(36,34,26,.78); border: none;
-      display: flex; align-items: center; justify-content: center; cursor: pointer;
-    }
-
-    /* ── PROFILE ── */
-    .prof-hero {
-      position: relative; display: flex; flex-direction: column; align-items: center;
-      padding: 28px 24px 22px;
-    }
-    .prof-avatar-wrap { position: relative; margin-bottom: 14px; }
-    .prof-avatar {
-      width: 86px; height: 86px; border-radius: 50%;
-      background: linear-gradient(135deg, rgba(200,210,195,0.70), rgba(155,175,152,0.45));
-      border: 3px solid rgba(255,255,255,0.80);
-      box-shadow: 0 4px 20px rgba(44,42,36,0.14);
-      display: flex; align-items: center; justify-content: center; font-size: 40px;
-    }
-    .prof-edit-btn {
-      position: absolute; bottom: 0; right: 0;
-      width: 26px; height: 26px; border-radius: 50%;
-      background: rgba(44,42,36,0.82); border: 2px solid rgba(255,255,255,0.90);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 11px; cursor: pointer; color: white;
-    }
-    .prof-name  { font-family: var(--display); font-size: 26px; font-weight: 600; color: var(--deep); letter-spacing: -.3px; margin-bottom: 3px; }
-    .prof-email { font-size: 12px; color: var(--deep-40); margin-bottom: 14px; }
-    .prof-badges { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
-    .prof-badge {
-      padding: 5px 12px; border-radius: 18px;
-      font-size: 11px; font-weight: 500; letter-spacing: .2px;
-      display: flex; align-items: center; gap: 4px;
-    }
-    .prof-badge.green  { background: rgba(80,155,95,0.14);  color: rgba(30,90,50,0.85);  border: 1px solid rgba(80,155,95,0.22); }
-    .prof-badge.amber  { background: rgba(200,150,30,0.14); color: rgba(100,70,10,0.85); border: 1px solid rgba(200,150,30,0.22); }
-    .prof-badge.blue   { background: rgba(70,130,200,0.14); color: rgba(30,70,140,0.85); border: 1px solid rgba(70,130,200,0.22); }
-
-    .prof-stats-row { display: flex; gap: 1px; margin: 0 24px 18px; overflow: hidden; border-radius: 18px; }
-    .prof-stat {
-      flex: 1; padding: 14px 8px; text-align: center;
-      background: rgba(255,255,255,0.42); border: 1px solid rgba(255,255,255,0.60);
-      backdrop-filter: blur(32px);
-    }
-    .prof-stat:first-child { border-radius: 18px 0 0 18px; }
-    .prof-stat:last-child  { border-radius: 0 18px 18px 0; }
-    .prof-stat-n { font-family: var(--display); font-size: 26px; font-weight: 500; color: var(--deep); line-height: 1; }
-    .prof-stat-l { font-size: 10px; font-weight: 500; color: var(--deep-60); margin-top: 3px; letter-spacing: .2px; }
-
-    .prof-section-title {
-      font-size: 11px; font-weight: 600; letter-spacing: .8px; text-transform: uppercase;
-      color: var(--deep-40); padding: 0 24px 8px;
-    }
-    .prof-menu { margin: 0 24px 18px; border-radius: 18px; overflow: hidden; }
-    .prof-row {
-      display: flex; align-items: center; gap: 14px;
-      padding: 14px 16px;
-      background: rgba(255,255,255,0.42); border: 1px solid rgba(255,255,255,0.60);
-      backdrop-filter: blur(32px); margin-bottom: 1px;
-      cursor: pointer; transition: background .18s;
-    }
-    .prof-row:first-child { border-radius: 18px 18px 0 0; }
-    .prof-row:last-child  { border-radius: 0 0 18px 18px; margin-bottom: 0; }
-    .prof-row:only-child  { border-radius: 18px; }
-    .prof-row:hover { background: rgba(255,255,255,0.58); }
-    .prof-row-ic {
-      width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center; font-size: 16px;
-    }
-    .prof-row-body { flex: 1; }
-    .prof-row-title { font-size: 13.5px; font-weight: 500; color: var(--deep); }
-    .prof-row-sub   { font-size: 11px; color: var(--deep-40); margin-top: 1px; }
-    .prof-row-chev  { font-size: 14px; color: var(--deep-40); }
-    .prof-row-badge {
-      font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 10px;
-      background: rgba(200,80,0,0.12); color: var(--orange);
-    }
-
-    .prof-signout {
-      width: calc(100% - 48px); margin: 0 24px 32px;
-      padding: 14px; border-radius: 16px; border: none;
-      background: rgba(200,80,0,0.08); border: 1px solid rgba(200,80,0,0.16);
-      font-family: var(--body); font-size: 14px; font-weight: 500;
-      color: var(--orange); cursor: pointer; letter-spacing: .1px;
-      transition: background .18s;
-    }
-    .prof-signout:hover { background: rgba(200,80,0,0.14); }
-
-    /* ── RESOURCES ── */
-    .filter-bar { padding: 10px 24px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
-    .filter-bar::-webkit-scrollbar { display: none; }
-    .chip {
-      padding: 7px 16px; border-radius: 20px; white-space: nowrap;
-      font-size: 12px; font-weight: 500; font-family: var(--body);
-      border: 1px solid rgba(40,38,30,.2); background: transparent;
-      color: var(--deep-60); cursor: pointer; transition: all .2s;
-    }
-    .chip.on { background: rgba(36,34,26,.74); border-color: transparent; color: rgba(255,255,255,.92); }
-
-    .res-list { padding: 0 24px 100px; display: flex; flex-direction: column; gap: 10px; }
-    .res-card { padding: 16px; }
-    .res-row  { display: flex; gap: 14px; align-items: flex-start; }
-    .res-ic   { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
-    .res-name { font-size: 14px; font-weight: 600; color: var(--deep); margin-bottom: 3px; }
-    .res-desc { font-size: 12px; color: var(--deep-60); line-height: 1.55; margin-bottom: 7px; }
-    .res-contact { font-size: 12px; font-weight: 500; color: var(--deep); display: flex; align-items: center; gap: 5px; }
-    .res-hours { font-size: 11px; color: var(--deep-40); margin-top: 2px; }
-
-    /* ── CRISIS ── */
-    .crisis-hero  { margin: 10px 24px 14px; padding: 24px; text-align: center; }
-    .crisis-big-ic { font-size: 46px; margin-bottom: 10px; }
-    .crisis-title { font-family: var(--display); font-size: 26px; font-weight: 400; color: var(--deep); margin-bottom: 6px; }
-    .crisis-sub   { font-size: 12px; color: var(--deep-60); line-height: 1.6; }
-    .call-now-btn {
-      display: flex; align-items: center; justify-content: center; gap: 9px;
-      width: 100%; padding: 16px; margin-top: 16px;
-      background: linear-gradient(135deg, #D05000, #F06820);
-      border: none; border-radius: 18px;
-      color: white; font-family: var(--body); font-size: 16px; font-weight: 600;
-      cursor: pointer; letter-spacing: .3px;
-      box-shadow: 0 8px 24px rgba(208,80,0,.30);
-    }
-    .crisis-list { padding: 0 24px; display: flex; flex-direction: column; gap: 9px; }
-    .cr-row  { padding: 13px 15px; display: flex; align-items: center; gap: 13px; }
-    .cr-ic   { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0; }
-    .cr-name { font-size: 13px; font-weight: 600; color: var(--deep); }
-    .cr-det  { font-size: 11px; color: var(--deep-60); }
-    .cr-act  {
-      padding: 7px 13px; border-radius: 16px; margin-left: auto;
-      background: rgba(40,38,30,.10); border: 1px solid rgba(40,38,30,.15);
-      font-family: var(--body); font-size: 12px; font-weight: 500;
-      color: var(--deep); cursor: pointer; white-space: nowrap;
-    }
+    @media (max-width: 430px) {
+      body { padding: 12px 0; align-items: flex-start; }
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to   { transform: none; }
+    }
+    /* Cloud character animations */
+    @keyframes cloudSad {
+      0%, 100% { transform: translateY(0px); }
+      50%       { transform: translateY(-8px); }
+    }
+    @keyframes cloudGood {
+      0%, 100% { transform: translateY(0) scale(1); }
+      30%      { transform: translateY(-14px) scale(1.04); }
+      60%      { transform: translateY(-4px) scale(0.98); }
+    }
+    @keyframes cloudHappy {
+      0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+      25%      { transform: translateY(-12px) rotate(6deg) scale(1.04); }
+      60%      { transform: translateY(-4px) rotate(-3deg) scale(1.01); }
+    }
+    @keyframes cloudGrateful {
+      0%   { transform: translateY(0px) rotate(0deg) scale(1); }
+      18%  { transform: translateY(7px) rotate(11deg) scale(0.94); }
+      28%  { transform: translateY(7px) rotate(11deg) scale(0.94); }
+      50%  { transform: translateY(-16px) rotate(-5deg) scale(1.08); }
+      65%  { transform: translateY(-11px) rotate(3deg) scale(1.04); }
+      80%  { transform: translateY(-6px) rotate(-1deg) scale(1.02); }
+      100% { transform: translateY(0px) rotate(0deg) scale(1); }
+    }
+    @keyframes cloudAngry {
+      0%, 100% { transform: rotate(0deg) scale(1); }
+      20%      { transform: rotate(-5deg) scale(1.03); }
+      40%      { transform: rotate(5deg) scale(1.03); }
+      60%      { transform: rotate(-3deg) scale(1.01); }
+      80%      { transform: rotate(3deg) scale(1.01); }
+    }
+    @keyframes cloudBoring {
+      0%   { transform: translateY(0px) rotate(0deg) scaleX(1); }
+      18%  { transform: translateY(4px) rotate(-9deg) scaleX(0.97); }
+      32%  { transform: translateY(8px) rotate(-16deg) scaleX(0.95); }
+      37%  { transform: translateY(-12px) rotate(6deg) scaleX(1.05); }
+      44%  { transform: translateY(2px) rotate(-2deg) scaleX(1); }
+      50%  { transform: translateY(0px) rotate(0deg) scaleX(1); }
+      100% { transform: translateY(0px) rotate(0deg) scaleX(1); }
+    }
+    @keyframes cloudExhausted {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      30%      { transform: translateY(3px) rotate(-2deg); }
+      70%      { transform: translateY(3px) rotate(2deg); }
+    }
+    @keyframes tearFall {
+      0%   { opacity: 0.9; transform: translateY(0) scale(1); }
+      80%  { opacity: 0.4; }
+      100% { opacity: 0;   transform: translateY(28px) scaleY(1.4); }
+    }
+    @keyframes orbPulse {
+      0%, 100% { transform: scale(1); opacity: 0.7; }
+      50%      { transform: scale(1.12); opacity: 1; }
+    }
+    @keyframes orbRipple {
+      0%   { transform: scale(1);    opacity: 0.45; }
+      100% { transform: scale(1.6);  opacity: 0; }
+    }
+    @keyframes orbBreath {
+      0%, 100% { transform: scale(1);    opacity: 0.9; }
+      50%      { transform: scale(1.06); opacity: 1; }
+    }
+    @keyframes liquidBlob {
+      0%   { border-radius: 62% 38% 46% 54% / 60% 44% 56% 40%; }
+      20%  { border-radius: 40% 60% 54% 46% / 48% 62% 38% 52%; }
+      40%  { border-radius: 56% 44% 38% 62% / 40% 56% 44% 60%; }
+      60%  { border-radius: 44% 56% 62% 38% / 52% 38% 62% 48%; }
+      80%  { border-radius: 58% 42% 48% 52% / 44% 58% 42% 56%; }
+      100% { border-radius: 62% 38% 46% 54% / 60% 44% 56% 40%; }
+    }
+    @keyframes fluidFloat1 {
+      0%, 100% { transform: translate(0%,   0%)  scale(1);    }
+      33%      { transform: translate(14%,  12%) scale(1.12); }
+      66%      { transform: translate(-8%,  22%) scale(0.94); }
+    }
+    @keyframes fluidFloat2 {
+      0%, 100% { transform: translate(0%,   0%)   scale(1);    }
+      40%      { transform: translate(-13%, -16%) scale(1.18); }
+      70%      { transform: translate(10%,  -9%)  scale(0.88); }
+    }
+    @keyframes fluidFloat3 {
+      0%, 100% { transform: translate(0%,   0%)  scale(1);    }
+      50%      { transform: translate(-10%, 14%) scale(1.1);  }
+    }
+    @keyframes eyeIdle {
+      0%, 90%, 100% { transform: scaleY(1); }
+      95%           { transform: scaleY(0.15); }
+    }
+    @keyframes eyeHappy {
+      0%, 80%, 100% { transform: scaleY(1); }
+      88%           { transform: scaleY(0.08); }
+      92%           { transform: scaleY(1); }
+      96%           { transform: scaleY(0.08); }
+    }
+    @keyframes eyeBlink {
+      0%, 88%, 100% { transform: scaleY(0); }
+      92%           { transform: scaleY(1); }
+      96%           { transform: scaleY(0); }
+    }
+    @keyframes faceBlink {
+      0%, 88%, 100% { transform: scaleY(1); }
+      91%           { transform: scaleY(0.15); }
+      94%           { transform: scaleY(1); }
+    }
+    @keyframes smileHappy {
+      0%, 100% { transform: scaleX(1) scaleY(1); }
+      40%      { transform: scaleX(1.08) scaleY(1.12); }
+      70%      { transform: scaleX(1.04) scaleY(1.06); }
+    }
+    @keyframes moodFadeIn {
+      from { opacity: 0; transform: scale(0.88); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    @keyframes bgFade {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes slideFromRight {
+      from { transform: translateX(100%); }
+      to   { transform: translateX(0); }
+    }
+    @keyframes slideFromLeft {
+      from { transform: translateX(-100%); }
+      to   { transform: translateX(0); }
+    }
+    @keyframes slideOutToLeft {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-100%); }
+    }
+    @keyframes slideOutToRight {
+      from { transform: translateX(0); }
+      to   { transform: translateX(100%); }
+    }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    .marquee-track { display: flex; gap: 8px; width: max-content; animation: marquee 14s linear infinite; }
+    .marquee-track:hover { animation-play-state: paused; }
+    @keyframes fluid1 { 0%,100%{border-radius:60% 40% 55% 45%/50% 60% 40% 50%;transform:translate(0,0) scale(1)} 33%{border-radius:40% 60% 45% 55%/60% 40% 55% 45%;transform:translate(12px,-8px) scale(1.05)} 66%{border-radius:55% 45% 60% 40%/45% 55% 45% 55%;transform:translate(-8px,10px) scale(0.97)} }
+    @keyframes fluid2 { 0%,100%{border-radius:45% 55% 40% 60%/55% 45% 60% 40%;transform:translate(0,0) scale(1)} 33%{border-radius:60% 40% 55% 45%/40% 60% 45% 55%;transform:translate(-10px,8px) scale(0.95)} 66%{border-radius:40% 60% 60% 40%/60% 40% 40% 60%;transform:translate(14px,-6px) scale(1.08)} }
+    @keyframes fluid3 { 0%,100%{border-radius:55% 45% 45% 55%/40% 55% 45% 60%;transform:translate(0,0) scale(1)} 33%{border-radius:45% 55% 60% 40%/55% 40% 60% 45%;transform:translate(8px,12px) scale(1.06)} 66%{border-radius:60% 40% 40% 60%/45% 60% 55% 40%;transform:translate(-12px,-10px) scale(0.94)} }
+    .fluid-blob1 { animation: fluid1 9s ease-in-out infinite; }
+    .fluid-blob2 { animation: fluid2 11s ease-in-out infinite; }
+    .fluid-blob3 { animation: fluid3 13s ease-in-out infinite; }
   </style>
 </head>
 <body>
   <div id="root"></div>
+  <script type="text/babel" src="src/assets.js"></script>
+  <script type="text/babel" src="src/components/FaceCells.js"></script>
+  <script type="text/babel" src="src/components/HomeWidgets.js"></script>
+  <script type="text/babel" src="src/components/StickerZones.js"></script>
+  <script type="text/babel" src="src/components/DayCard.js"></script>
+  <script type="text/babel" src="src/components/LogMoodPage.js"></script>
+  <script type="text/babel" src="src/components/WeeklyBubbles.js"></script>
+  <script type="text/babel" src="src/components/StatsPage.js"></script>
+  <script type="text/babel" src="src/components/MoodSheets.js"></script>
+  <script type="text/babel" src="src/components/ProfilePage.js"></script>
+  <script type="text/babel" src="src/components/CanvasOrbs.js"></script>
+  <script type="text/babel" src="src/components/TypeChatPage.js"></script>
+  <script type="text/babel" src="src/components/SupportPage.js"></script>
+  <script type="text/babel" src="src/components/BottomNav.js"></script>
+  <script type="text/babel" src="src/App.js"></script>
 
-  <script type="text/babel">
-    const { useState, useEffect, useRef } = React;
-
-    /* ─── VIDEO BACKGROUND COMPONENT ────────────────────────────────────── */
-    function VideoBg() {
-      const vidRef = useRef(null);
-
-      useEffect(() => {
-        const v = vidRef.current; if (!v) return;
-
-        const tryPlay = () => { v.play().catch(() => {}); };
-
-        // Attempt autoplay immediately
-        tryPlay();
-
-        // Retry on first user interaction (needed for WeChat / iOS WebView)
-        const onTouch = () => { tryPlay(); document.removeEventListener('touchstart', onTouch); document.removeEventListener('click', onTouch); };
-        document.addEventListener('touchstart', onTouch, { once: true, passive: true });
-        document.addEventListener('click',      onTouch, { once: true });
-
-        return () => {
-          document.removeEventListener('touchstart', onTouch);
-          document.removeEventListener('click', onTouch);
-        };
-      }, []);
-
-      return (
-        <div className="video-bg">
-          <video
-            ref={vidRef}
-            src="bg2.mp4"
-            autoPlay muted loop
-            playsInline
-            webkit-playsinline="true"
-            x5-playsinline="true"
-            x5-video-player-type="h5"
-            x5-video-player-fullscreen="false"
-            preload="auto"
-          />
-        </div>
-      );
-    }
-
-    /* ─── SVG ICONS ──────────────────────────────────────────────────────── */
-    const IC = {
-      home: (s=22,c='currentColor') => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>,
-      chart: (s=22,c='currentColor') => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>,
-      chat: (s=22,c='currentColor') => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>,
-      peer: (s=22,c='currentColor') => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.8" strokeLinecap="round"><circle cx="9" cy="7" r="3"/><path d="M3 21v-1a6 6 0 0112 0v1"/><circle cx="17" cy="9" r="2.5"/><path d="M20 21v-.8a5 5 0 00-4-4.9"/></svg>,
-      grid: (s=22,c='currentColor') => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.8" strokeLinecap="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>,
-      right: (s=20,c='currentColor') => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>,
-      back: (s=18,c='currentColor') => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>,
-      send: (s=16,c='currentColor') => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>,
-      phone: (s=20,c='currentColor') => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.21 14.9a19.79 19.79 0 01-3.07-8.67A2 2 0 013.12 4h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L7.09 11.9a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>,
-      dots: () => <svg width="18" height="12" viewBox="0 0 18 12" fill="none"><circle cx="2" cy="2" r="2" fill="rgba(44,42,36,.55)"/><circle cx="9" cy="2" r="2" fill="rgba(44,42,36,.55)"/><circle cx="16" cy="2" r="2" fill="rgba(44,42,36,.55)"/><circle cx="2" cy="10" r="2" fill="rgba(44,42,36,.55)"/><circle cx="9" cy="10" r="2" fill="rgba(44,42,36,.55)"/><circle cx="16" cy="10" r="2" fill="rgba(44,42,36,.55)"/></svg>,
-    };
-
-    /* ─── STATIC DATA ─────────────────────────────────────────────────────── */
-    const MOODS = [
-      {val:1, emoji:'😔', label:'Rough'},
-      {val:2, emoji:'😕', label:'Low'},
-      {val:3, emoji:'😌', label:'Okay'},
-      {val:4, emoji:'🙂', label:'Good'},
-      {val:5, emoji:'😊', label:'Great'},
-    ];
-    const TAGS = ['Academic','Sleep','Social','Health','Finance','Relationships','Work'];
-
-    const DEFAULT_HISTORY = [
-      {day:14,mon:'APR',emoji:'😊',label:'Great',tags:'Academic · Sleep',val:5},
-      {day:13,mon:'APR',emoji:'😌',label:'Okay', tags:'Social',val:3},
-      {day:12,mon:'APR',emoji:'😕',label:'Low',  tags:'Academic · Finance',val:2},
-      {day:11,mon:'APR',emoji:'🙂',label:'Good', tags:'Sleep · Health',val:4},
-      {day:10,mon:'APR',emoji:'😌',label:'Okay', tags:'Work',val:3},
-      {day:9, mon:'APR',emoji:'😊',label:'Great',tags:'Social',val:5},
-      {day:8, mon:'APR',emoji:'😔',label:'Rough',tags:'Academic',val:1},
-    ];
-    const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-    function loadHistory() {
-      try { const s = localStorage.getItem('illinicare_history'); return s ? JSON.parse(s) : DEFAULT_HISTORY; }
-      catch(e) { return DEFAULT_HISTORY; }
-    }
-
-    const RESOURCES = [
-      {cat:'counseling',icon:'🏥',bg:'rgba(100,165,120,.22)',name:'CAPS — Counseling Center',desc:'Free individual & group counseling for UIUC students. Same-day crisis slots available.',contact:'(217) 333-3704',hours:'Mon–Fri  8am–5pm'},
-      {cat:'health',    icon:'🩺',bg:'rgba(80,145,185,.22)', name:'McKinley Health Center',  desc:'Student health services including mental health, wellness programs, and psychiatry.',contact:'(217) 333-2700',hours:'Mon–Fri  8am–5pm'},
-      {cat:'crisis',    icon:'☎️',bg:'rgba(218,98,78,.22)',  name:'988 Suicide & Crisis Lifeline',desc:'Free, confidential support for people in distress. Call or text 988 any time.',contact:'Call or text  988',hours:'24 / 7'},
-      {cat:'wellness',  icon:'🧘',bg:'rgba(155,128,200,.22)',name:'Counseling & Wellness Hub',desc:'Stress management workshops, mindfulness sessions, and one-on-one wellness coaching.',contact:'wellness.illinois.edu',hours:'See website'},
-      {cat:'crisis',    icon:'💬',bg:'rgba(218,140,58,.22)', name:'Crisis Text Line',         desc:'Text HOME to 741741 to connect with a trained crisis counselor instantly.',contact:'Text HOME → 741741',hours:'24 / 7'},
-      {cat:'wellness',  icon:'🌿',bg:'rgba(118,162,98,.22)', name:'Illini Resiliency Program',desc:'Peer-led resilience workshops and stress management resources on campus.',contact:'resilience@illinois.edu',hours:'Varies by week'},
-    ];
-
-    const AI_POOLS = {
-      default:  ["I hear you — it sounds like something's weighing on you. Would you like to share a little more about what's been going on?","Thank you for opening up. Your feelings are completely valid. Let's explore this together — what do you think is contributing most to how you're feeling?","That makes a lot of sense. Many UIUC students go through similar moments, especially mid-semester. You're not navigating this alone.","I'm right here with you. One small thing that might help right now: breathe in for 4 counts, hold for 4, out for 6. You can do that at any time. Would you like to try another technique?"],
-      stress:   ["Academic pressure at UIUC can feel genuinely crushing sometimes. Have you had any moments to step away and breathe, even briefly?","When everything piles up, breaking it into one thing at a time can help. What's the single most urgent task you're facing today?","It's okay to ask for help — CAPS offers free counseling and has same-day crisis appointments if things feel too heavy to carry alone."],
-      anxiety:  ["Anxiety can be really consuming, especially with exams or deadlines looming. You're brave for putting it into words.","A quick grounding exercise: name 5 things you can see right now. It sounds simple, but it gently pulls you back to the present.","Anxiety often comes from uncertainty. What feels most unknown for you right now? Sometimes naming it out loud helps shrink it."],
-      sad:      ["I'm really sorry you're feeling this way. Sadness deserves space, not dismissal — and you deserve support.","It takes courage to acknowledge when we're struggling. Would you like to talk about what's been on your mind lately?","Please remember — it's okay to not be okay. If these feelings stay heavy, reaching out to CAPS or a peer supporter can make a real difference."],
-    };
-
-    function getReply(msg) {
-      const t = msg.toLowerCase();
-      let pool = AI_POOLS.default;
-      if (/stress|overwhelm|exam|homework|deadline|grade/.test(t)) pool = AI_POOLS.stress;
-      else if (/anxi|nervous|worry|panic/.test(t))               pool = AI_POOLS.anxiety;
-      else if (/sad|depress|cry|hopeless|alone|empty/.test(t))   pool = AI_POOLS.sad;
-      return pool[Math.floor(Math.random() * pool.length)];
-    }
-
-    /* ─── STATUS BAR ─────────────────────────────────────────────────────── */
-    function StatusBar() {
-      const [time, setTime] = useState('');
-      useEffect(() => {
-        const fmt = () => { const n=new Date(); return `${n.getHours()}:${String(n.getMinutes()).padStart(2,'0')}`; };
-        setTime(fmt());
-        const id = setInterval(() => setTime(fmt()), 30000);
-        return () => clearInterval(id);
-      }, []);
-      return (
-        <div className="status-bar">
-          <span className="status-time">{time || '9:41'}</span>
-          <div className="status-icons">
-            <svg width="17" height="11" viewBox="0 0 17 11" fill="rgba(255,255,255,.88)">
-              <rect x="0" y="7" width="3" height="4" rx=".5"/><rect x="4.5" y="5" width="3" height="6" rx=".5"/>
-              <rect x="9" y="2.5" width="3" height="8.5" rx=".5"/><rect x="13.5" y="0" width="3" height="11" rx=".5" opacity=".35"/>
-            </svg>
-            <svg width="16" height="11" viewBox="0 0 16 11" fill="none" stroke="rgba(255,255,255,.88)" strokeWidth="1.5" strokeLinecap="round">
-              <path d="M8 9h.01"/><path d="M5.5 7a3.5 3.5 0 015 0"/><path d="M3 4.5a7 7 0 0110 0"/>
-            </svg>
-            <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
-              <rect x=".5" y=".5" width="21" height="11" rx="3" stroke="rgba(255,255,255,.88)" strokeWidth="1"/>
-              <rect x="2" y="2" width="16" height="8" rx="1.5" fill="rgba(255,255,255,.88)"/>
-              <path d="M22.5 4v4a1.5 1.5 0 000-4z" fill="rgba(255,255,255,.88)"/>
-            </svg>
-          </div>
-        </div>
-      );
-    }
-
-    /* ─── MOOD CHECK-IN SHEET ─────────────────────────────────────────────── */
-    function CheckinSheet({ onClose, onSave }) {
-      const [sel, setSel]   = useState(null); // sel = full mood object
-      const [tags, setTags] = useState([]);
-      const [note, setNote] = useState('');
-      const tog = t => setTags(p => p.includes(t) ? p.filter(x=>x!==t) : [...p, t]);
-      return (
-        <div className="sheet-overlay" onClick={e => e.target===e.currentTarget && onClose()}>
-          <div className="sheet">
-            <div className="sheet-handle"/>
-            <div className="sheet-title">How are you feeling?</div>
-            <div className="sheet-sub">A quick check-in — no pressure to share everything.</div>
-            <div className="mood-row">
-              {MOODS.map(m => (
-                <button key={m.val} className={`mood-opt ${sel?.val===m.val?'sel':''}`} onClick={() => setSel(m)}>
-                  <span className="m-emoji">{m.emoji}</span>
-                  <span className="m-label">{m.label}</span>
-                </button>
-              ))}
-            </div>
-            <div className="tags-lbl">What's on your mind?</div>
-            <div className="tags-wrap">
-              {TAGS.map(t => <button key={t} className={`tag-pill ${tags.includes(t)?'on':''}`} onClick={() => tog(t)}>{t}</button>)}
-            </div>
-            <textarea className="note-ta" rows={2} placeholder="Optional note to yourself…" value={note} onChange={e=>setNote(e.target.value)}/>
-            <button className="primary-btn" disabled={!sel} onClick={() => { if(sel){ onSave({mood:sel,tags,note}); onClose(); } }}>Save Check-in</button>
-          </div>
-        </div>
-      );
-    }
-
-    /* ─── HOME SCREEN ─────────────────────────────────────────────────────── */
-    function HomeScreen({ nav, openCheckin, history }) {
-      const [condDay, setCondDay] = useState('today');
-      const now   = new Date();
-      const hour  = now.getHours();
-      const greetingText = hour < 12 ? 'Good morning ☀️' : hour < 17 ? 'Good afternoon 🌤' : 'Good evening 🌙';
-
-      const todayD = now.getDate();
-      const todayM = now.toLocaleString('en-US', { month: 'short' });
-      const yest   = new Date(now); yest.setDate(now.getDate() - 1);
-      const yesterD = yest.getDate();
-      const yesterM = yest.toLocaleString('en-US', { month: 'short' });
-
-      // consecutive-day streak
-      const streak = (() => {
-        if (!history.length) return 0;
-        const MON = {JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
-        const yr = now.getFullYear();
-        const unique = [...new Set(history.map(h => new Date(yr, MON[h.mon]||0, h.day).toDateString()))];
-        let count = 0, d = new Date(now);
-        while (unique.includes(d.toDateString())) { count++; d.setDate(d.getDate() - 1); }
-        return count;
-      })();
-
-      return (
-        <div className="screen screen-home">
-          <div className="home-header fade-up d1">
-            <div className="avatar-wrap">
-              <div className="avatar">🧑</div>
-              <div>
-                <div className="greet-sub">{greetingText}</div>
-                <div className="greet-name">Alex</div>
-              </div>
-            </div>
-            <div className="header-right">
-              {streak > 0 && <div className="streak-badge">🔥 {streak}d</div>}
-              <div className="menu-btn">{IC.dots()}</div>
-            </div>
-          </div>
-
-          <div className="sky-spacer"/>
-          <div className="daily-thought fade-up d2">
-            <div className="thought-label">Today's Thought</div>
-            <div className="thought-quote">Healing isn't linear.<br/>Honor your pace.</div>
-          </div>
-
-          <div className="glass cond-card fade-up d3">
-            <div className="cond-head">
-              <span className="cond-title">Your Condition</span>
-              <div className="toggle-grp">
-                <button className={`tog ${condDay==='today'?'on':''}`} onClick={()=>setCondDay('today')}>Today</button>
-                <button className={`tog ${condDay==='yesterday'?'on':''}`} onClick={()=>setCondDay('yesterday')}>Yesterday</button>
-              </div>
-            </div>
-            <div className="cond-body">
-              <div className="cond-date">
-                <div className="cond-day">{condDay==='today' ? todayD : yesterD}</div>
-                <div className="cond-month">{condDay==='today' ? todayM : yesterM}</div>
-              </div>
-              <div className="cond-text">
-                {condDay==='today'
-                  ? "Today your mental state shows signs of moderate stress and low energy. That's okay — some days are harder than others. Take a moment to breathe and be gentle with yourself."
-                  : "Yesterday showed mixed signals — a dip in energy early on but some recovery toward evening. Rest and routine go hand-in-hand. Keep building those small consistent habits."}
-              </div>
-            </div>
-            <button className="sol-btn" onClick={() => nav('ai-chat')}>Need Solutions?</button>
-          </div>
-
-          <div className="essentials-wrap fade-up d4">
-            <div className="essentials-header">
-              <div className="essentials-title">Your Mindful Essentials</div>
-              <button className="essentials-more">{IC.dots()}</button>
-            </div>
-            <div className="feats">
-              <div className="feat-card" onClick={openCheckin}>
-                <div className="feat-card-top">
-                  <div className="feat-card-name">Log Mood</div>
-                  <div className="feat-card-desc">Track how you feel and spot patterns over time</div>
-                </div>
-                <div className="feat-card-footer">
-                  <div className="feat-arrow">→</div>
-                  <div className="feat-illus">🌸</div>
-                </div>
-              </div>
-
-              <div className="feat-card" onClick={() => nav('resources')}>
-                <div className="feat-card-top">
-                  <div className="feat-card-name">Book Session</div>
-                  <div className="feat-card-desc">Schedule a 1:1 with a certified counselor</div>
-                </div>
-                <div className="feat-card-footer">
-                  <div className="feat-arrow">→</div>
-                  <div className="feat-illus">🫶</div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    /* ─── INSIGHTS SCREEN ─────────────────────────────────────────────────── */
-    function InsightsScreen({ history, openCheckin }) {
-      const [selDay, setSelDay] = useState(null);
-      const now      = new Date();
-      const todayD   = now.getDate();
-      const curMon   = MONTHS[now.getMonth()];
-      const daysInMon = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
-      const firstDow  = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
-
-      // map day → full entry for this month
-      const dayMap = {};
-      history.forEach(h => { if(h.mon === curMon && !dayMap[h.day]) dayMap[h.day] = h; });
-
-      const loggedThisMon = Object.keys(dayMap).length;
-      const avg = history.length
-        ? (history.reduce((a,b)=>a+b.val,0)/history.length).toFixed(1) : '—';
-
-      const cells = [];
-      for(let i=0;i<firstDow;i++) cells.push({blank:true});
-      for(let d=1;d<=daysInMon;d++) cells.push({day:d, entry:dayMap[d]||null, today:d===todayD});
-
-      const handleCellClick = (c) => {
-        if(c.entry) {
-          setSelDay(selDay === c.day ? null : c.day);
-        } else if(c.day <= todayD) {
-          openCheckin();
-        }
-      };
-
-      const selEntry = selDay ? dayMap[selDay] : null;
-
-      return (
-        <div className="screen">
-          <div className="scr-header">
-            <div className="scr-title">Your Journey</div>
-          </div>
-
-          <div className="stats-row">
-            {[{n:avg,l:'Avg Mood'},{n:history.length,l:'Entries'},{n:'🌱',l:'Growing'}].map((s,i)=>(
-              <div key={i} className="glass stat-card"><div className="stat-num">{s.n}</div><div className="stat-lbl">{s.l}</div></div>
-            ))}
-          </div>
-
-          {history.length > 0 && (
-            <div className="glass chart-card">
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:12}}>
-                <div style={{fontSize:'13px',fontWeight:600,color:'var(--deep)'}}>7-Day Mood Trend</div>
-                <div className="chart-sub" style={{marginBottom:0}}>tap to see details</div>
-              </div>
-              <svg width="100%" height="76" viewBox="0 0 280 76" preserveAspectRatio="xMidYMid meet" style={{overflow:'visible'}}>
-                {history.slice(0,7).reverse().map((h,i) => {
-                  const slots = Math.min(history.length, 7);
-                  const slotW = 280 / slots;
-                  const x = i * slotW + slotW * 0.18;
-                  const barW = slotW * 0.52;
-                  const barH = Math.max(8, (h.val / 5) * 52);
-                  const y = 58 - barH;
-                  const color = h.val >= 4
-                    ? 'rgba(80,155,95,0.68)'
-                    : h.val === 3
-                      ? 'rgba(190,155,60,0.68)'
-                      : 'rgba(200,90,70,0.68)';
-                  return (
-                    <g key={i}>
-                      <rect x={x} y={y} width={barW} height={barH} rx="5" fill={color}/>
-                      <text x={x + barW/2} y="72" textAnchor="middle" fontSize="8.5"
-                        fill="rgba(44,42,36,0.42)"
-                        fontFamily="'Jost',system-ui,sans-serif" fontWeight="500">
-                        {h.mon.slice(0,1)}{h.day}
-                      </text>
-                      <text x={x + barW/2} y={y - 3} textAnchor="middle" fontSize="12">
-                        {h.emoji}
-                      </text>
-                    </g>
-                  );
-                })}
-              </svg>
-            </div>
-          )}
-
-          <div className="glass cal-card">
-            <div className="cal-header">
-              <div>
-                <div className="cal-title">{now.toLocaleString('en-US',{month:'long'})} {now.getFullYear()}</div>
-                <div className="cal-count">{loggedThisMon}/{daysInMon} moods logged</div>
-              </div>
-              <button className="cal-plus" onClick={openCheckin}>+</button>
-            </div>
-            <div className="cal-dow">
-              {['Su','Mo','Tu','We','Th','Fr','Sa'].map(d=><span key={d}>{d}</span>)}
-            </div>
-            <div className="cal-grid">
-              {cells.map((c,i)=>(
-                c.blank
-                  ? <div key={i} className="cal-cell empty"/>
-                  : <div key={i}
-                      className={`cal-cell${c.today?' today':''}${c.entry?' has-entry':''}${selDay===c.day?' selected':''}`}
-                      onClick={()=>handleCellClick(c)}>
-                      {c.entry ? c.entry.emoji : c.day}
-                    </div>
-              ))}
-            </div>
-
-            {selEntry && (
-              <div className="day-detail" key={selDay}>
-                <div className="day-detail-emoji">{selEntry.emoji}</div>
-                <div className="day-detail-info">
-                  <div className="day-detail-date">{curMon} {selEntry.day}, {now.getFullYear()}</div>
-                  <div className="day-detail-label">{selEntry.label}</div>
-                  <div className="day-detail-tags">{selEntry.tags}</div>
-                  {selEntry.note && <div className="day-detail-note">"{selEntry.note}"</div>}
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="sec-label">Recent Entries</div>
-          <div className="history-list">
-            {history.map((h,i)=>(
-              <div key={i} className="glass hist-row">
-                <div className="hist-date"><div className="hist-d">{h.day}</div><div className="hist-m">{h.mon}</div></div>
-                <div className="hist-emoji">{h.emoji}</div>
-                <div className="hist-info"><div className="hist-name">{h.label}</div><div className="hist-tags">{h.tags}</div></div>
-              </div>
-            ))}
-          </div>
-        </div>
-      );
-    }
-
-    /* ─── AI CHAT SCREEN ──────────────────────────────────────────────────── */
-    const QUICK_STARTS = [
-      {name:'Feel stressed',     bg:'linear-gradient(135deg, rgba(255,200,180,0.45), rgba(255,160,140,0.25))', topic:'stress'},
-      {name:'Feel anxious',      bg:'linear-gradient(135deg, rgba(200,220,255,0.45), rgba(170,190,255,0.25))', topic:'anxiety'},
-      {name:'Feel sad',          bg:'linear-gradient(135deg, rgba(200,240,200,0.45), rgba(160,220,170,0.25))', topic:'sad'},
-      {name:'Need to talk',      bg:'linear-gradient(135deg, rgba(240,220,255,0.45), rgba(210,180,240,0.25))', topic:'stress'},
-    ];
-
-    function AIChatScreen({ nav, toCrisis }) {
-      const [mode, setMode]   = useState('landing'); // landing | chat
-      const [msgs, setMsgs]   = useState([]);
-      const [inp, setInp]     = useState('');
-      const [landInp, setLandInp] = useState('');
-      const [typing, setT]    = useState(false);
-      const [expanded, setExpanded] = useState(false);
-      const endRef            = useRef(null);
-
-      useEffect(()=>{ endRef.current?.scrollIntoView({behavior:'smooth'}); }, [msgs, typing]);
-
-      const startChat = (firstMsg) => {
-        const greeting = {from:'bot', text:"Hi there 👋 I'm here to listen — no judgment, just support."};
-        setMsgs([greeting, {from:'me', text:firstMsg}]);
-        setMode('chat');
-        setT(true);
-        setTimeout(()=>{ setT(false); setMsgs(p=>[...p,{from:'bot',text:getReply(firstMsg)}]); }, 1100+Math.random()*900);
-      };
-
-      const send = () => {
-        const t = inp.trim(); if(!t) return;
-        setMsgs(p=>[...p,{from:'me',text:t}]); setInp(''); setT(true);
-        setTimeout(()=>{ setT(false); setMsgs(p=>[...p,{from:'bot',text:getReply(t)}]); }, 1100+Math.random()*900);
-      };
-
-      const landSend = () => {
-        const t = landInp.trim(); if(!t) return;
-        startChat(t); setLandInp('');
-      };
-
-      if (mode === 'landing') return (
-        <div className="screen" style={{display:'flex',flexDirection:'column'}}>
-          <div className="ai-landing">
-            {/* Top bar */}
-            <div className="ai-top-bar">
-              <div className="ai-top-back" onClick={()=>nav('home')}>‹</div>
-              <div className="ai-top-title">IlliniCare Chat</div>
-              <div className="ai-top-plus" onClick={()=>startChat('Hello, I need support')}>+</div>
-            </div>
-
-            {/* Combined greeting + insight card */}
-            <div className="ai-combined-card">
-              <div className="ai-combined-top">
-                <div className="ai-greet-row">
-                  <span className="ai-greet-text">Good morning,</span>
-                  <span className="ai-greet-avatar">🧑‍🎓</span>
-                  <span className="ai-greet-text" style={{fontWeight:700}}>Alex!</span>
-                </div>
-                <div className="ai-greet-msg">
-                  Today, I have prepared you{' '}
-                  <span className="ai-highlight">💛 gentle insights</span>{' '}
-                  for your mindful day.
-                </div>
-                <div className="ai-greet-meta">
-                  <span>12 min ago</span>
-                  <span>📋 3</span>
-                  <span>✅ 2</span>
-                  <span>🎧 1</span>
-                </div>
-              </div>
-
-              {/* Expand toggle */}
-              <button className="ai-expand-btn" onClick={()=>setExpanded(e=>!e)}>
-                <div className={`ai-expand-chevron ${expanded?'open':''}`}>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M6 9l6 6 6-6"/></svg>
-                </div>
-              </button>
-
-              {/* Collapsible insight section */}
-              <div className={`ai-insight-card ${expanded?'expanded':''}`}>
-                <div className="ai-insight-journal">
-                  Stress patterns around academics detected. Let's work through it together.
-                </div>
-                <div className="ai-insight-quote">
-                  "You don't have to control your thoughts — just stop letting them control you."
-                </div>
-                <div className="ai-insight-tips">
-                  <div className="ai-insight-tip"><span className="tip-ic">🧘</span> 5-min body scan before your next study session</div>
-                  <div className="ai-insight-tip"><span className="tip-ic">🌙</span> Sleep improved this week — keep it up!</div>
-                </div>
-                <div className="ai-action-row" style={{marginTop:'auto'}}>
-                  <div className="ai-action-pill" onClick={()=>startChat('I want to try a breathing exercise')}>
-                    <span className="pill-ic">🫁</span> Breathing mode
-                  </div>
-                  <div className="ai-action-pill" onClick={()=>startChat('Generate a wellness report for me')}>
-                    <span className="pill-ic">📊</span> Weekly report
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick start pills + input — anchored to bottom together */}
-            <div className="ai-bottom-anchor">
-              <div style={{padding:'0 18px 6px', fontSize:'10.5px', fontWeight:600, letterSpacing:'.5px', textTransform:'uppercase', color:'var(--deep-40)'}}>Start a conversation</div>
-              <div className="ai-qs-row">
-                {QUICK_STARTS.map((q,i)=>(
-                  <div key={i} className="ai-qs-pill" onClick={()=>startChat(`I ${q.name.toLowerCase()}`)}>
-                    {q.name}
-                  </div>
-                ))}
-              </div>
-              <div className="ai-bottom-bar">
-                <div className="ai-bottom-plus">+</div>
-                <input className="ai-bottom-input" placeholder="Ask IlliniCare something…"
-                  value={landInp} onChange={e=>setLandInp(e.target.value)}
-                  onKeyDown={e=>e.key==='Enter'&&landSend()} />
-                <div className="ai-bottom-send" onClick={landSend}>✦</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-
-      return (
-        <div className="screen-chat">
-          <div className="scr-header" style={{paddingBottom:12, flexShrink:0}}>
-            <div className="back-btn" onClick={()=>setMode('landing')}>{IC.back()}</div>
-            <div className="chat-head-title">
-              <div className="cht-main">AI Support</div>
-              <div className="cht-sub">🟢 Always available · Confidential</div>
-            </div>
-          </div>
-
-          <div className="msgs-wrap">
-            <div className="msgs-inner">
-              {msgs.map((m,i)=><div key={i} className={`bubble ${m.from}`}>{m.text}</div>)}
-              {typing && <div className="bubble bot"><div className="typing-ind"><div className="typing-dot"/><div className="typing-dot"/><div className="typing-dot"/></div></div>}
-              <div ref={endRef}/>
-            </div>
-          </div>
-
-          <div className="crisis-banner">
-            <span style={{fontSize:15}}>🆘</span>
-            <span className="crisis-banner-text">In immediate danger? Reach out now.</span>
-            <span className="crisis-banner-link" onClick={toCrisis}>Crisis →</span>
-          </div>
-
-          <div className="input-bar">
-            <input className="chat-inp" placeholder="Share what's on your mind…" value={inp} onChange={e=>setInp(e.target.value)} onKeyDown={e=>e.key==='Enter'&&send()}/>
-            <button className="send-btn" onClick={send}>{IC.send(16,'rgba(255,255,255,.92)')}</button>
-          </div>
-        </div>
-      );
-    }
-
-    /* ─── PROFILE SCREEN ─────────────────────────────────────────────────── */
-    function ProfileScreen({ nav, history, openCheckin }) {
-      const avg = history.length
-        ? (history.reduce((a,b)=>a+b.val,0)/history.length).toFixed(1) : '—';
-
-      // streak calc
-      const streak = (() => {
-        if (!history.length) return 0;
-        const MON = {JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
-        const now = new Date(); const yr = now.getFullYear();
-        const unique = [...new Set(history.map(h => new Date(yr, MON[h.mon]||0, h.day).toDateString()))];
-        let count = 0, d = new Date(now);
-        while (unique.includes(d.toDateString())) { count++; d.setDate(d.getDate()-1); }
-        return count;
-      })();
-
-      const MENU_ITEMS = [
-        { section: 'Wellness', rows: [
-          { ic:'🌸', bg:'rgba(255,180,180,0.20)', title:'Mood History',       sub:'View all your past entries',      chev:true },
-          { ic:'🔔', bg:'rgba(255,200,100,0.20)', title:'Reminders',          sub:'Daily check-in at 9:00 PM',       chev:true },
-          { ic:'🎯', bg:'rgba(100,180,255,0.20)', title:'Wellness Goals',     sub:'3 active goals this month',       chev:true },
-        ]},
-        { section: 'Account', rows: [
-          { ic:'🔒', bg:'rgba(140,200,140,0.20)', title:'Privacy & Data',     sub:'Control what you share',          chev:true },
-          { ic:'🎓', bg:'rgba(200,160,255,0.20)', title:'University',         sub:'University of Illinois · UIUC',   chev:true },
-          { ic:'❓', bg:'rgba(200,200,200,0.20)', title:'Help & Support',     sub:'FAQs, contact, feedback',         chev:true, badge:'2' },
-        ]},
-      ];
-
-      return (
-        <div className="screen">
-          {/* Hero */}
-          <div className="prof-hero fade-up d1">
-            <div className="prof-avatar-wrap">
-              <div className="prof-avatar">🧑</div>
-              <div className="prof-edit-btn">✎</div>
-            </div>
-            <div className="prof-name">Alex</div>
-            <div className="prof-email">alex@illinois.edu</div>
-            <div className="prof-badges">
-              <span className="prof-badge green">🌱 {streak}d streak</span>
-              <span className="prof-badge amber">⭐ {history.length} entries</span>
-              <span className="prof-badge blue">🎓 Junior · CS</span>
-            </div>
-          </div>
-
-          {/* Stats */}
-          <div className="prof-stats-row fade-up d2">
-            <div className="prof-stat">
-              <div className="prof-stat-n">{avg}</div>
-              <div className="prof-stat-l">Avg Mood</div>
-            </div>
-            <div className="prof-stat">
-              <div className="prof-stat-n">{streak}</div>
-              <div className="prof-stat-l">Day Streak</div>
-            </div>
-            <div className="prof-stat">
-              <div className="prof-stat-n">{history.length}</div>
-              <div className="prof-stat-l">Check-ins</div>
-            </div>
-            <div className="prof-stat">
-              <div className="prof-stat-n">🌱</div>
-              <div className="prof-stat-l">Growing</div>
-            </div>
-          </div>
-
-          {/* Menu sections */}
-          {MENU_ITEMS.map((sec, si) => (
-            <div key={si} className="fade-up" style={{animationDelay:`${(si+3)*0.06}s`}}>
-              <div className="prof-section-title">{sec.section}</div>
-              <div className="prof-menu">
-                {sec.rows.map((r, ri) => (
-                  <div key={ri} className={`prof-row${ri===0?' prof-row-first':''}${ri===sec.rows.length-1?' prof-row-last':''}`}
-                    onClick={r.title==='Mood History' ? ()=>nav('insights') : undefined}>
-                    <div className="prof-row-ic" style={{background:r.bg}}>{r.ic}</div>
-                    <div className="prof-row-body">
-                      <div className="prof-row-title">{r.title}</div>
-                      <div className="prof-row-sub">{r.sub}</div>
-                    </div>
-                    {r.badge && <span className="prof-row-badge">{r.badge} new</span>}
-                    {r.chev && <span className="prof-row-chev">›</span>}
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-
-          {/* Sign out */}
-          <button className="prof-signout fade-up d6">Sign Out</button>
-        </div>
-      );
-    }
-
-    /* ─── RESOURCES SCREEN ────────────────────────────────────────────────── */
-    function ResourcesScreen() {
-      const [filter, setFilter] = useState('all');
-      const cats = ['all','counseling','health','crisis','wellness'];
-      const list = filter==='all' ? RESOURCES : RESOURCES.filter(r=>r.cat===filter);
-      return (
-        <div className="screen">
-          <div className="scr-header"><div className="scr-title">Resources</div></div>
-          <div className="filter-bar">
-            {cats.map(c=><button key={c} className={`chip ${filter===c?'on':''}`} onClick={()=>setFilter(c)}>{c.charAt(0).toUpperCase()+c.slice(1)}</button>)}
-          </div>
-          <div className="res-list">
-            {list.map((r,i)=>(
-              <div key={i} className="glass res-card">
-                <div className="res-row">
-                  <div className="res-ic" style={{background:r.bg}}>{r.icon}</div>
-                  <div style={{flex:1}}>
-                    <div className="res-name">{r.name}</div>
-                    <div className="res-desc">{r.desc}</div>
-                    <div className="res-contact">{IC.phone(12,'var(--deep-60)')}{r.contact}</div>
-                    <div className="res-hours">{r.hours}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      );
-    }
-
-    /* ─── CRISIS SCREEN ───────────────────────────────────────────────────── */
-    function CrisisScreen({ nav }) {
-      return (
-        <div className="screen">
-          <div className="scr-header" style={{paddingBottom:4}}>
-            <div className="back-btn" onClick={()=>nav('home')}>{IC.back()}</div>
-            <div style={{flex:1,marginLeft:12}}>
-              <div className="cht-main">Crisis Support</div>
-              <div className="cht-sub">Immediate help · always available</div>
-            </div>
-          </div>
-
-          <div className="glass-hi crisis-hero">
-            <div className="crisis-big-ic">🌸</div>
-            <div className="crisis-title">You're not alone.</div>
-            <div className="crisis-sub">If you're in immediate distress or having thoughts of self-harm, please reach out right now. Help is here 24 / 7.</div>
-            <button className="call-now-btn">{IC.phone(20,'white')} Call 988 Now</button>
-          </div>
-
-          <div className="sec-label">Emergency Resources</div>
-          <div className="crisis-list">
-            {[
-              {ic:'🏥',bg:'rgba(100,165,120,.24)',name:'CAPS Crisis Line',       det:'(217) 333-3704 · After-hours available',action:'Call'},
-              {ic:'💬',bg:'rgba(100,142,202,.24)',name:'Crisis Text Line',        det:'Text HOME to 741741',                   action:'Text'},
-              {ic:'🚨',bg:'rgba(218,98,78,.24)',  name:'988 Lifeline',            det:'Call or text 988 · 24/7 nationwide',    action:'Call'},
-              {ic:'🚑',bg:'rgba(178,148,78,.24)', name:'UIUC Emergency',          det:'University Police: (217) 333-1216',     action:'Call'},
-              {ic:'🏃',bg:'rgba(138,118,182,.24)',name:'McKinley Walk-in',        det:'1109 S Lincoln Ave · 8am–5pm',          action:'Map'},
-            ].map((r,i)=>(
-              <div key={i} className="glass cr-row">
-                <div className="cr-ic" style={{background:r.bg}}>{r.ic}</div>
-                <div><div className="cr-name">{r.name}</div><div className="cr-det">{r.det}</div></div>
-                <button className="cr-act">{r.action}</button>
-              </div>
-            ))}
-          </div>
-        </div>
-      );
-    }
-
-    /* ─── ROOT APP ────────────────────────────────────────────────────────── */
-    const NAV_TABS = [
-      {id:'home',      icon:'🏠',  label:'Home'},
-      {id:'insights',  icon:'📈',  label:'Insights'},
-      {id:'ai-chat',   icon:'💬',  label:'AI Chat'},
-      {id:'resources', icon:'📚',  label:'Resources'},
-      {id:'profile',   icon:'🧑',  label:'Profile'},
-    ];
-
-    function App() {
-      const [screen,       setScreen]  = useState('home');
-      const [tab,          setTab]     = useState('home');
-      const [showCheckin,  setCheckin] = useState(false);
-      const [history,      setHistory] = useState(loadHistory);
-
-      const nav = s => {
-        setScreen(s);
-        const tabId = ['home','insights','ai-chat','resources','profile'].includes(s) ? s : tab;
-        setTab(tabId);
-      };
-
-      const addEntry = ({mood, tags, note}) => {
-        if (!mood) return;
-        const now = new Date();
-        const entry = {
-          day:   now.getDate(),
-          mon:   MONTHS[now.getMonth()],
-          emoji: mood.emoji,
-          label: mood.label,
-          tags:  tags.length ? tags.join(' · ') : 'General',
-          val:   mood.val,
-          note:  note || '',
-        };
-        const updated = [entry, ...history];
-        setHistory(updated);
-        try { localStorage.setItem('illinicare_history', JSON.stringify(updated)); } catch(e) {}
-      };
-
-      const hideNav = screen === 'crisis';
-
-      return (
-        <div className="phone">
-          {/* ── Grainient WebGL background ── */}
-          <VideoBg/>
-
-          {/* ── Shell ── */}
-          <div className="shell">
-            <StatusBar/>
-
-            <div className="screens">
-              {screen==='home'      && <HomeScreen      nav={nav} openCheckin={()=>setCheckin(true)} history={history}/>}
-              {screen==='insights'  && <InsightsScreen history={history} openCheckin={()=>setCheckin(true)}/>}
-              {screen==='ai-chat'   && <AIChatScreen    nav={nav} toCrisis={()=>nav('crisis')}/>}
-              {screen==='resources' && <ResourcesScreen/>}
-              {screen==='profile'   && <ProfileScreen   nav={nav} history={history} openCheckin={()=>setCheckin(true)}/>}
-              {screen==='crisis'    && <CrisisScreen    nav={nav}/>}
-            </div>
-
-            {!hideNav && (
-              <div className="bottom-nav">
-                {NAV_TABS.map(t=>(
-                  <button key={t.id} className={`nav-btn ${tab===t.id?'active':''}`} onClick={()=>nav(t.id)}>
-                    <span className="nav-emoji">{t.icon}</span>
-                    <span className="nav-label">{t.label}</span>
-                    <span className="nav-dot"/>
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {showCheckin && (
-              <CheckinSheet
-                onClose={()=>setCheckin(false)}
-                onSave={d=>{ addEntry(d); setCheckin(false); }}
-              />
-            )}
-          </div>
-        </div>
-      );
-    }
-
-    ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
-  </script>
 </body>
 </html>

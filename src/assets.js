@@ -15,12 +15,12 @@
     const imgRectangle4   = 'https://www.figma.com/api/mcp/asset/558c1989-b9a4-4694-a2c7-8e179e29f146';
     const imgGroup3       = 'https://www.figma.com/api/mcp/asset/1aadbce5-4957-48ba-b535-60d24fb40406';
     /* Log Mood page (node 77-1264) – fresh URLs */
-    const imgLogCloudChar = 'https://www.figma.com/api/mcp/asset/d25179a4-b539-4185-af15-4cd8d5984a1c';
+    const imgLogCloudChar = 'https://www.figma.com/api/mcp/asset/38d7ef73-3dc0-490e-bc7d-f18f738ada90';
     const imgLogEllipse1  = 'https://www.figma.com/api/mcp/asset/5790a353-34d1-411f-853c-5721dfaff6ee';
     const imgLogEllipse5  = 'https://www.figma.com/api/mcp/asset/dd6c9513-a1f5-4ab6-8b9e-38f73b4f0561';
     const imgLogBubble    = 'https://www.figma.com/api/mcp/asset/eb936309-40c6-42b3-8daa-3d2dc138e749';
     /* Good mood (node 52-340, 52-352) – fresh URLs */
-    const imgGoodChar     = 'https://www.figma.com/api/mcp/asset/882b8c0d-0742-4ff2-bf83-ae7bb6a5929c';
+    const imgGoodChar     = 'https://www.figma.com/api/mcp/asset/9a0f34b4-c296-4d61-a447-8c0c06f56b83';
     const imgGoodFace     = 'https://www.figma.com/api/mcp/asset/d59190bb-f312-44e3-b2d9-8fe527d4329a';
     const imgGoodBubble   = 'https://www.figma.com/api/mcp/asset/a8904e24-0184-4c00-8d82-46c76d23b296';
     /* Happy mood (node 60-232) – fresh URLs */
@@ -131,6 +131,21 @@
     const imgAiHandCoin    = 'https://www.figma.com/api/mcp/asset/86e4ae20-4982-4525-968b-c62fd5d1fda1';
     const imgAiShield2     = 'https://www.figma.com/api/mcp/asset/9864da28-7b3c-479f-b4f6-38d58ad99238';
     const imgAiPlus        = 'https://www.figma.com/api/mcp/asset/e200451b-8746-4093-b649-e51caf75433a';
+
+    /* ── TYPE CHAT PAGE ASSETS (node 291-5374) ── */
+    const imgTcPattern   = 'https://www.figma.com/api/mcp/asset/c44e4698-d3bb-451c-bf80-e72888c2f66c';
+    const imgTcOrbMask   = 'https://www.figma.com/api/mcp/asset/cc8a1cbe-cf40-4d86-b535-58fb10170715';
+    const imgTcTail      = 'https://www.figma.com/api/mcp/asset/18d4b9fd-3659-46b7-9e7f-c01fd078dd77';
+    const imgTcLogo      = 'https://www.figma.com/api/mcp/asset/0e6c4119-59fa-4e21-938b-1da0c7353679';
+    const imgTcMic       = 'https://www.figma.com/api/mcp/asset/5e15221b-1131-416d-8c17-2e2a3a77e32a';
+    const imgTcSend      = 'https://www.figma.com/api/mcp/asset/3ecb2199-f8e9-48f5-a52b-3c007e9e8d2f';
+    const imgTcChevron   = 'https://www.figma.com/api/mcp/asset/19040189-f9ec-46d7-a60d-2e799599adb9';
+    const imgTcMenuDots  = 'https://www.figma.com/api/mcp/asset/7f27a434-8e4b-4712-b502-2c999efe823a';
+    /* Peer Support + Resource Center page backgrounds (node 291-5374) */
+    const imgSupportBg   = 'https://www.figma.com/api/mcp/asset/1c1ebba5-2579-4a29-927a-67d91cc8551f'; /* warm canvas — peer support */
+    const imgSupportBg2  = 'https://www.figma.com/api/mcp/asset/c9c016f3-b163-4d23-8fb3-7110760a2660'; /* warm canvas — resource center */
+    const imgPeerChatBtn = 'https://www.figma.com/api/mcp/asset/77e32d45-b4b0-465e-8cbf-d6caf35e8d6e'; /* chat bubble icon on peer cards */
+    const imgPeerArrow   = 'https://www.figma.com/api/mcp/asset/71fd28dd-ad8e-4220-9ca9-8f2c7cc54a12'; /* arrow icon on Find a Match */
 
     /* ── WAVEFORM HEIGHTS ── */
     const WAVES = [21,45,29,45,36,18,23,29,33,36,45,55,49,45,38,38,38,38,38];

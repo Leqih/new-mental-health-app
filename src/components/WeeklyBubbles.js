@@ -49,11 +49,7 @@
           wall(W+26, H/2, 52, H+100),
         ]);
 
-        /* Bubble body HTML — shapes without faces */
-        const FACE_BAKED_GRAD = {
-          sad:     'linear-gradient(160deg,#cce8ff,#80b8f0)',
-          anxious: 'linear-gradient(160deg,#ffb8d0,#f06888)',
-        };
+        /* Bubble body HTML — character images for most moods; CSS blobs for Good/Sad (expired asset URLs) */
         const bubbleBodyHTML = (mood) => {
           const s = mood.toLowerCase();
           const img = (src) => `<img alt="" src="${src}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;pointer-events:none">`;
@@ -62,11 +58,13 @@
             <img alt="" src="${imgBoringChar2}" style="position:absolute;top:0;bottom:0;left:24.99%;right:50%;width:25.01%;height:100%;display:block;object-fit:cover;pointer-events:none">
             <img alt="" src="${imgBoringChar1}" style="position:absolute;top:0;bottom:0;left:50%;right:24.99%;width:25.01%;height:100%;display:block;object-fit:cover;pointer-events:none">
             <img alt="" src="${imgBoringChar2}" style="position:absolute;top:0;bottom:0;left:75%;right:0;width:25%;height:100%;display:block;object-fit:cover;pointer-events:none">`;
-          if (s === 'sad' || s === 'anxious') {
-            const src = s === 'sad' ? imgLogCloudChar : imgAnxiousChar;
-            const grad = FACE_BAKED_GRAD[s];
-            const mask = `url(${src}) center/contain no-repeat`;
-            return `<div style="position:absolute;inset:0;background:${grad};-webkit-mask:${mask};mask:${mask};pointer-events:none"></div>`;
+          if (s === 'anxious') {
+            const mask = `url(${imgAnxiousChar}) center/contain no-repeat`;
+            return `<div style="position:absolute;inset:0;background:linear-gradient(160deg,#ffb8d0,#f06888);-webkit-mask:${mask};mask:${mask};pointer-events:none"></div>`;
+          }
+          if (s === 'sad') {
+            const mask = `url(${imgLogCloudChar}) center/contain no-repeat`;
+            return `<div style="position:absolute;inset:0;background:linear-gradient(160deg,#cce8ff,#80b8f0);-webkit-mask:${mask};mask:${mask};pointer-events:none"></div>`;
           }
           const src = s==='good' ? imgGoodChar : s==='happy'||s==='excited' ? imgHappyChar :
                       s==='grateful' ? imgGratefulChar : s==='angry' ? imgAngryChar : imgExhaustedChar;

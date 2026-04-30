@@ -1,10 +1,117 @@
     const { useRef, useState } = React;
+
+    /* ── CHAT HISTORY SIDEBAR ── */
+    const CHAT_SIDEBAR_ICON_SEARCH = 'https://www.figma.com/api/mcp/asset/94a3b85e-f910-4850-8871-e5de092b6d76';
+    const CHAT_SIDEBAR_ICON_PLUS   = 'https://www.figma.com/api/mcp/asset/1eb42fef-10b7-4d3d-ad36-87e4d27e7e53';
+    const CHAT_SIDEBAR_ICON_CHAT   = 'https://www.figma.com/api/mcp/asset/31f34602-fbd0-4447-9685-a7d3a7b7156f';
+    const CHAT_SIDEBAR_ICON_VOICE  = 'https://www.figma.com/api/mcp/asset/ad3e0d13-d99e-4154-b919-2da9e7dc7034';
+    const CHAT_SIDEBAR_ICON_MSG    = 'https://www.figma.com/api/mcp/asset/0306a7ba-71c3-46f3-9d9e-62404309513e';
+
+    const CHAT_HISTORY = {
+      Today: [
+        'Help me write a fantasy story opening involving a cursed forest...',
+        'Can you explain how to calculate compound interest?',
+        'Make a workout plan for a beginner aiming to lose weight',
+      ],
+      Yesterday: [
+        'Write a humorous dialogue between a sarcastic AI assistant...',
+        'What are the best practices for designing call-to-action buttons?',
+        'Generate a series of motivational quotes focused on overcoming...',
+      ],
+      'Previous 7 Days': [
+        'Explain the concept of quantum computing in simple terms...',
+        'What are the best practices for designing call-to-action buttons?',
+        'Write a short story about a young apprentice in a magical forest...',
+      ],
+    };
+
+    function ChatSidebar({ open, onClose }) {
+      const [tab, setTab] = useState('Chat');
+      const W = 314;
+      return (
+        <React.Fragment>
+          <div
+            onClick={onClose}
+            style={{
+              position: 'absolute', inset: 0, zIndex: 500,
+              background: 'rgba(0,0,0,0.38)',
+              opacity: open ? 1 : 0,
+              pointerEvents: open ? 'auto' : 'none',
+              transition: 'opacity 0.32s ease',
+            }}
+          />
+          <div style={{
+            position: 'absolute', top: 0, left: 0, bottom: 0,
+            width: W,
+            background: 'white',
+            zIndex: 510,
+            transform: open ? 'translateX(0)' : `translateX(-${W}px)`,
+            transition: 'transform 0.34s cubic-bezier(0.4,0,0.2,1)',
+            display: 'flex', flexDirection: 'column',
+            overflowY: 'auto',
+            paddingTop: 50, paddingBottom: 67, paddingLeft: 16, paddingRight: 16,
+            gap: 32,
+            boxShadow: open ? '4px 0 32px rgba(0,0,0,0.14)' : 'none',
+          }}>
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexShrink: 0 }}>
+              <div style={{ flex: 1, height: 38, borderRadius: 999, background: 'white', boxShadow: '0 0 0 1px rgba(3,7,18,0.05), 0 8px 16px rgba(3,7,18,0.08)', display: 'flex', alignItems: 'center', padding: '0 12px', gap: 10, overflow: 'hidden' }}>
+                <div style={{ width: 14, height: 14, position: 'relative', flexShrink: 0 }}>
+                  <img alt="" src={CHAT_SIDEBAR_ICON_SEARCH} style={{ position: 'absolute', inset: '8.33%', display: 'block', width: '83.34%', height: '83.34%' }} />
+                </div>
+                <span style={{ fontSize: 12, color: '#808898', fontFamily: 'Sofia Sans,sans-serif', letterSpacing: '-0.084px', lineHeight: 1, whiteSpace: 'nowrap' }}>Search</span>
+              </div>
+              <div style={{ width: 38, height: 38, borderRadius: 99, background: '#0d0d12', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, cursor: 'pointer', boxShadow: 'inset 0 1.5px 1.2px rgba(255,255,255,0.12)' }}>
+                <div style={{ width: 14, height: 14, position: 'relative', overflow: 'hidden' }}>
+                  <img alt="" src={CHAT_SIDEBAR_ICON_PLUS} style={{ position: 'absolute', inset: '20.83%', display: 'block', width: '58.34%', height: '58.34%' }} />
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, flexShrink: 0 }}>
+              <div style={{ display: 'flex', gap: 6, borderBottom: '1px solid #d0d5dd', width: '100%' }}>
+                {['Chat', 'Voice'].map(t => {
+                  const active = tab === t;
+                  return (
+                    <div key={t} onClick={() => setTab(t)} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingBottom: 12, paddingLeft: 8, paddingRight: 8, borderBottom: active ? '2px solid #37394a' : '2px solid transparent', cursor: 'pointer', position: 'relative', top: 1, boxShadow: active ? 'inset 0 -2px 2px rgba(0,0,0,0.08)' : 'none' }}>
+                      <div style={{ display: 'flex', gap: 6, alignItems: 'center', justifyContent: 'center' }}>
+                        <div style={{ width: 14, height: 14, position: 'relative', flexShrink: 0 }}>
+                          <img alt="" src={t === 'Chat' ? CHAT_SIDEBAR_ICON_CHAT : CHAT_SIDEBAR_ICON_VOICE} style={{ position: 'absolute', inset: t === 'Chat' ? '8.33% 8.33% 6.42% 8.33%' : '8.33%', display: 'block', width: '100%', height: '100%', maxWidth: 'none' }} />
+                        </div>
+                        <span style={{ fontSize: 14, fontWeight: 500, color: active ? '#37394a' : '#808898', fontFamily: 'Sofia Sans,sans-serif', letterSpacing: '-0.14px', lineHeight: 1.25, whiteSpace: 'nowrap' }}>{t}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {Object.entries(CHAT_HISTORY).map(([label, items]) => (
+                <div key={label} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <p style={{ margin: 0, fontSize: 12, color: '#a3acb9', fontFamily: 'Sofia Sans,sans-serif', letterSpacing: '-0.12px', lineHeight: 1.2 }}>{label}</p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {items.map((text, i) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, height: 38, background: '#f6f8fa', borderRadius: 8, padding: '0 8px', boxShadow: '0 0 0 1px rgba(3,7,18,0.05), 0 1px 2px -1px rgba(3,7,18,0.08)', cursor: 'pointer', overflow: 'hidden' }}>
+                        <div style={{ width: 14, height: 14, position: 'relative', flexShrink: 0 }}>
+                          <img alt="" src={CHAT_SIDEBAR_ICON_MSG} style={{ position: 'absolute', inset: '12.5% 12.5% 10.58% 12.5%', display: 'block', width: '77%', height: '77%', maxWidth: 'none' }} />
+                        </div>
+                        <span style={{ flex: 1, minWidth: 0, fontSize: 11, fontWeight: 500, color: '#37394a', fontFamily: 'Sofia Sans,sans-serif', letterSpacing: '-0.11px', lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{text}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </React.Fragment>
+      );
+    }
+
     /* ── SUPPORT PAGE ── */
     function SupportPage({ onBack, userName }) {
       const [section, setSection] = useState(0);
       const [voiceMode, setVoiceMode] = useState(false);
       const [typeChat, setTypeChat] = useState(false);
       const [chatTopic, setChatTopic] = useState(null);
+      const [sidebarOpen, setSidebarOpen] = useState(false);
       const touchStartY = useRef(null);
       const mouseStartY = useRef(null);
       const SECTIONS = ['AI Chat', 'Peer Support', 'Resource Center'];
@@ -47,7 +154,7 @@
 
       return (
         <div
-          style={{ position:'absolute', inset:0, zIndex: (voiceMode || typeChat) ? 350 : 200, overflow:'hidden', userSelect:'none', cursor: voiceMode ? 'default' : 'grab' }}
+          style={{ position:'absolute', inset:0, zIndex: sidebarOpen ? 400 : (voiceMode || typeChat) ? 350 : 200, overflow:'hidden', userSelect:'none', cursor: voiceMode ? 'default' : 'grab' }}
           onTouchStart={e => { if (!voiceMode) onTouchStart(e); }}
           onTouchEnd={e => { if (!voiceMode) onTouchEnd(e); }}
           onMouseDown={e => { if (!voiceMode) onMouseDown(e); }}
@@ -91,20 +198,21 @@
               <div style={{ position:'absolute', top:0, right:0, width:80, height:'100%', background:'linear-gradient(to left, rgba(255,255,255,0.80) 0%, rgba(255,255,255,0) 100%)', zIndex:11, pointerEvents:'none' }} />
 
               {/* ── Header (top:52 per Figma) ── */}
-              <div style={{ position:'absolute', top:52, left:0, right:0, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 20px', zIndex:5 }}>
-                {/* Back: white pill, p-10, 14×14 chevron */}
-                <div onClick={onBack} style={{ background:'rgba(255,255,255,0.88)', border:'1px solid rgba(20,20,19,0.07)', borderRadius:99, padding:10, display:'inline-flex', alignItems:'center', justifyContent:'center', cursor:'pointer', boxShadow:'0 2px 4px rgba(3,7,18,0.04)', flexShrink:0 }}>
-                  <div style={{ width:14, height:14, position:'relative', overflow:'hidden' }}>
-                    <div style={{ position:'absolute', top:'20.83%', bottom:'20.83%', left:'33.33%', right:'33.33%' }}>
-                      <img alt="" src={imgAiSolid} style={{ position:'absolute', inset:0, display:'block', width:'100%', height:'100%', maxWidth:'none' }} />
-                    </div>
-                  </div>
+              <div style={{ position:'absolute', top:52, left:0, right:0, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 20px', zIndex:15 }}>
+                {/* History button — opens chat history sidebar */}
+                <div onClick={() => setSidebarOpen(true)} style={{ background:'rgba(255,255,255,0.88)', border:'1px solid rgba(20,20,19,0.07)', borderRadius:99, padding:10, display:'inline-flex', alignItems:'center', justifyContent:'center', cursor:'pointer', boxShadow:'0 2px 4px rgba(3,7,18,0.04)', flexShrink:0 }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#141413" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="1 4 1 10 7 10"/>
+                    <path d="M3.51 15a9 9 0 1 0 .49-3.36"/>
+                    <line x1="12" y1="7" x2="12" y2="12"/>
+                    <polyline points="12 12 15 14"/>
+                  </svg>
                 </div>
-                {/* Title pill: w-83 h-35, rgba(255,255,255,0.88), r-22 */}
+                {/* Title pill */}
                 <div style={{ background:'rgba(255,255,255,0.88)', border:'1px solid rgba(20,20,19,0.07)', width:83, height:35, borderRadius:22, position:'relative', boxShadow:'0 2px 4px rgba(3,7,18,0.04)', flexShrink:0 }}>
                   <span style={{ position:'absolute', left:20, top:9, color:'#141413', fontSize:13, fontWeight:700, fontFamily:'Sofia Sans,sans-serif', whiteSpace:'nowrap' }}>AI Chat</span>
                 </div>
-                {/* Dots menu: size-36, r-99, 18×18 icon */}
+                {/* Dots menu */}
                 <div style={{ background:'rgba(255,255,255,0.88)', border:'1px solid rgba(20,20,19,0.07)', width:36, height:36, borderRadius:99, display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 4px rgba(3,7,18,0.04)', overflow:'hidden', cursor:'pointer', flexShrink:0 }}>
                   <div style={{ width:18, height:18, position:'relative', overflow:'hidden' }}>
                     <div style={{ position:'absolute', top:'16.67%', bottom:'16.67%', left:'45.83%', right:'45.83%' }}>
@@ -262,8 +370,10 @@
 
             {/* ══ SECTION 1 — PEER SUPPORT ══ */}
             <div style={{ position:'relative', width:390, height:844, overflow:'hidden' }}>
-              <GrainientBg c1='#B8E8D0' c2='#78C8A8' c3='#D8F4E8' speed={0.22} />
-              <div style={{ position:'absolute', inset:0, background:'linear-gradient(to bottom, transparent 55%, rgba(60,28,20,0.18) 100%)', pointerEvents:'none', zIndex:1 }} />
+              <div style={{ position:'absolute', inset:0, background:'#fff3ec' }} />
+              <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse 90% 55% at 50% 10%, rgba(255,185,130,0.55) 0%, transparent 68%)' }} />
+              <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse 60% 40% at 80% 80%, rgba(255,160,100,0.18) 0%, transparent 65%)' }} />
+              <div style={{ position:'absolute', inset:0, background:'linear-gradient(to bottom, transparent 55%, rgba(60,28,20,0.12) 100%)', pointerEvents:'none', zIndex:1 }} />
 
               {/* Top bar */}
               <div style={{ position:'absolute', top:52, left:0, right:0, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 20px', zIndex:5 }}>
@@ -296,8 +406,8 @@
                       </div>
                       <span style={{ fontSize:12, color:'rgba(20,20,19,0.4)', fontFamily:'Sofia Sans,sans-serif' }}>{status}</span>
                     </div>
-                    <div style={{ width:32, height:32, borderRadius:16, background:'rgba(20,20,19,0.06)', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', flexShrink:0 }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(20,20,19,0.45)" strokeWidth="2.5" strokeLinecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                    <div style={{ width:32, height:32, borderRadius:16, background:'white', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', flexShrink:0 }}>
+                      <img alt="" src={imgPeerChatBtn} style={{ width:14, height:14, display:'block', objectFit:'contain' }} />
                     </div>
                   </div>
                 ))}
@@ -311,7 +421,7 @@
                     <p style={{ color:'rgba(255,255,255,0.55)', fontSize:12, margin:0, fontFamily:'Sofia Sans,sans-serif' }}>3 peers available now</p>
                   </div>
                   <div style={{ width:36, height:36, borderRadius:18, background:'rgba(255,255,255,0.12)', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    <img alt="" src={imgPeerArrow} style={{ width:16, height:16, display:'block', objectFit:'contain' }} />
                   </div>
                 </div>
               </div>
@@ -319,8 +429,10 @@
 
             {/* ══ SECTION 2 — RESOURCE CENTER ══ */}
             <div style={{ position:'relative', width:390, height:844, overflow:'hidden' }}>
-              <GrainientBg c1='#C8D8FF' c2='#88A8F0' c3='#D8E8FF' speed={0.20} />
-              <div style={{ position:'absolute', inset:0, background:'linear-gradient(to bottom, transparent 55%, rgba(60,28,20,0.18) 100%)', pointerEvents:'none', zIndex:1 }} />
+              <div style={{ position:'absolute', inset:0, background:'#fff3ec' }} />
+              <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse 90% 55% at 50% 10%, rgba(255,185,130,0.55) 0%, transparent 68%)' }} />
+              <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse 60% 40% at 20% 85%, rgba(255,160,100,0.18) 0%, transparent 65%)' }} />
+              <div style={{ position:'absolute', inset:0, background:'linear-gradient(to bottom, transparent 55%, rgba(60,28,20,0.12) 100%)', pointerEvents:'none', zIndex:1 }} />
 
               {/* Top bar */}
               <div style={{ position:'absolute', top:52, left:0, right:0, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 20px', zIndex:5 }}>
@@ -353,6 +465,9 @@
             </div>
 
           </div>{/* end sliding container */}
+
+          {/* Chat history sidebar */}
+          <ChatSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
           {/* Section indicator — right edge; dark on white AI Chat bg, white on coloured sections */}
           <div style={{ position:'absolute', right:12, top:'50%', transform:'translateY(-50%)', display:'flex', flexDirection:'column', gap:7, zIndex:210, pointerEvents:'none' }}>

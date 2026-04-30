@@ -286,39 +286,52 @@
         }
       }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+      const ID = 'Inter Display,sans-serif';
       return (
         <div
-          style={{ position:'absolute', inset:0, zIndex:400, display:'flex', flexDirection:'column', overflow:'hidden' }}
+          style={{ position:'absolute', inset:0, zIndex:400, display:'flex', flexDirection:'column', overflow:'hidden', background:'white' }}
           onMouseDown={e => e.stopPropagation()}
           onMouseUp={e => e.stopPropagation()}
           onTouchStart={e => e.stopPropagation()}
           onTouchEnd={e => e.stopPropagation()}
         >
-          <GrainientBg c1='#EDE5FF' c2='#C0AFF5' c3='#F2EEFF' speed={0.28} sat={0.38} />
-          <div style={{ position:'absolute', inset:0, background:'linear-gradient(to bottom, transparent 55%, rgba(240,235,255,0.5) 100%)', pointerEvents:'none', zIndex:1 }} />
-
-          {/* Top bar */}
-          <div style={{ position:'relative', zIndex:5, flexShrink:0, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'52px 20px 12px' }}>
-            <div onClick={onBack} style={{ background:'rgba(255,255,255,0.88)', backdropFilter:'blur(16px)', width:36, height:36, borderRadius:18, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', border:'1px solid rgba(20,20,19,0.07)', boxShadow:'0 2px 8px rgba(20,20,19,0.05)' }}>
-              <span style={{ color:'#141413', fontSize:20, lineHeight:1, marginTop:-1 }}>‹</span>
+          {/* Orb + pattern — non-scrolling overlay at top */}
+          <div style={{ position:'absolute', top:0, left:0, right:0, height:262, zIndex:3, pointerEvents:'none' }}>
+            <div style={{ position:'absolute', left:'50%', top:102, transform:'translateX(-50%)', width:343, height:335, opacity:0.55 }}>
+              <img alt="" src={imgTcPattern} style={{ width:'100%', height:'100%', objectFit:'contain', display:'block' }} />
             </div>
-            <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:3 }}>
-              <div style={{ background:'rgba(255,255,255,0.88)', backdropFilter:'blur(16px)', padding:'7px 20px', borderRadius:22, border:'1px solid rgba(20,20,19,0.07)', boxShadow:'0 2px 8px rgba(20,20,19,0.05)' }}>
-                <span style={{ color:'#141413', fontSize:13, fontWeight:700, fontFamily:SF }}>AI Chat</span>
-              </div>
-              <div style={{ display:'flex', alignItems:'center', gap:5 }}>
-                <div style={{ width:6, height:6, borderRadius:3, background:'#22c55e', boxShadow:'0 0 6px rgba(34,197,94,0.8)' }} />
-                <span style={{ fontSize:11, fontWeight:600, color:'rgba(20,20,19,0.45)', fontFamily:SF }}>Online · UIUC resources ready</span>
+            <div style={{ position:'absolute', left:'50%', top:102, transform:'translateX(-50%)', width:155, height:155 }}>
+              <div style={{ position:'absolute', left:18.5, top:18.5, width:117.5, height:117.5, borderRadius:58.75, background:'rgba(255,255,255,0.72)', border:'2px solid rgba(255,255,255,0.5)', overflow:'hidden', boxShadow:'0 64px 250px 0 #ef8c5a, 0 24px 54px 0 rgba(255,255,255,0.1), 0 3px 120px 0 #ccebff' }}>
+                <img alt="" src={imgTcOrbMask} style={{ position:'absolute', left:8, top:22, width:102, height:75, objectFit:'contain', display:'block' }} />
+                <div style={{ position:'absolute', inset:0, background:'linear-gradient(145deg,rgba(255,255,255,0.22) 6%,transparent 46%)', borderRadius:58.75 }} />
               </div>
             </div>
-            <div style={{ width:36 }} />
+            <div style={{ position:'absolute', bottom:0, left:0, right:0, height:80, background:'linear-gradient(to bottom,transparent,white)' }} />
           </div>
 
-          {/* Messages */}
-          <div ref={messagesRef} style={{ position:'relative', zIndex:2, flex:1, overflowY:'auto', padding:'2px 18px 0', display:'flex', flexDirection:'column', gap:4 }}>
+          {/* Header */}
+          <div style={{ position:'relative', zIndex:15, flexShrink:0, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'52px 20px 12px' }}>
+            <div onClick={onBack} style={{ background:'white', borderRadius:99, width:34, height:34, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', flexShrink:0, boxShadow:'0 0 0 1px rgba(3,7,18,0.04),0 2px 4px rgba(3,7,18,0.04)' }}>
+              <img alt="" src={imgTcChevron} style={{ width:14, height:14, objectFit:'contain', display:'block' }} />
+            </div>
+            <div style={{ background:'rgba(255,255,255,0.88)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', padding:'9px 20px', borderRadius:22, border:'1px solid rgba(20,20,19,0.07)', boxShadow:'0 0 0 0 rgba(3,7,18,0.04),0 2px 4px rgba(3,7,18,0.04)' }}>
+              <span style={{ color:'#141413', fontSize:13, fontWeight:700, fontFamily:SF }}>AI Chat</span>
+            </div>
+            <div style={{ background:'white', borderRadius:99, width:36, height:36, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, overflow:'hidden', boxShadow:'0 0 0 1px rgba(3,7,18,0.04),0 2px 4px rgba(3,7,18,0.04)' }}>
+              <div style={{ width:18, height:18, position:'relative', overflow:'hidden' }}>
+                <div style={{ position:'absolute', top:'16.67%', bottom:'16.67%', left:'45.83%', right:'45.83%' }}>
+                  <div style={{ position:'absolute', top:'-6.25%', bottom:'-6.25%', left:'-50%', right:'-50%' }}>
+                    <img alt="" src={imgAiIcon} style={{ display:'block', width:'100%', height:'100%', maxWidth:'none' }} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-            {/* Disclaimer */}
-            <div style={{ alignSelf:'center', background:'rgba(255,255,255,0.60)', border:'1px solid rgba(20,20,19,0.06)', borderRadius:99, padding:'5px 14px', margin:'6px 0 10px' }}>
+          {/* Messages — scrolls under the orb overlay */}
+          <div ref={messagesRef} style={{ position:'relative', zIndex:2, flex:1, overflowY:'auto', display:'flex', flexDirection:'column', gap:4, paddingTop:168, paddingLeft:20, paddingRight:20 }}>
+
+            <div style={{ alignSelf:'center', background:'rgba(0,0,0,0.04)', borderRadius:99, padding:'5px 14px', margin:'0 0 10px' }}>
               <span style={{ fontSize:10.5, color:'rgba(20,20,19,0.40)', fontFamily:SF, fontWeight:500, letterSpacing:'0.1px' }}>🔒 What you share stays between us · here to listen, not judge</span>
             </div>
 
@@ -327,20 +340,28 @@
               const nextMsg = messages[i+1];
               const isLastInGroup = !nextMsg || nextMsg.from !== msg.from || nextMsg.type === 'resource';
               const isFirstInGroup = prevFrom !== msg.from;
-              const gap = (msg.type === 'resource' || (prevFrom && messages[i-1]?.type === 'resource')) ? 3 : (isFirstInGroup ? 10 : 3);
+              const gap = (msg.type === 'resource' || (prevFrom && messages[i-1]?.type === 'resource')) ? 3 : (isFirstInGroup ? 14 : 4);
               return (
                 <div key={i} style={{ display:'flex', flexDirection:'column', alignItems: msg.from==='user' ? 'flex-end' : 'flex-start', marginTop: gap, animation:'msgIn 0.28s ease-out both' }}>
                   {msg.from === 'ai' && (
-                    <div style={{ display:'flex', alignItems:'flex-end', gap:7 }}>
-                      {isLastInGroup ? AI_AVATAR : <div style={{ width:26, flexShrink:0 }} />}
-                      <div style={{ maxWidth:'76%', background:'rgba(255,255,255,0.94)', border:'1px solid rgba(20,20,19,0.055)', borderRadius: isFirstInGroup ? '18px 18px 18px 4px' : '4px 18px 18px 4px', padding:'10px 14px', boxShadow:'0 1px 8px rgba(20,20,19,0.055)' }}>
-                        <p style={{ margin:0, fontSize:14, lineHeight:1.52, color:'#141413', fontFamily:SF, fontWeight:500 }}>{msg.text}</p>
-                      </div>
+                    <div style={{ display:'flex', flexDirection:'column', gap:6, maxWidth:'88%' }}>
+                      {isFirstInGroup && (
+                        <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                          <img alt="" src={imgTcLogo} style={{ width:21, height:21, display:'block', flexShrink:0 }} />
+                          <span style={{ fontSize:14, fontWeight:500, color:'#0d0d12', fontFamily:ID, letterSpacing:-0.14, lineHeight:1.25 }}>Answer</span>
+                        </div>
+                      )}
+                      <p style={{ margin:0, fontSize:12, lineHeight:1.4, color:'#37394a', fontFamily:SF, fontWeight:500 }}>{msg.text}</p>
                     </div>
                   )}
                   {msg.from === 'user' && (
-                    <div style={{ maxWidth:'76%', background:'linear-gradient(145deg,#9d72f5,#7a4fd3)', borderRadius: isFirstInGroup ? '18px 18px 4px 18px' : '18px 4px 4px 18px', padding:'10px 14px', boxShadow:'0 2px 10px rgba(110,65,210,0.28)' }}>
-                      <p style={{ margin:0, fontSize:14, lineHeight:1.52, color:'white', fontFamily:SF, fontWeight:500 }}>{msg.text}</p>
+                    <div style={{ display:'flex', alignItems:'flex-end', paddingRight:8 }}>
+                      <div style={{ background:'white', borderRadius:16, padding:10, boxShadow:'0 0 0 1px rgba(3,7,18,0.04),0 1px 3px rgba(3,7,18,0.03)', maxWidth:257, marginRight:-8, overflow:'hidden', flexShrink:0 }}>
+                        <p style={{ margin:0, fontSize:12, lineHeight:1.25, color:'#0d0d12', fontFamily:ID }}>{msg.text}</p>
+                      </div>
+                      <div style={{ width:12.5, height:9.652, flexShrink:0, marginRight:-8, marginBottom:6 }}>
+                        <img alt="" src={imgTcTail} style={{ display:'block', width:'100%', height:'100%' }} />
+                      </div>
                     </div>
                   )}
                   {msg.type === 'resource' && <ResourceCard res={msg.res} SF={SF} />}
@@ -355,11 +376,14 @@
 
             {/* Typing indicator */}
             {typing && (
-              <div style={{ display:'flex', alignItems:'flex-end', gap:7, marginTop:10 }}>
-                {AI_AVATAR}
-                <div style={{ background:'rgba(255,255,255,0.94)', border:'1px solid rgba(20,20,19,0.055)', borderRadius:'18px 18px 18px 4px', padding:'11px 16px', boxShadow:'0 1px 8px rgba(20,20,19,0.055)', display:'flex', gap:4, alignItems:'center' }}>
+              <div style={{ display:'flex', flexDirection:'column', gap:6, marginTop:14, alignSelf:'flex-start', maxWidth:'88%' }}>
+                <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                  <img alt="" src={imgTcLogo} style={{ width:21, height:21, display:'block', flexShrink:0 }} />
+                  <span style={{ fontSize:14, fontWeight:500, color:'#0d0d12', fontFamily:ID, letterSpacing:-0.14 }}>Answer</span>
+                </div>
+                <div style={{ display:'flex', gap:4, alignItems:'center', paddingLeft:2 }}>
                   {[0, 0.2, 0.4].map(d => (
-                    <div key={d} style={{ width:5, height:5, borderRadius:'50%', background:'rgba(110,80,200,0.5)', animation:`typingDot 1s ease-in-out ${d}s infinite` }} />
+                    <div key={d} style={{ width:5, height:5, borderRadius:'50%', background:'rgba(55,57,74,0.4)', animation:`typingDot 1s ease-in-out ${d}s infinite` }} />
                   ))}
                 </div>
               </div>
@@ -367,33 +391,31 @@
             <div style={{ height:8, flexShrink:0 }} />
           </div>
 
-          {/* Chips + input frosted panel */}
-          <div style={{ position:'relative', zIndex:3, flexShrink:0, background:'rgba(245,242,255,0.82)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', borderTop:'1px solid rgba(255,255,255,0.6)' }}>
-            {/* Chips row */}
+          {/* Chips + input panel */}
+          <div style={{ position:'relative', zIndex:3, flexShrink:0, background:'rgba(255,255,255,0.92)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', borderTop:'1px solid rgba(0,0,0,0.06)' }}>
             <div style={{ padding:'10px 16px 0', display:'flex', gap:6, overflowX:'auto' }}>
               {chips.map(s => (
-                <div key={s} onClick={() => sendMessage(s)} style={{ background:'rgba(255,255,255,0.90)', border:'1px solid rgba(150,110,240,0.18)', borderRadius:99, padding:'6px 13px', cursor:'pointer', flexShrink:0, boxShadow:'0 1px 4px rgba(20,20,19,0.04)' }}>
-                  <span style={{ color:'rgba(80,50,160,0.82)', fontSize:12, fontFamily:SF, fontWeight:600, whiteSpace:'nowrap' }}>{s}</span>
+                <div key={s} onClick={() => sendMessage(s)} style={{ background:'white', border:'1px solid rgba(0,0,0,0.08)', borderRadius:99, padding:'6px 13px', cursor:'pointer', flexShrink:0, boxShadow:'0 1px 3px rgba(0,0,0,0.04)' }}>
+                  <span style={{ color:'rgba(20,20,19,0.65)', fontSize:12, fontFamily:SF, fontWeight:600, whiteSpace:'nowrap' }}>{s}</span>
                 </div>
               ))}
             </div>
-            {/* Input row */}
-            <div style={{ padding:'8px 14px 28px', display:'flex', alignItems:'flex-end', gap:9 }}>
-              <div style={{ flex:1, background:'rgba(255,255,255,0.95)', border:'1px solid rgba(20,20,19,0.08)', borderRadius:20, padding:'9px 15px', boxShadow:'0 1px 6px rgba(20,20,19,0.05)' }}>
+            <div style={{ padding:'8px 18px 34px', display:'flex', alignItems:'center', gap:8 }}>
+              <div style={{ flex:1, background:'white', borderRadius:8, padding:'9px 12px', boxShadow:'0 0 0 1px rgba(3,7,18,0.04),0 1px 3px rgba(3,7,18,0.03)', display:'flex', alignItems:'center' }}>
                 <textarea
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={e => { if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-                  placeholder="Share what's on your mind…"
+                  placeholder="Ask me anything..."
                   rows={1}
-                  style={{ display:'block', width:'100%', border:'none', outline:'none', background:'transparent', fontFamily:SF, fontSize:13.5, color:'#141413', resize:'none', lineHeight:1.45, maxHeight:88, overflowY:'auto' }}
+                  style={{ display:'block', width:'100%', border:'none', outline:'none', background:'transparent', fontFamily:ID, fontSize:12, color:'#0d0d12', resize:'none', lineHeight:1.2, maxHeight:88, overflowY:'auto' }}
                 />
               </div>
-              <div
-                onClick={() => sendMessage()}
-                style={{ width:42, height:42, borderRadius:21, background: input.trim() ? 'linear-gradient(145deg,#9d72f5,#7a4fd3)' : 'rgba(20,20,19,0.09)', display:'flex', alignItems:'center', justifyContent:'center', cursor: input.trim() ? 'pointer' : 'default', flexShrink:0, transition:'all 0.18s', boxShadow: input.trim() ? '0 3px 12px rgba(110,65,210,0.38)' : 'none' }}
-              >
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={input.trim() ? 'white' : 'rgba(20,20,19,0.28)'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+              <div style={{ width:28, height:28, borderRadius:99, background:'#f6f8fa', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, cursor:'pointer', boxShadow:'0 0 0 0.7px rgba(3,7,18,0.06),0 8px 16px rgba(3,7,18,0.08)' }}>
+                <img alt="" src={imgTcMic} style={{ width:14, height:14, objectFit:'contain', display:'block' }} />
+              </div>
+              <div onClick={() => sendMessage()} style={{ width:28, height:28, borderRadius:24, background:'#0d0d12', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, cursor:'pointer', boxShadow:'0 0 0 0.7px rgba(3,7,18,0.06),0 8px 16px rgba(3,7,18,0.08)' }}>
+                <img alt="" src={imgTcSend} style={{ width:14, height:14, objectFit:'contain', display:'block' }} />
               </div>
             </div>
           </div>

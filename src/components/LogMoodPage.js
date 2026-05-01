@@ -742,9 +742,9 @@
                           {/* Talk to Aiden CTA */}
                           {onChatWithMood && (
                             <div onClick={() => onChatWithMood(savedMoodData)}
-                              style={{ width:'100%', height:52, borderRadius:26, background: `linear-gradient(130deg, ${accentColor} 0%, ${accentLight} 100%)`, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:8, marginBottom:10, boxShadow:`0 8px 24px ${accentColor}44` }}>
+                              style={{ width:'100%', height:52, borderRadius:26, background:'#141413', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:8, marginBottom:10, boxShadow:'0 8px 28px rgba(10,8,20,0.22)' }}>
                               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" fill="white"/>
+                                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" fill="rgba(255,255,255,0.85)"/>
                               </svg>
                               <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:600, fontSize:15, color:'white', letterSpacing:'-0.1px', margin:0 }}>
                                 Talk to Aiden about this

@@ -189,7 +189,7 @@
                   {/* Card — animated gradient, matches LogMoodPage success card */}
                   <div onClick={e => e.stopPropagation()}
                     style={{ position:'relative', width:'100%', borderRadius:32, overflow:'hidden',
-                      background:'linear-gradient(135deg, #D4B8F4, #C4B8F0, #B8C8F4, #C4B8F0, #D4B8F4)',
+                      background:'linear-gradient(135deg, #EADCFA, #E2DCF8, #DCE4FA, #E2DCF8, #EADCFA)',
                       backgroundSize:'400% 400%', animation:'mgFlow 4s ease infinite',
                       boxShadow:'0px 25px 50px -12px rgba(0,0,0,0.28)',
                       padding:'32px 24px 28px', boxSizing:'border-box' }}>

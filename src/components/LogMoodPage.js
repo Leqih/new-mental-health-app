@@ -47,7 +47,7 @@
       useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
-        const gl = canvas.getContext('webgl', { antialias: true });
+        const gl = canvas.getContext('webgl', { antialias: true, preserveDrawingBuffer: true });
         if (!gl) return;
         glRef.current = gl;
 

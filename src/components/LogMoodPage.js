@@ -27,17 +27,32 @@
     const LOG_MOOD_OPTIONS = ['Angry','Exhausted','Sad','Anxious','Boring','Good','Happy','Grateful'];
 
     /* ── Mood-specific CSS gradients for the success modal card ──
-       Angle 152° matches the Figma reference. Three vivid stops: warm → neutral → cool. */
+       5-stop gradients so background-position animation has rich travel range. */
     const MOOD_CARD_GRADIENT = {
-      Good:      'linear-gradient(152deg, #6AF0B0 0%, #E8F8A0 50%, #9ACFFF 100%)',
-      Happy:     'linear-gradient(152deg, #FFE44C 0%, #FFD6A8 50%, #D4A0FF 100%)',
-      Grateful:  'linear-gradient(152deg, #FFB840 0%, #FFD8A0 50%, #FF8EB4 100%)',
-      Sad:       'linear-gradient(152deg, #70A8FF 0%, #B8A8FF 50%, #FFB0CC 100%)',
-      Anxious:   'linear-gradient(152deg, #FF80A8 0%, #FFCCA8 50%, #B880FF 100%)',
-      Angry:     'linear-gradient(152deg, #FF7060 0%, #FFCC90 50%, #FF80B0 100%)',
-      Exhausted: 'linear-gradient(152deg, #B880FF 0%, #D0C0FF 50%, #80B4FF 100%)',
-      Boring:    'linear-gradient(152deg, #30E8D0 0%, #80FFF0 50%, #60B4FF 100%)',
+      Good:      'linear-gradient(135deg, #6AF0B0, #B8F870, #E8F8A0, #A0E8FF, #9ACFFF)',
+      Happy:     'linear-gradient(135deg, #FFE44C, #FFD080, #FFD6A8, #E8B8FF, #D4A0FF)',
+      Grateful:  'linear-gradient(135deg, #FFB840, #FFD080, #FFD8A0, #FFB0C0, #FF8EB4)',
+      Sad:       'linear-gradient(135deg, #70A8FF, #98B8FF, #B8A8FF, #FFB8D8, #FFB0CC)',
+      Anxious:   'linear-gradient(135deg, #FF80A8, #FFB0C0, #FFCCA8, #D0A8FF, #B880FF)',
+      Angry:     'linear-gradient(135deg, #FF7060, #FF9870, #FFCC90, #FFB0C0, #FF80B0)',
+      Exhausted: 'linear-gradient(135deg, #B880FF, #C8A8FF, #D0C0FF, #A8C8FF, #80B4FF)',
+      Boring:    'linear-gradient(135deg, #30E8D0, #60F8E0, #80FFF0, #90D8FF, #60B4FF)',
     };
+
+    /* ── Inject CSS keyframes once for the animated gradient ── */
+    (() => {
+      if (document.getElementById('_mgAnim')) return;
+      const s = document.createElement('style');
+      s.id = '_mgAnim';
+      s.textContent = `
+        @keyframes mgFlow {
+          0%   { background-position: 0% 50%; }
+          50%  { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+      `;
+      document.head.appendChild(s);
+    })();
 
     /* ── Animated WebGL shader gradient — warm-to-cool 3D depth ── */
     // Wide hue spread per mood: vivid warm + soft neutral + vivid cool.
@@ -714,8 +729,8 @@
                     <div style={{ position:'absolute', inset:0, zIndex:500, display:'flex', alignItems:'center', justifyContent:'center', padding:'0 20px', borderRadius:'inherit' }}>
                       <div style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.30)', backdropFilter:'blur(6px)', WebkitBackdropFilter:'blur(6px)', borderRadius:'inherit' }} />
 
-                      {/* Full-gradient card — matches Figma 209-4 */}
-                      <div style={{ position:'relative', width:'100%', borderRadius:32, overflow:'hidden', background: cardGradient, boxShadow:'0px 25px 50px -12px rgba(0,0,0,0.35)', padding:'32px 24px 28px', boxSizing:'border-box' }}>
+                      {/* Full-gradient card — animated flowing background */}
+                      <div style={{ position:'relative', width:'100%', borderRadius:32, overflow:'hidden', background: cardGradient, backgroundSize:'300% 300%', animation:'mgFlow 7s ease infinite', boxShadow:'0px 25px 50px -12px rgba(0,0,0,0.35)', padding:'32px 24px 28px', boxSizing:'border-box' }}>
 
                         {/* Dot grid decoration — top right (3×3) */}
                         <div style={{ position:'absolute', top:28, right:28, display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:7 }}>

@@ -170,38 +170,42 @@
                 </div>
               </div>
 
-              {/* ── PROACTIVE AI BANNER — floats above bottom nav ── */}
+              {/* ── PROACTIVE AI MODAL ── */}
               {moodBanner && (
-                <div style={{ position:'absolute', bottom:82, left:16, right:16, zIndex:350 }}>
-                  <div style={{ background:'rgba(255,255,255,0.94)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', borderRadius:22, padding:'14px 14px 14px 14px', boxShadow:'0 8px 32px rgba(124,92,252,0.18), 0 2px 8px rgba(0,0,0,0.06)', border:'1px solid rgba(124,92,252,0.14)', display:'flex', flexDirection:'column', gap:10 }}>
-                    {/* Top row: orb + text + dismiss */}
-                    <div style={{ display:'flex', alignItems:'flex-start', gap:11 }}>
-                      {/* Mini orb */}
-                      <div style={{ width:38, height:38, borderRadius:19, background:'linear-gradient(145deg,#c4a8f8,#9b72e8)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, boxShadow:'0 4px 14px rgba(140,100,220,0.38)', marginTop:1 }}>
-                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-                          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.27 2 8.5 2 5.41 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.08C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.41 22 8.5c0 3.77-3.4 6.86-8.55 11.53L12 21.35z" fill="rgba(255,255,255,0.95)"/>
+                <div style={{ position:'absolute', inset:0, zIndex:500, display:'flex', alignItems:'center', justifyContent:'center', padding:'0 24px' }}
+                  onClick={() => setBannerDismissed(true)}>
+                  {/* Scrim */}
+                  <div style={{ position:'absolute', inset:0, background:'rgba(10,8,20,0.52)', backdropFilter:'blur(4px)', WebkitBackdropFilter:'blur(4px)' }} />
+                  {/* Card */}
+                  <div onClick={e => e.stopPropagation()}
+                    style={{ position:'relative', width:'100%', background:'#ffffff', borderRadius:28, overflow:'hidden', boxShadow:'0 24px 80px rgba(0,0,0,0.28)' }}>
+                    {/* Purple gradient header zone */}
+                    <div style={{ background:'linear-gradient(160deg,#ede8ff 0%,#f5f0ff 100%)', padding:'32px 24px 24px', display:'flex', flexDirection:'column', alignItems:'center', gap:16 }}>
+                      {/* Orb */}
+                      <div style={{ width:80, height:80, borderRadius:40, background:'linear-gradient(145deg,#c4a8f8,#9b72e8)', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 12px 40px rgba(124,92,252,0.45), 0 4px 16px rgba(124,92,252,0.20)' }}>
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+                          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.27 2 8.5 2 5.41 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.08C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.41 22 8.5c0 3.77-3.4 6.86-8.55 11.53L12 21.35z" fill="rgba(255,255,255,0.96)"/>
                         </svg>
                       </div>
-                      {/* Text block */}
-                      <div style={{ flex:1, minWidth:0 }}>
-                        <p style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:11, fontWeight:700, color:'#7C5CFC', letterSpacing:'0.5px', textTransform:'uppercase', margin:'0 0 3px' }}>Aiden noticed</p>
-                        <p style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:13.5, fontWeight:500, color:'#141413', lineHeight:1.45, margin:0 }}>{moodBanner.text}</p>
-                      </div>
-                      {/* Dismiss X */}
-                      <div onClick={() => setBannerDismissed(true)}
-                        style={{ flexShrink:0, width:26, height:26, borderRadius:13, background:'rgba(20,20,19,0.06)', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', marginTop:1 }}>
-                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                          <path d="M1.5 1.5L8.5 8.5M8.5 1.5L1.5 8.5" stroke="rgba(20,20,19,0.35)" strokeWidth="1.6" strokeLinecap="round"/>
-                        </svg>
+                      {/* Title */}
+                      <div style={{ textAlign:'center' }}>
+                        <p style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:22, fontWeight:700, color:'#141413', letterSpacing:'-0.4px', margin:'0 0 6px', lineHeight:1.2 }}>Aiden noticed 💜</p>
+                        <p style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:14, fontWeight:400, color:'rgba(20,20,19,0.55)', lineHeight:1.5, margin:0 }}>{moodBanner.text}</p>
                       </div>
                     </div>
-                    {/* CTA button */}
-                    <div onClick={() => handleChatWithMood(moodBanner.moodCtx)}
-                      style={{ background:'linear-gradient(135deg,#9b72e8,#7C5CFC)', borderRadius:14, height:42, display:'flex', alignItems:'center', justifyContent:'center', gap:7, cursor:'pointer', boxShadow:'0 4px 14px rgba(124,92,252,0.35)' }}>
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-                        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" fill="rgba(255,255,255,0.92)"/>
-                      </svg>
-                      <span style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:14, fontWeight:700, color:'white', letterSpacing:'-0.1px' }}>Talk to Aiden</span>
+                    {/* Action zone */}
+                    <div style={{ padding:'20px 20px 24px', display:'flex', flexDirection:'column', gap:10 }}>
+                      <div onClick={() => handleChatWithMood(moodBanner.moodCtx)}
+                        style={{ background:'linear-gradient(135deg,#9b72e8,#7C5CFC)', borderRadius:18, height:54, display:'flex', alignItems:'center', justifyContent:'center', gap:8, cursor:'pointer', boxShadow:'0 8px 24px rgba(124,92,252,0.38)' }}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                          <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" fill="rgba(255,255,255,0.95)"/>
+                        </svg>
+                        <span style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:16, fontWeight:700, color:'white', letterSpacing:'-0.2px' }}>Talk to Aiden</span>
+                      </div>
+                      <div onClick={() => setBannerDismissed(true)}
+                        style={{ height:44, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}>
+                        <span style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:14, fontWeight:500, color:'rgba(20,20,19,0.38)' }}>Maybe later</span>
+                      </div>
                     </div>
                   </div>
                 </div>

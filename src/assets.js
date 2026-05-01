@@ -19,9 +19,9 @@
     const imgLogEllipse1  = 'https://www.figma.com/api/mcp/asset/5790a353-34d1-411f-853c-5721dfaff6ee';
     const imgLogEllipse5  = 'https://www.figma.com/api/mcp/asset/dd6c9513-a1f5-4ab6-8b9e-38f73b4f0561';
     const imgLogBubble    = 'https://www.figma.com/api/mcp/asset/eb936309-40c6-42b3-8daa-3d2dc138e749';
-    /* Good mood (node 52-340, 52-352) – fresh URLs */
-    const imgGoodChar     = 'https://www.figma.com/api/mcp/asset/9a0f34b4-c296-4d61-a447-8c0c06f56b83';
-    const imgGoodFace     = 'https://www.figma.com/api/mcp/asset/d59190bb-f312-44e3-b2d9-8fe527d4329a';
+    /* Good mood (node 52-340) – refreshed 2026-05-01 */
+    const imgGoodChar     = 'https://www.figma.com/api/mcp/asset/22680cba-6ca8-4ee6-adfe-ee9eac16e64b';
+    const imgGoodFace     = 'https://www.figma.com/api/mcp/asset/fbb42262-19c1-445e-84a3-d170d9441f0c';
     const imgGoodBubble   = 'https://www.figma.com/api/mcp/asset/a8904e24-0184-4c00-8d82-46c76d23b296';
     /* Happy mood (node 60-232) – fresh URLs */
     const imgHappyChar    = 'https://www.figma.com/api/mcp/asset/aeea785e-9b8c-4a0d-b250-0629845886f3';

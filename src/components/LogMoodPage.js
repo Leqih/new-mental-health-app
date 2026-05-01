@@ -26,6 +26,19 @@
     };
     const LOG_MOOD_OPTIONS = ['Angry','Exhausted','Sad','Anxious','Boring','Good','Happy','Grateful'];
 
+    /* ── Mood-specific CSS gradients for the success modal card ──
+       Angle 152° matches the Figma reference. Three vivid stops: warm → neutral → cool. */
+    const MOOD_CARD_GRADIENT = {
+      Good:      'linear-gradient(152deg, #6AF0B0 0%, #E8F8A0 50%, #9ACFFF 100%)',
+      Happy:     'linear-gradient(152deg, #FFE44C 0%, #FFD6A8 50%, #D4A0FF 100%)',
+      Grateful:  'linear-gradient(152deg, #FFB840 0%, #FFD8A0 50%, #FF8EB4 100%)',
+      Sad:       'linear-gradient(152deg, #70A8FF 0%, #B8A8FF 50%, #FFB0CC 100%)',
+      Anxious:   'linear-gradient(152deg, #FF80A8 0%, #FFCCA8 50%, #B880FF 100%)',
+      Angry:     'linear-gradient(152deg, #FF7060 0%, #FFCC90 50%, #FF80B0 100%)',
+      Exhausted: 'linear-gradient(152deg, #B880FF 0%, #D0C0FF 50%, #80B4FF 100%)',
+      Boring:    'linear-gradient(152deg, #30E8D0 0%, #80FFF0 50%, #60B4FF 100%)',
+    };
+
     /* ── Animated WebGL shader gradient — warm-to-cool 3D depth ── */
     // Wide hue spread per mood: vivid warm + soft neutral + vivid cool.
     // More saturation than before so blobs read as distinct colour zones.
@@ -695,67 +708,61 @@
                 {showSaved && savedMoodData && (() => {
                   const NEGATIVE = ['Anxious','Sad','Angry','Exhausted','Boring'];
                   const isNeg = NEGATIVE.includes(savedMoodData.emotion);
+                  const cardGradient = MOOD_CARD_GRADIENT[savedMoodData.emotion] || MOOD_CARD_GRADIENT['Good'];
                   return (
-                    /* Scrim — light frosted mist (not dark) so the mood wave shows through */
+                    /* Scrim */
                     <div style={{ position:'absolute', inset:0, zIndex:500, display:'flex', alignItems:'center', justifyContent:'center', padding:'0 20px', borderRadius:'inherit' }}>
-                      {/* Light frosted backdrop — lets the page gradient bleed through */}
-                      <div style={{ position:'absolute', inset:0, background:'rgba(235,232,248,0.52)', backdropFilter:'blur(14px)', WebkitBackdropFilter:'blur(14px)', borderRadius:'inherit' }} />
+                      <div style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.30)', backdropFilter:'blur(6px)', WebkitBackdropFilter:'blur(6px)', borderRadius:'inherit' }} />
 
-                      {/* Card */}
-                      <div style={{ position:'relative', width:'100%', borderRadius:32, overflow:'hidden', boxShadow:'0 1px 0 rgba(255,255,255,1.0) inset, 0 32px 64px rgba(80,70,120,0.18), 0 0 0 1px rgba(255,255,255,0.55)' }}>
+                      {/* Full-gradient card — matches Figma 209-4 */}
+                      <div style={{ position:'relative', width:'100%', borderRadius:32, overflow:'hidden', background: cardGradient, boxShadow:'0px 25px 50px -12px rgba(0,0,0,0.35)', padding:'32px 24px 28px', boxSizing:'border-box' }}>
 
-                        {/* Gradient header */}
-                        <div style={{ position:'relative', height:210 }}>
-                          <GradientCanvas mood={savedMoodData.emotion} height={210} />
-                          {/* Checkmark badge */}
-                          <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                            <div style={{ width:80, height:80, borderRadius:40, background:'rgba(255,255,255,0.48)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', border:'1.5px solid rgba(255,255,255,0.90)', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 0 rgba(255,255,255,0.9) inset, 0 12px 36px rgba(80,60,120,0.14)' }}>
-                              <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                                <path d="M6 14L11.5 19.5L22 9" stroke="rgba(30,28,50,0.65)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"/>
-                              </svg>
-                            </div>
-                          </div>
-                          {/* Fade into card body */}
-                          <div style={{ position:'absolute', bottom:0, left:0, right:0, height:60, background:'linear-gradient(to bottom, transparent, white)' }} />
+                        {/* Dot grid decoration — top right (3×3) */}
+                        <div style={{ position:'absolute', top:28, right:28, display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:7 }}>
+                          {Array.from({length:9}).map((_,i) => (
+                            <div key={i} style={{ width:5, height:5, borderRadius:'50%', background:'rgba(0,0,0,0.22)' }} />
+                          ))}
                         </div>
 
-                        {/* Card body */}
-                        <div style={{ background:'white', padding:'4px 24px 28px', display:'flex', flexDirection:'column', alignItems:'center' }}>
-                          {/* Emotion pill */}
-                          <div style={{ background: accentColor + '14', border:`1px solid ${accentColor}28`, borderRadius:20, padding:'5px 16px', marginBottom:12 }}>
-                            <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:600, fontSize:12, color: accentColor, margin:0, letterSpacing:'0.4px', textTransform:'uppercase' }}>
-                              {savedMoodData.emotion} logged
+                        {/* Checkmark badge */}
+                        <div style={{ width:52, height:52, borderRadius:26, background:'rgba(255,255,255,0.55)', backdropFilter:'blur(12px)', WebkitBackdropFilter:'blur(12px)', border:'1.5px solid rgba(255,255,255,0.85)', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:20, boxShadow:'0 2px 0 rgba(255,255,255,0.8) inset' }}>
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                            <path d="M5 12L10 17L19 8" stroke="rgba(20,18,40,0.70)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </div>
+
+                        {/* Title */}
+                        <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:700, fontSize:26, color:'#111', letterSpacing:'-0.5px', margin:'0 0 10px', lineHeight:1.2, paddingRight:52 }}>
+                          {isNeg ? 'Want to talk it through?' : 'Nice — keep the momentum!'}
+                        </p>
+
+                        {/* Subtitle */}
+                        <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:400, fontSize:14, color:'rgba(10,8,20,0.60)', margin:'0 0 32px', lineHeight:1.55 }}>
+                          {isNeg
+                            ? "Aiden can help you process what you're feeling right now."
+                            : 'Reflecting on good days helps them stick. Share it with Aiden?'}
+                        </p>
+
+                        {/* White pill CTA — mirrors Figma button style */}
+                        {onChatWithMood && (
+                          <div onClick={() => onChatWithMood(savedMoodData)}
+                            style={{ width:'100%', height:50, borderRadius:999, background:'white', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 18px 0 20px', boxSizing:'border-box', marginBottom:14, boxShadow:'0 4px 20px rgba(0,0,0,0.12)' }}>
+                            <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:600, fontSize:15, color:'#111', letterSpacing:'0.1px', margin:0 }}>
+                              Talk to Aiden about this
                             </p>
-                          </div>
-                          {/* Title */}
-                          <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:700, fontSize:21, color:'#111', letterSpacing:'-0.5px', margin:'0 0 7px', textAlign:'center', lineHeight:1.22 }}>
-                            {isNeg ? 'Want to talk it through?' : 'Nice — keep the momentum!'}
-                          </p>
-                          {/* Subtitle */}
-                          <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:400, fontSize:13.5, color:'rgba(20,20,19,0.48)', margin:'0 0 22px', textAlign:'center', lineHeight:1.6 }}>
-                            {isNeg
-                              ? "Aiden can help you process what you're feeling right now."
-                              : 'Reflecting on good days helps them stick. Share it with Aiden?'}
-                          </p>
-
-                          {/* Talk to Aiden CTA */}
-                          {onChatWithMood && (
-                            <div onClick={() => onChatWithMood(savedMoodData)}
-                              style={{ width:'100%', height:52, borderRadius:26, background:'#141413', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:8, marginBottom:10, boxShadow:'0 8px 28px rgba(10,8,20,0.22)' }}>
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" fill="rgba(255,255,255,0.85)"/>
+                            <div style={{ width:30, height:30, borderRadius:15, background:'rgba(0,0,0,0.07)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                <path d="M5 12h14M13 6l6 6-6 6" stroke="#111" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                               </svg>
-                              <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:600, fontSize:15, color:'white', letterSpacing:'-0.1px', margin:0 }}>
-                                Talk to Aiden about this
-                              </p>
                             </div>
-                          )}
-                          {/* Back to home */}
-                          <div onClick={onBack}
-                            style={{ width:'100%', height:44, borderRadius:26, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                            <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:500, fontSize:13.5, color:'rgba(20,20,19,0.38)', margin:0 }}>Back to home</p>
                           </div>
+                        )}
+
+                        {/* Back to home */}
+                        <div onClick={onBack} style={{ width:'100%', textAlign:'center', cursor:'pointer', padding:'4px 0' }}>
+                          <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:500, fontSize:14, color:'rgba(10,8,20,0.50)', margin:0 }}>Back to Home</p>
                         </div>
+
                       </div>
                     </div>
                   );

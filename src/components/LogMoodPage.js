@@ -27,18 +27,17 @@
     const LOG_MOOD_OPTIONS = ['Angry','Exhausted','Sad','Anxious','Boring','Good','Happy','Grateful'];
 
     /* ── Animated WebGL shader gradient — warm-to-cool 3D depth ── */
-    // Each mood: warm anchor + neutral + cool anchor.
-    // The warm/cool hue spread (even at low sat) creates the dimensional
-    // "peach → gold → lavender" look from the reference.
+    // Wide hue spread per mood: vivid warm + soft neutral + vivid cool.
+    // More saturation than before so blobs read as distinct colour zones.
     const MOOD_GRADIENT_COLORS = {
-      Good:      [[0.92,0.95,0.80], [0.97,0.93,0.84], [0.80,0.87,0.97]],
-      Happy:     [[0.99,0.93,0.70], [0.99,0.88,0.78], [0.87,0.83,0.97]],
-      Grateful:  [[0.99,0.88,0.72], [0.98,0.85,0.82], [0.92,0.80,0.96]],
-      Sad:       [[0.84,0.88,0.99], [0.88,0.84,0.97], [0.97,0.88,0.92]],
-      Anxious:   [[0.99,0.83,0.87], [0.95,0.80,0.96], [0.84,0.78,0.98]],
-      Angry:     [[0.99,0.81,0.74], [0.99,0.89,0.80], [0.93,0.80,0.90]],
-      Exhausted: [[0.94,0.84,0.97], [0.82,0.80,0.97], [0.82,0.88,0.99]],
-      Boring:    [[0.78,0.96,0.90], [0.84,0.96,0.96], [0.82,0.86,0.99]],
+      Good:      [[0.78,0.97,0.70], [0.94,0.97,0.80], [0.66,0.87,0.94]],  // lime-sage | cream | seafoam-teal
+      Happy:     [[0.99,0.93,0.52], [0.99,0.83,0.70], [0.78,0.74,0.99]],  // rich gold | peach | lavender
+      Grateful:  [[0.99,0.82,0.60], [0.99,0.76,0.78], [0.86,0.72,0.98]],  // amber | warm rose | mauve
+      Sad:       [[0.70,0.80,0.99], [0.84,0.84,0.99], [0.92,0.82,0.99]],  // vivid blue | periwinkle | lilac
+      Anxious:   [[0.99,0.72,0.80], [0.93,0.70,0.98], [0.72,0.68,0.99]],  // rose-pink | purple-pink | deep lavender
+      Angry:     [[0.99,0.68,0.60], [0.99,0.86,0.70], [0.94,0.70,0.88]],  // coral | peach | magenta-rose
+      Exhausted: [[0.90,0.76,0.99], [0.70,0.70,0.99], [0.70,0.82,0.99]],  // mauve | lavender | periwinkle
+      Boring:    [[0.62,0.97,0.84], [0.78,0.99,0.94], [0.70,0.82,0.99]],  // vivid seafoam | mint | sky
     };
 
     function GradientCanvas({ mood, width = 340, height = 180 }) {
@@ -79,15 +78,15 @@
 
             vec3 col = (u_c0*w0 + u_c1*w1 + u_c2*w2) / total;
 
-            // Less white mix so warm-cool colors remain visible
-            col = mix(col, vec3(1.0), 0.18);
+            // Gentle white mix — just enough to keep it airy, not washed out
+            col = mix(col, vec3(1.0), 0.10);
 
             // Soft diffuse light from top-left (matches reference photo)
             float d = length(uv - vec2(0.2, 0.85));
-            col += vec3(0.04) * (1.0 - clamp(d * 1.8, 0.0, 1.0));
+            col += vec3(0.05) * (1.0 - clamp(d * 1.8, 0.0, 1.0));
 
-            // Brightness floor
-            col = max(col, vec3(0.76));
+            // Brightness floor (lower than before so colour depth shows)
+            col = max(col, vec3(0.68));
 
             gl_FragColor = vec4(col, 1.0);
           }

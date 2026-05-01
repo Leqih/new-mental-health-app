@@ -31,12 +31,14 @@
       intlStudent:  { level:3, icon:'🌍', title:'International Student Support',sub:'Cultural adjustment & counseling', tagline:'Navigating a new country, language, and system is hard. ISSS offers guidance for academic, cultural, and emotional challenges.',                     tags:['Free','International','Cultural support'],      detail:'Turner Student Services Bldg',                                 phone:'(217) 333-1303',   color:'#0ea5e9' },
     };
 
-    const BOOKABLE_KEYS = new Set(['caps','letsTalk','mckinley','groupCounseling','embeddedCounseling','resilience']);
+    /* Inject _key into each resource for canBook checks */
+    Object.keys(UIUC_RESOURCES).forEach(k => { UIUC_RESOURCES[k]._key = k; });
+    const BOOKABLE_KEYS = new Set(['caps','letsTalk','mckinley','resilience']);
 
-    function ResourceCard({ res, SF, onBook, resKey }) {
+    function ResourceCard({ res, SF, onBook }) {
       const BADGE = { 1:['URGENT','#dc2626','rgba(254,226,226,0.95)'], 2:['START HERE','#7c3aed','rgba(237,233,254,0.95)'], 3:['RECOMMENDED','#059669','rgba(209,250,229,0.95)'], 4:['HELPFUL','#0891b2','rgba(224,242,254,0.95)'] };
       const [bLabel, bText, bBg] = BADGE[res.level] || BADGE[3];
-      const canBook = onBook && BOOKABLE_KEYS.has(resKey);
+      const canBook = onBook && res._key && BOOKABLE_KEYS.has(res._key);
       return (
         <div style={{ marginLeft:36, maxWidth:'86%', background:'rgba(255,255,255,0.96)', borderRadius:16, overflow:'hidden', boxShadow:'0 2px 14px rgba(20,20,19,0.09)', border:'1px solid rgba(20,20,19,0.06)', display:'flex' }}>
           <div style={{ width:3, background:res.color, flexShrink:0 }} />
@@ -70,12 +72,12 @@
                 ))}
               </div>
             )}
-            {/* Footer: location + call + book buttons */}
+            {/* Footer: location + book + call buttons */}
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:8 }}>
               <p style={{ margin:0, fontSize:10, color:'rgba(20,20,19,0.34)', fontFamily:SF, letterSpacing:'0.1px', lineHeight:1.4, flex:1 }}>{res.detail}</p>
               <div style={{ display:'flex', gap:6, flexShrink:0 }}>
                 {canBook && (
-                  <div onClick={() => onBook(resKey)} style={{ display:'flex', alignItems:'center', gap:4, background:`${res.color}15`, borderRadius:99, padding:'5px 10px', cursor:'pointer', border:`1px solid ${res.color}30` }}>
+                  <div onClick={onBook} style={{ display:'flex', alignItems:'center', gap:4, background:`${res.color}15`, borderRadius:99, padding:'5px 10px', cursor:'pointer', border:`1px solid ${res.color}30` }}>
                     <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke={res.color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                     <span style={{ fontSize:10.5, fontWeight:700, color:res.color, fontFamily:SF, whiteSpace:'nowrap' }}>Book</span>
                   </div>
@@ -211,184 +213,104 @@
     }
 
     /* ══════════════════════════════════════════
-       BOOKING WIDGETS — used in conversational booking flow
+       INTAKE ASSESSMENT — therapist matching flow
        ══════════════════════════════════════════ */
 
-    const BOOKING_SERVICES = [
-      { key:'caps',           icon:'🏛️', title:'CAPS Counseling',       sub:'Individual therapy · ongoing support',   color:'#3b82f6', phone:'(217) 333-3704', url:'counselingcenter.illinois.edu' },
-      { key:'letsTalk',       icon:'💬', title:"Let's Talk",             sub:'Free 15-min consult · no commitment',    color:'#7c3aed', phone:'(217) 333-3704', url:'counselingcenter.illinois.edu/lets-talk' },
-      { key:'mckinley',       icon:'🏥', title:'McKinley Mental Health', sub:'Psychiatry & medication management',     color:'#059669', phone:'(217) 333-2700', url:'mckinley.illinois.edu/mental-health' },
-      { key:'groupCounseling',icon:'👥', title:'Group Counseling',       sub:'Therapeutic group sessions at CAPS',     color:'#0ea5e9', phone:'(217) 333-3704', url:'counselingcenter.illinois.edu' },
+    const THERAPISTS = [
+      { id:'sarah_chen',   name:'Dr. Sarah Chen',    title:'Licensed Psychologist · PhD',       initials:'SC', color:'#a78bfa', specializations:['anxiety','depression','identity','academic','stress'],       approach:'balanced',    gender:'woman',    cultural:['Asian American'],                        bio:'Integrates CBT and mindfulness with genuine warmth. Known for making you feel heard from session one.',        availability:'Tue & Thu · Afternoons',       wait:'~1 week' },
+      { id:'marcus_j',     name:'Marcus Johnson',     title:'Licensed Clinical Social Worker',   initials:'MJ', color:'#34d399', specializations:['stress','grief','relationship','identity','financial'],       approach:'exploratory', gender:'man',      cultural:['Black/African American','First-gen'],    bio:'Creates space to untangle complex feelings without rushing. Open, exploratory, judgment-free.',                availability:'Mon & Wed · Morning & Evening', wait:'~2 weeks' },
+      { id:'maya_rod',     name:'Maya Rodriguez',     title:'Licensed Professional Counselor',   initials:'MR', color:'#fb923c', specializations:['anxiety','sleep','academic','relationship','stress'],         approach:'structured',  gender:'woman',    cultural:['Latina/Hispanic'],                       bio:'Practical and goal-oriented. Gives you real tools and strategies you can use between sessions.',               availability:'Mon & Fri · Mornings',          wait:'~1 week' },
+      { id:'alex_kim',     name:'Alex Kim',            title:'Licensed Clinical Psychologist',    initials:'AK', color:'#60a5fa', specializations:['identity','anxiety','depression','lgbtq'],                   approach:'balanced',    gender:'nonbinary',cultural:['Asian American','LGBTQ+ affirming'],    bio:'Specializes in identity and LGBTQ+ concerns. Creates a deeply affirming, non-judgmental space.',              availability:'Tue & Thu · All day',           wait:'~2 weeks' },
+      { id:'emeka_ok',     name:'Dr. Emeka Okafor',   title:'Psychiatrist & Therapist',          initials:'EO', color:'#e879f9', specializations:['depression','anxiety','sleep','academic','stress'],           approach:'structured',  gender:'man',      cultural:['African/Nigerian American'],             bio:'Dual-trained in psychiatry and therapy. Can address medication needs alongside talk therapy in one place.',   availability:'Wed & Fri · All day',           wait:'~3 weeks' },
+      { id:'priya_sh',     name:'Priya Sharma',        title:'Licensed Counseling Psychologist',  initials:'PS', color:'#fb7185', specializations:['stress','grief','identity','relationship','depression'],      approach:'balanced',    gender:'woman',    cultural:['South Asian','International student exp.'],bio:'Specializes in life transitions and cultural identity. Warm, relational approach with practical tools.',       availability:'Mon, Wed & Fri · Afternoons',   wait:'~1 week' },
     ];
 
-    function BookingServiceWidget({ onAnswer, answered, SF }) {
-      const [sel, setSel] = useState(null);
-      if (answered) {
-        const s = BOOKING_SERVICES.find(x => x.key === answered);
-        return (
-          <div style={{ marginLeft:36, display:'inline-flex', alignItems:'center', gap:7, background:'rgba(130,90,220,0.09)', borderRadius:99, padding:'5px 13px', border:'1px solid rgba(130,90,220,0.18)', animation:'msgIn 0.25s ease-out' }}>
-            <span style={{ fontSize:13 }}>{s?.icon}</span>
-            <span style={{ fontSize:12, color:'rgba(110,65,200,0.9)', fontFamily:SF, fontWeight:700 }}>✓ {s?.title}</span>
-          </div>
-        );
-      }
-      return (
-        <div style={{ marginLeft:36, maxWidth:'90%', display:'flex', flexDirection:'column', gap:8, animation:'msgIn 0.28s ease-out' }}>
-          {BOOKING_SERVICES.map(s => (
-            <div key={s.key} onClick={() => { setSel(s.key); setTimeout(() => onAnswer(s.key), 220); }}
-              style={{ padding:'11px 14px', borderRadius:14, border:`1.5px solid ${sel===s.key ? s.color : 'rgba(20,20,19,0.08)'}`, background: sel===s.key ? `${s.color}0e` : 'white', cursor:'pointer', transition:'all 0.18s', display:'flex', alignItems:'center', gap:10, boxShadow:'0 1px 6px rgba(20,20,19,0.05)' }}>
-              <div style={{ width:34, height:34, borderRadius:10, background:`${s.color}18`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-                <span style={{ fontSize:16 }}>{s.icon}</span>
-              </div>
-              <div style={{ flex:1 }}>
-                <p style={{ margin:'0 0 1px', fontSize:13, fontWeight:700, color: sel===s.key ? s.color : '#141413', fontFamily:SF }}>{s.title}</p>
-                <p style={{ margin:0, fontSize:10.5, color:'rgba(20,20,19,0.44)', fontFamily:SF }}>{s.sub}</p>
-              </div>
-              {sel === s.key && (
-                <div style={{ width:18, height:18, borderRadius:9, background:s.color, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-                  <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5l2 2L7.5 2" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      );
+    const CONCERN_MAP = {
+      'Anxiety & worry':'anxiety', 'Low mood / depression':'depression', 'Stress & overwhelm':'stress',
+      'Loneliness':'identity', 'Grief or loss':'grief', 'Relationship issues':'relationship',
+      'Trauma':'anxiety', 'Identity & belonging':'identity', 'Academic pressure':'academic',
+      'Sleep problems':'sleep', 'LGBTQ+ concerns':'lgbtq', 'Financial stress':'financial',
+    };
+
+    const APPROACH_MAP = {
+      'Structured & practical (CBT / tools)':'structured',
+      'Open & exploratory (just talk)':'exploratory',
+      'A mix of both':'balanced',
+    };
+
+    function matchTherapists(intakeData) {
+      const { concerns, genderPref, approachPref } = intakeData;
+      const concernKeys = (concerns || '').split(' · ').map(c => CONCERN_MAP[c.trim()]).filter(Boolean);
+      const approachKey = APPROACH_MAP[approachPref];
+      return THERAPISTS.map(t => {
+        let score = 0;
+        score += concernKeys.filter(k => t.specializations.includes(k)).length * 3;
+        if (!genderPref || genderPref === 'No preference') score += 1;
+        else if ((genderPref === 'Woman' && t.gender === 'woman') || (genderPref === 'Man' && t.gender === 'man') || (genderPref === 'Non-binary' && t.gender === 'nonbinary')) score += 3;
+        if (approachKey) { if (t.approach === approachKey) score += 2; else if (t.approach === 'balanced') score += 1; } else score += 1;
+        return { ...t, score };
+      }).sort((a, b) => b.score - a.score).slice(0, 3);
     }
 
-    function BookingUrgencyWidget({ onAnswer, answered, SF }) {
-      const [sel, setSel] = useState(null);
-      const opts = [
-        { v:'flexible', label:'I can wait a few weeks',    icon:'😌' },
-        { v:'week',     label:'Within the next week',      icon:'🙏' },
-        { v:'soon',     label:'As soon as possible',       icon:'😟' },
-        { v:'urgent',   label:'It feels urgent right now', icon:'😰' },
-      ];
-      if (answered) {
-        const o = opts.find(x => x.v === answered);
-        return (
-          <div style={{ marginLeft:36, display:'inline-flex', alignItems:'center', gap:6, background:'rgba(130,90,220,0.09)', borderRadius:99, padding:'5px 13px', border:'1px solid rgba(130,90,220,0.18)', animation:'msgIn 0.25s ease-out' }}>
-            <span>{o?.icon}</span>
-            <span style={{ fontSize:12, color:'rgba(110,65,200,0.9)', fontFamily:SF, fontWeight:700 }}>✓ {o?.label}</span>
-          </div>
-        );
-      }
+    function TherapistMatchWidget({ matches, SF }) {
+      const [requested, setRequested] = useState(null);
+      const APPROACH_LABEL = { structured:'Structured & tools', exploratory:'Open & exploratory', balanced:'Mixed approach' };
+      const APPROACH_COLOR = { structured:'#3b82f6', exploratory:'#7c3aed', balanced:'#059669' };
       return (
-        <div style={{ marginLeft:36, maxWidth:'90%', display:'flex', flexDirection:'column', gap:7, animation:'msgIn 0.28s ease-out' }}>
-          {opts.map(o => (
-            <div key={o.v} onClick={() => { setSel(o.v); setTimeout(() => onAnswer(o.v), 220); }}
-              style={{ padding:'10px 14px', borderRadius:14, border:`1.5px solid ${sel===o.v ? '#9b6ef3' : 'rgba(20,20,19,0.08)'}`, background: sel===o.v ? 'rgba(155,110,243,0.07)' : 'white', cursor:'pointer', transition:'all 0.15s', display:'flex', alignItems:'center', gap:10, boxShadow:'0 1px 6px rgba(20,20,19,0.05)' }}>
-              <span style={{ fontSize:18 }}>{o.icon}</span>
-              <span style={{ fontSize:13, fontWeight: sel===o.v ? 700 : 500, color: sel===o.v ? '#7c5cfc' : '#141413', fontFamily:SF }}>{o.label}</span>
-              {sel === o.v && (
-                <div style={{ marginLeft:'auto', width:18, height:18, borderRadius:9, background:'#9b6ef3', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                  <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5l2 2L7.5 2" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        <div style={{ marginLeft:36, maxWidth:'92%', display:'flex', flexDirection:'column', gap:10, animation:'msgIn 0.28s ease-out' }}>
+          {matches.map((t, idx) => (
+            <div key={t.id} style={{ borderRadius:16, border:`1.5px solid ${requested===t.id ? '#9b6ef3' : 'rgba(20,20,19,0.08)'}`, overflow:'hidden', boxShadow:'0 2px 12px rgba(20,20,19,0.07)', background: requested===t.id ? 'rgba(155,110,243,0.03)' : 'white', transition:'all 0.2s' }}>
+              {/* Avatar + name + badge */}
+              <div style={{ padding:'12px 14px 8px', display:'flex', alignItems:'center', gap:11 }}>
+                <div style={{ width:44, height:44, borderRadius:22, background:t.color, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, boxShadow:`0 2px 10px ${t.color}55` }}>
+                  <span style={{ fontSize:15, fontWeight:800, color:'white', fontFamily:SF }}>{t.initials}</span>
                 </div>
-              )}
-            </div>
-          ))}
-        </div>
-      );
-    }
-
-    function BookingPrefsWidget({ onAnswer, answered, SF }) {
-      const [time, setTime]     = useState(null);
-      const [format, setFormat] = useState(null);
-      const times   = ['Morning','Afternoon','Evening','Flexible'];
-      const formats = ['In-person','Video call','No preference'];
-      if (answered) {
-        return (
-          <div style={{ marginLeft:36, display:'flex', flexWrap:'wrap', gap:5, maxWidth:'90%', animation:'msgIn 0.25s ease-out' }}>
-            {answered.split(' · ').map(t => (
-              <div key={t} style={{ background:'rgba(130,90,220,0.09)', borderRadius:99, padding:'4px 10px', border:'1px solid rgba(130,90,220,0.18)' }}>
-                <span style={{ fontSize:11.5, color:'rgba(110,65,200,0.85)', fontFamily:SF, fontWeight:700 }}>✓ {t}</span>
-              </div>
-            ))}
-          </div>
-        );
-      }
-      return (
-        <div style={{ marginLeft:36, maxWidth:'90%', background:'rgba(255,255,255,0.95)', borderRadius:14, overflow:'hidden', border:'1px solid rgba(20,20,19,0.055)', boxShadow:'0 1px 8px rgba(20,20,19,0.06)', animation:'msgIn 0.28s ease-out' }}>
-          <div style={{ borderLeft:'3px solid #9b6ef3', padding:'11px 13px' }}>
-            <p style={{ margin:'0 0 8px', fontSize:10.5, fontWeight:700, color:'rgba(20,20,19,0.38)', fontFamily:SF, letterSpacing:'0.5px', textTransform:'uppercase' }}>Preferred time of day</p>
-            <div style={{ display:'flex', flexWrap:'wrap', gap:6, marginBottom:12 }}>
-              {times.map(t => (
-                <div key={t} onClick={() => setTime(t)}
-                  style={{ padding:'7px 13px', borderRadius:99, border:`1.5px solid ${time===t ? '#9b6ef3' : 'rgba(20,20,19,0.10)'}`, background: time===t ? 'rgba(155,110,243,0.09)' : 'transparent', cursor:'pointer', transition:'all 0.15s' }}>
-                  <span style={{ fontSize:12.5, fontWeight:600, color: time===t ? '#7c5cfc' : 'rgba(20,20,19,0.6)', fontFamily:SF }}>{t}</span>
+                <div style={{ flex:1, minWidth:0 }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:6, flexWrap:'wrap' }}>
+                    <p style={{ margin:0, fontSize:13.5, fontWeight:800, color:'#141413', fontFamily:SF }}>{t.name}</p>
+                    {idx === 0 && (
+                      <div style={{ background:'linear-gradient(135deg,#9b6ef3,#7c5cfc)', borderRadius:99, padding:'2px 8px', flexShrink:0 }}>
+                        <span style={{ fontSize:9, fontWeight:800, color:'white', fontFamily:SF, letterSpacing:'0.3px' }}>BEST MATCH</span>
+                      </div>
+                    )}
+                  </div>
+                  <p style={{ margin:'2px 0 0', fontSize:10.5, color:'rgba(20,20,19,0.42)', fontFamily:SF }}>{t.title}</p>
                 </div>
-              ))}
-            </div>
-            <p style={{ margin:'0 0 8px', fontSize:10.5, fontWeight:700, color:'rgba(20,20,19,0.38)', fontFamily:SF, letterSpacing:'0.5px', textTransform:'uppercase' }}>Appointment format</p>
-            <div style={{ display:'flex', flexWrap:'wrap', gap:6, marginBottom: (time && format) ? 10 : 0 }}>
-              {formats.map(f => (
-                <div key={f} onClick={() => setFormat(f)}
-                  style={{ padding:'7px 13px', borderRadius:99, border:`1.5px solid ${format===f ? '#9b6ef3' : 'rgba(20,20,19,0.10)'}`, background: format===f ? 'rgba(155,110,243,0.09)' : 'transparent', cursor:'pointer', transition:'all 0.15s' }}>
-                  <span style={{ fontSize:12.5, fontWeight:600, color: format===f ? '#7c5cfc' : 'rgba(20,20,19,0.6)', fontFamily:SF }}>{f}</span>
+              </div>
+              {/* Bio */}
+              <div style={{ padding:'0 14px 9px' }}>
+                <p style={{ margin:0, fontSize:11.5, color:'rgba(20,20,19,0.60)', fontFamily:SF, lineHeight:1.45 }}>{t.bio}</p>
+              </div>
+              {/* Specialty + approach tags */}
+              <div style={{ padding:'0 14px 10px', display:'flex', flexWrap:'wrap', gap:5 }}>
+                {t.specializations.slice(0, 3).map(spec => (
+                  <div key={spec} style={{ background:'rgba(124,92,252,0.08)', borderRadius:99, padding:'3px 9px', border:'1px solid rgba(124,92,252,0.16)' }}>
+                    <span style={{ fontSize:10, fontWeight:700, color:'#7c5cfc', fontFamily:SF, textTransform:'capitalize' }}>{spec}</span>
+                  </div>
+                ))}
+                <div style={{ background:`${APPROACH_COLOR[t.approach]}14`, borderRadius:99, padding:'3px 9px', border:`1px solid ${APPROACH_COLOR[t.approach]}28` }}>
+                  <span style={{ fontSize:10, fontWeight:700, color:APPROACH_COLOR[t.approach], fontFamily:SF }}>{APPROACH_LABEL[t.approach]}</span>
                 </div>
-              ))}
-            </div>
-            {(time && format) && (
-              <div onClick={() => onAnswer(`${time} · ${format}`)}
-                style={{ marginTop:10, display:'inline-flex', alignItems:'center', gap:5, background:'linear-gradient(135deg,#9b6ef3,#7c5cfc)', borderRadius:99, padding:'7px 16px', cursor:'pointer', boxShadow:'0 2px 8px rgba(120,70,220,0.28)' }}>
-                <span style={{ fontSize:12.5, fontWeight:700, color:'white', fontFamily:SF }}>Confirm  →</span>
               </div>
-            )}
-          </div>
-        </div>
-      );
-    }
-
-    function BookingConfirmWidget({ serviceKey, urgency, prefs, SF }) {
-      const s = BOOKING_SERVICES.find(x => x.key === serviceKey);
-      if (!s) return null;
-      const [timePref, formatPref] = (prefs || '').split(' · ');
-      const urgencyLabels = { flexible:'Can wait a few weeks', week:'Within the next week', soon:'As soon as possible', urgent:'Urgent — right now' };
-      return (
-        <div style={{ marginLeft:36, maxWidth:'92%', animation:'msgIn 0.28s ease-out' }}>
-          <div style={{ borderRadius:16, border:'1.5px solid rgba(20,20,19,0.08)', overflow:'hidden', boxShadow:'0 2px 12px rgba(20,20,19,0.07)' }}>
-            <div style={{ padding:'11px 14px', background:`${s.color}0d`, borderBottom:'1px solid rgba(20,20,19,0.06)', display:'flex', alignItems:'center', gap:10 }}>
-              <div style={{ width:32, height:32, borderRadius:10, background:`${s.color}18`, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                <span style={{ fontSize:16 }}>{s.icon}</span>
-              </div>
-              <div>
-                <p style={{ margin:0, fontSize:13, fontWeight:700, color:'#141413', fontFamily:SF }}>{s.title}</p>
-                <p style={{ margin:0, fontSize:10.5, color:'rgba(20,20,19,0.44)', fontFamily:SF }}>{s.sub}</p>
-              </div>
-            </div>
-            <div style={{ padding:'11px 14px', display:'flex', flexDirection:'column', gap:6 }}>
-              {[['Urgency', urgencyLabels[urgency] || urgency], ['Time', timePref], ['Format', formatPref]].map(([label, val]) => val ? (
-                <div key={label} style={{ display:'flex', gap:10 }}>
-                  <span style={{ fontSize:10.5, fontWeight:700, color:'rgba(20,20,19,0.35)', fontFamily:SF, width:52, flexShrink:0 }}>{label}</span>
-                  <span style={{ fontSize:10.5, color:'rgba(20,20,19,0.65)', fontFamily:SF }}>{val}</span>
-                </div>
-              ) : null)}
-            </div>
-          </div>
-          <div style={{ display:'flex', flexDirection:'column', gap:8, marginTop:10 }}>
-            <a href={`tel:${s.phone.replace(/[^0-9]/g,'')}`} style={{ textDecoration:'none', display:'block' }}>
-              <div style={{ background:s.color, borderRadius:14, padding:'13px 16px', display:'flex', alignItems:'center', justifyContent:'space-between', cursor:'pointer', boxShadow:`0 4px 14px ${s.color}44` }}>
+              {/* Footer: availability + CTA */}
+              <div style={{ padding:'9px 14px 12px', borderTop:'1px solid rgba(20,20,19,0.05)', display:'flex', alignItems:'center', justifyContent:'space-between', gap:8 }}>
                 <div>
-                  <p style={{ margin:0, fontSize:13, fontWeight:700, color:'white', fontFamily:SF }}>Call to Book</p>
-                  <p style={{ margin:0, fontSize:10.5, color:'rgba(255,255,255,0.68)', fontFamily:SF }}>{s.phone} · M–F 8am–5pm</p>
+                  <p style={{ margin:0, fontSize:10, color:'rgba(20,20,19,0.44)', fontFamily:SF }}><span style={{ color:'#22c55e', fontWeight:700 }}>●</span> {t.availability}</p>
+                  <p style={{ margin:'2px 0 0', fontSize:10, color:'rgba(20,20,19,0.34)', fontFamily:SF }}>Estimated wait: {t.wait}</p>
                 </div>
-                <div style={{ width:32, height:32, borderRadius:16, background:'rgba(255,255,255,0.18)', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.18 6.18l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
+                <div onClick={() => setRequested(t.id)} style={{ background: requested===t.id ? 'linear-gradient(135deg,#4ade80,#22c55e)' : 'linear-gradient(135deg,#9b6ef3,#7c5cfc)', borderRadius:11, padding:'9px 15px', cursor:'pointer', boxShadow:`0 3px 10px ${requested===t.id ? 'rgba(74,222,128,0.35)' : 'rgba(124,92,252,0.32)'}`, flexShrink:0, transition:'all 0.25s' }}>
+                  <span style={{ fontSize:12, fontWeight:700, color:'white', fontFamily:SF, whiteSpace:'nowrap' }}>
+                    {requested===t.id ? '✓ Requested' : 'Request Session'}
+                  </span>
                 </div>
               </div>
-            </a>
-            <div onClick={() => window.open(`https://${s.url}`, '_blank')} style={{ background:'rgba(20,20,19,0.04)', borderRadius:14, padding:'13px 16px', display:'flex', alignItems:'center', justifyContent:'space-between', cursor:'pointer', border:'1.5px solid rgba(20,20,19,0.08)' }}>
-              <div>
-                <p style={{ margin:0, fontSize:13, fontWeight:700, color:'#141413', fontFamily:SF }}>Book Online</p>
-                <p style={{ margin:0, fontSize:10.5, color:'rgba(20,20,19,0.42)', fontFamily:SF }}>{s.url}</p>
-              </div>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(20,20,19,0.4)" strokeWidth="2" strokeLinecap="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
             </div>
-          </div>
+          ))}
         </div>
       );
     }
 
-    function TypeChatPage({ onBack, userName, initialTopic, moodContext, onBook, bookingMode, preService }) {
+    function TypeChatPage({ onBack, userName, initialTopic, moodContext, bookingMode, preService }) {
       const SF = 'Sofia Sans,sans-serif';
       const R = UIUC_RESOURCES;
       const [input, setInput] = useState('');
@@ -419,36 +341,25 @@
         return ["I've been anxious","I'm overwhelmed","Something happened","I just need to vent"];
       };
 
-      /* ── Booking mode state ── */
-      const [bookingData, setBookingData] = useState({ service: preService || null, urgency: null, prefs: null });
-      const bookingStep = bookingData.service === null ? 'service'
-                        : bookingData.urgency === null ? 'urgency'
-                        : bookingData.prefs   === null ? 'prefs'
-                        : 'done';
+      /* ── Intake / therapist-matching state ── */
+      const [intakeData, setIntakeData] = useState({ concerns:null, duration:null, severity:null, therapyHistory:null, pastHelpful:null, goals:null, genderPref:null, approachPref:null });
+      const pendingIntakeField = useRef(null);
+      const SCALE_EMOJI = { Mild:'😌', Noticeable:'😕', Moderate:'😟', Intense:'😣', Overwhelming:'😰' };
 
-      const getBookingOpening = () => {
-        if (preService) {
-          const s = BOOKING_SERVICES.find(x => x.key === preService);
-          return `Sure! Let's book you in for ${s?.title || 'your appointment'} 📅 How urgent is this for you right now?`;
-        }
-        return `Sure, I can help you book an appointment 📅 Which service are you interested in?`;
+      const getIntakeOpening = () => {
+        if (preService) return `Hi ${userName} 💜 Before we connect you with the right therapist, I'd love to learn a little about what you're going through. It only takes about 2 minutes — the more you share, the better your match. What's been weighing on you lately?`;
+        return `Hi ${userName} 💜 I'm here to help you find the right therapist for what you're going through. This takes about 2 minutes — the more you share, the better your match. Let's start: what's been weighing on you lately?`;
       };
 
-      const getBookingInitialMessages = () => {
-        if (preService) {
-          return [
-            { from:'ai', text: getBookingOpening() },
-            { type:'widget', _wt:'booking-urgency', id:'bk-urgency' },
-          ];
-        }
-        return [
-          { from:'ai', text: getBookingOpening() },
-          { type:'widget', _wt:'booking-service', id:'bk-service' },
-        ];
-      };
+      const getIntakeInitialMessages = () => [
+        { from:'ai', text: getIntakeOpening() },
+        { type:'widget', _wt:'intake-tags', id:'intake-concerns', intakeField:'concerns',
+          label:"What are you looking for support with? (pick any that apply)",
+          options:['Anxiety & worry','Low mood / depression','Stress & overwhelm','Loneliness','Grief or loss','Relationship issues','Trauma','Identity & belonging','Academic pressure','Sleep problems','LGBTQ+ concerns','Financial stress','Not sure yet'] },
+      ];
 
       const [messages, setMessages] = useState(
-        bookingMode ? getBookingInitialMessages() : [{ from:'ai', text: getMoodOpening(moodContext) }]
+        bookingMode ? getIntakeInitialMessages() : [{ from:'ai', text: getMoodOpening(moodContext) }]
       );
       const [typing, setTyping] = useState(false);
       const [chips, setChips] = useState(bookingMode ? [] : getMoodChips(moodContext));
@@ -459,38 +370,85 @@
       const messagesRef = useRef(null);
       const didAutoSend = useRef(false);
 
-      const advanceBooking = (field, value) => {
-        setWidgetAnswers(prev => ({ ...prev, [`bk-${field}`]: value }));
-        const updated = { ...bookingData, [field]: value };
-        setBookingData(updated);
-        const s = BOOKING_SERVICES.find(x => x.key === (updated.service || preService));
+      const advanceIntake = (field, value) => {
+        setWidgetAnswers(prev => ({ ...prev, [`intake-${field}`]: value }));
+        const updated = { ...intakeData, [field]: value };
+        setIntakeData(updated);
+        pendingIntakeField.current = null;
 
-        if (field === 'service') {
-          setMessages(m => [
-            ...m,
-            { from:'user', text: s?.title || value },
-            { from:'ai',   text: `${s?.title} is a great choice 💜 How urgent is your need right now?` },
-            { type:'widget', _wt:'booking-urgency', id:'bk-urgency' },
+        if (field === 'concerns') {
+          const displayVal = value.split(' · ').join(', ');
+          setMessages(m => [...m,
+            { from:'user', text: displayVal },
+            { from:'ai', text:`Thank you for sharing that 💜 How long has this been affecting your daily life?` },
+            { type:'widget', _wt:'intake-duration', id:'intake-duration' },
           ]);
           setChips([]);
-        } else if (field === 'urgency') {
-          const urgencyLabels = { flexible:'Can wait a few weeks', week:'Within the next week', soon:'As soon as possible', urgent:'Urgent — right now' };
-          setMessages(m => [
-            ...m,
-            { from:'user', text: urgencyLabels[value] || value },
-            { from:'ai',   text: `Got it. Last thing — what time of day works best, and would you prefer in-person or video?` },
-            { type:'widget', _wt:'booking-prefs', id:'bk-prefs' },
-          ]);
-          setChips([]);
-        } else if (field === 'prefs') {
-          const serviceKey = updated.service || preService;
-          setMessages(m => [
-            ...m,
+        } else if (field === 'duration') {
+          setMessages(m => [...m,
             { from:'user', text: value },
-            { from:'ai',   text: `Perfect, ${userName}! Here's your summary. You can call or book online to confirm — nothing gets submitted automatically.` },
-            { type:'widget', _wt:'booking-confirm', id:'bk-confirm', serviceKey, urgency: updated.urgency, prefs: value },
+            { from:'ai', text:`I hear you. On a typical day, how intense does it feel?` },
+            { type:'widget', _wt:'intake-severity', id:'intake-severity' },
           ]);
-          setChips(["I want to talk to someone too","Show me other resources","Thanks, I'm all set!"]);
+          setChips([]);
+        } else if (field === 'severity') {
+          setMessages(m => [...m,
+            { from:'user', text:`${SCALE_EMOJI[value] || ''} ${value}` },
+            { from:'ai', text:`Got it. Have you worked with a therapist or counselor before?` },
+          ]);
+          setChips(["Yes, I have","No, this would be my first time","Briefly, once or twice"]);
+          pendingIntakeField.current = 'therapyHistory';
+        } else if (field === 'therapyHistory') {
+          const hadTherapy = value !== "No, this would be my first time";
+          if (hadTherapy) {
+            setMessages(m => [...m,
+              { from:'user', text: value },
+              { from:'ai', text:`That's helpful to know. What felt most useful in those sessions?` },
+              { type:'widget', _wt:'intake-tags', id:'intake-pastHelpful', intakeField:'pastHelpful',
+                label:'What helped most?',
+                options:["Just being heard","Practical coping tools","Understanding my patterns","Processing specific events","Homework & exercises","Nothing really clicked"] },
+            ]);
+          } else {
+            setMessages(m => [...m,
+              { from:'user', text: value },
+              { from:'ai', text:`That's totally fine — everyone starts somewhere 💙 What are you hoping to get from therapy?` },
+              { type:'widget', _wt:'intake-tags', id:'intake-goals', intakeField:'goals',
+                label:"What are you hoping for?",
+                options:["Learn practical coping tools","Process feelings in depth","Work on specific goals","Understand myself better","Improve my relationships","Just consistent support","Not sure yet"] },
+            ]);
+          }
+          setChips([]);
+        } else if (field === 'pastHelpful') {
+          setMessages(m => [...m,
+            { from:'user', text: value.split(' · ').join(', ') },
+            { from:'ai', text:`That's really helpful. What are you hoping to get from therapy this time?` },
+            { type:'widget', _wt:'intake-tags', id:'intake-goals', intakeField:'goals',
+              label:"What are you hoping for?",
+              options:["Learn practical coping tools","Process feelings in depth","Work on specific goals","Understand myself better","Improve my relationships","Just consistent support","Not sure yet"] },
+          ]);
+          setChips([]);
+        } else if (field === 'goals') {
+          setMessages(m => [...m,
+            { from:'user', text: value.split(' · ').join(', ') },
+            { from:'ai', text:`Almost there — just a couple of quick preferences. Do you have a gender preference for your therapist?` },
+          ]);
+          setChips(["No preference","Woman","Man","Non-binary"]);
+          pendingIntakeField.current = 'genderPref';
+        } else if (field === 'genderPref') {
+          setMessages(m => [...m,
+            { from:'user', text: value },
+            { from:'ai', text:`And what kind of therapy style feels right for you?` },
+          ]);
+          setChips(["Structured & practical (CBT / tools)","Open & exploratory (just talk)","A mix of both","Not sure"]);
+          pendingIntakeField.current = 'approachPref';
+        } else if (field === 'approachPref') {
+          const matches = matchTherapists({ ...updated });
+          setMessages(m => [...m,
+            { from:'user', text: value },
+            { from:'ai', text:`Based on everything you've shared, here are your top matches 💜 Each has been selected for how well they fit what you're looking for.` },
+            { type:'widget', _wt:'intake-match', id:'intake-match', matches },
+          ]);
+          setChips(["Tell me more about one of them","I have more questions","Thanks, I'll reach out directly"]);
         }
       };
 
@@ -585,6 +543,17 @@
       const sendMessage = (textOverride) => {
         const text = (textOverride || input).trim();
         if (!text) return;
+
+        /* Intercept chip responses for intake flow steps */
+        if (intakeAlreadyStarted.current && pendingIntakeField.current) {
+          const field = pendingIntakeField.current;
+          pendingIntakeField.current = null;
+          setInput('');
+          setChips([]);
+          advanceIntake(field, text);
+          return;
+        }
+
         const newTurn = turn + 1;
         setTurn(newTurn);
         setMessages(m => [...m, { from:'user', text }]);
@@ -638,6 +607,26 @@
         }
       }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+      /* Called directly when user clicks Book on a resource card mid-chat */
+      const intakeAlreadyStarted = useRef(bookingMode);
+      const startIntakeInline = () => {
+        if (intakeAlreadyStarted.current) return;
+        intakeAlreadyStarted.current = true;
+        pendingIntakeField.current = 'concerns';
+        setTyping(true);
+        setTimeout(() => {
+          setTyping(false);
+          setMessages(m => [
+            ...m,
+            { from:'ai', text: getIntakeOpening() },
+            { type:'widget', _wt:'intake-tags', id:'intake-concerns-' + Date.now(), intakeField:'concerns',
+              label:"What are you looking for support with? (pick any that apply)",
+              options:['Anxiety & worry','Low mood / depression','Stress & overwhelm','Loneliness','Grief or loss','Relationship issues','Trauma','Identity & belonging','Academic pressure','Sleep problems','LGBTQ+ concerns','Financial stress','Not sure yet'] },
+          ]);
+          setChips([]);
+        }, 700);
+      };
+
       const ID = 'Inter Display,sans-serif';
       return (
         <div
@@ -655,7 +644,7 @@
               </svg>
             </div>
             <div style={{ background:'rgba(255,255,255,0.88)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', padding:'9px 20px', borderRadius:22, border:'1px solid rgba(20,20,19,0.07)', boxShadow:'0 0 0 0 rgba(3,7,18,0.04),0 2px 4px rgba(3,7,18,0.04)' }}>
-              <span style={{ color:'#141413', fontSize:13, fontWeight:700, fontFamily:SF }}>{bookingMode ? 'Book Appointment' : 'AI Chat'}</span>
+              <span style={{ color:'#141413', fontSize:13, fontWeight:700, fontFamily:SF }}>{bookingMode ? 'Find a Therapist' : 'AI Chat'}</span>
             </div>
             <div style={{ background:'white', borderRadius:99, width:36, height:36, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, cursor:'pointer', boxShadow:'0 0 0 1px rgba(3,7,18,0.04),0 2px 4px rgba(3,7,18,0.04)' }}>
               {/* 3-dot menu — inline SVG */}
@@ -729,12 +718,12 @@
                       </div>
                     </div>
                   )}
-                  {msg.type === 'resource' && <ResourceCard res={msg.res} resKey={msg.resKey} SF={SF} onBook={onBook} />}
+                  {msg.type === 'resource' && <ResourceCard res={msg.res} SF={SF} onBook={BOOKABLE_KEYS.has(msg.res?._key) ? startIntakeInline : null} />}
                   {msg.type === 'widget' && (
-                    msg._wt === 'booking-service'  ? <BookingServiceWidget answered={widgetAnswers[msg.id]} onAnswer={v => { setWidgetAnswers(p=>({...p,[msg.id]:v})); advanceBooking('service', v); }} SF={SF} /> :
-                    msg._wt === 'booking-urgency'  ? <BookingUrgencyWidget answered={widgetAnswers[msg.id]} onAnswer={v => { setWidgetAnswers(p=>({...p,[msg.id]:v})); advanceBooking('urgency', v); }} SF={SF} /> :
-                    msg._wt === 'booking-prefs'    ? <BookingPrefsWidget   answered={widgetAnswers[msg.id]} onAnswer={v => { setWidgetAnswers(p=>({...p,[msg.id]:v})); advanceBooking('prefs',   v); }} SF={SF} /> :
-                    msg._wt === 'booking-confirm'  ? <BookingConfirmWidget serviceKey={msg.serviceKey} urgency={msg.urgency} prefs={msg.prefs} SF={SF} /> :
+                    msg._wt === 'intake-tags'     ? <TagWidget     options={msg.options} label={msg.label} answered={widgetAnswers[msg.id]} onAnswer={v => advanceIntake(msg.intakeField, v)} SF={SF} /> :
+                    msg._wt === 'intake-duration' ? <DurationWidget answered={widgetAnswers[msg.id]} onAnswer={v => advanceIntake('duration', v)} SF={SF} /> :
+                    msg._wt === 'intake-severity' ? <ScaleWidget    label="How intense does it feel on a typical day?" answered={widgetAnswers[msg.id]} onAnswer={v => advanceIntake('severity', v)} SF={SF} /> :
+                    msg._wt === 'intake-match'    ? <TherapistMatchWidget matches={msg.matches} SF={SF} /> :
                     msg._wt === 'tags'  ? <TagWidget  options={msg.options} label={msg.label} answered={widgetAnswers[msg.id]} onAnswer={t => answerWidget(msg.id, t)} SF={SF} /> :
                     msg._wt === 'scale' ? <ScaleWidget label={msg.label}   answered={widgetAnswers[msg.id]} onAnswer={t => answerWidget(msg.id, t)} SF={SF} /> :
                                           <DurationWidget                  answered={widgetAnswers[msg.id]} onAnswer={t => answerWidget(msg.id, t)} SF={SF} />

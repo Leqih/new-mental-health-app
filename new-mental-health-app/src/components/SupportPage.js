@@ -119,6 +119,7 @@
       const [voiceMode, setVoiceMode] = useState(false);
       const [typeChat, setTypeChat] = useState(false);
       const [chatTopic, setChatTopic] = useState(null);
+      const [bookingMode, setBookingMode] = useState(false);
       const [sidebarOpen, setSidebarOpen] = useState(false);
       const touchStartY = useRef(null);
       const mouseStartY = useRef(null);
@@ -171,7 +172,7 @@
           {/* Voice mode overlay */}
           {voiceMode && <VoiceModeOverlay onClose={() => setVoiceMode(false)} />}
           {/* Type chat overlay */}
-          {typeChat && <TypeChatPage onBack={() => { setTypeChat(false); setChatTopic(null); }} userName={userName} initialTopic={chatTopic} />}
+          {typeChat && <TypeChatPage onBack={() => { setTypeChat(false); setChatTopic(null); setBookingMode(false); }} userName={userName} initialTopic={chatTopic} bookingMode={bookingMode} />}
           {/* Shared warp filter */}
           <svg style={{ position:'absolute', width:0, height:0, overflow:'hidden' }}>
             <defs>
@@ -347,6 +348,28 @@
                         </div>
                         <div style={{ alignSelf:'stretch', display:'flex', justifyContent:'flex-end' }}>
                           <p style={{ margin:0, color:'white', fontSize:11, fontWeight:700, fontFamily:'Sofia Sans,sans-serif', textDecoration:'underline solid white', whiteSpace:'nowrap' }}>Start talking ↗</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card 5 — Find a Therapist */}
+                  <div onClick={() => { setBookingMode(true); setTypeChat(true); }} style={{ position:'relative', width:176, height:203, flexShrink:0, borderRadius:22, overflow:'hidden', border:'1px solid rgba(255,255,255,0.5)', boxShadow:'0 64px 120px 0 rgba(168,139,250,0.35)', cursor:'pointer', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center' }}>
+                    <div style={{ position:'absolute', inset:0, background:'linear-gradient(163.155deg,#7c3aed 4.94%,#a78bfa 89.60%)' }} />
+                    <div style={{ position:'absolute', inset:0, boxShadow:'inset 0 24px 54px rgba(255,255,255,0.10), inset 0 3px 120px rgba(200,180,255,0.3)', pointerEvents:'none' }} />
+                    <div style={{ position:'relative', flex:'1 0 0', width:'100%', display:'flex', alignItems:'flex-end', justifyContent:'center' }}>
+                      <div style={{ height:167, width:136, display:'flex', flexDirection:'column', alignItems:'flex-end', justifyContent:'space-between' }}>
+                        <div style={{ width:40, height:40, borderRadius:20, background:'rgba(255,255,255,0.2)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                          </svg>
+                        </div>
+                        <div style={{ display:'flex', flexDirection:'column', gap:20, alignSelf:'stretch' }}>
+                          <p style={{ margin:0, color:'white', fontSize:15, fontWeight:800, letterSpacing:'-0.3px', lineHeight:'17.25px', fontFamily:'Sofia Sans,sans-serif' }}>Find a therapist</p>
+                          <p style={{ margin:0, color:'rgba(255,255,255,0.85)', fontSize:10, fontWeight:400, lineHeight:'15px', fontFamily:'Sofia Sans,sans-serif', width:136 }}>Answer a few questions and get matched with the right person for you.</p>
+                        </div>
+                        <div style={{ alignSelf:'stretch', display:'flex', justifyContent:'flex-end' }}>
+                          <p style={{ margin:0, color:'white', fontSize:11, fontWeight:700, fontFamily:'Sofia Sans,sans-serif', textDecoration:'underline solid white', whiteSpace:'nowrap' }}>Start matching ↗</p>
                         </div>
                       </div>
                     </div>

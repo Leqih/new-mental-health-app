@@ -26,17 +26,17 @@
     };
     const LOG_MOOD_OPTIONS = ['Angry','Exhausted','Sad','Anxious','Boring','Good','Happy','Grateful'];
 
-    /* ── Mood-specific CSS gradients for the success modal card ──
-       5-stop gradients so background-position animation has rich travel range. */
+    /* ── Mood-specific CSS gradients — analogous ~90° hue span for visible flow ──
+       Pattern: A → B → C → B → A so the loop is seamless in both directions. */
     const MOOD_CARD_GRADIENT = {
-      Good:      'linear-gradient(135deg, #6AF0B0, #B8F870, #E8F8A0, #A0E8FF, #9ACFFF)',
-      Happy:     'linear-gradient(135deg, #FFE44C, #FFD080, #FFD6A8, #E8B8FF, #D4A0FF)',
-      Grateful:  'linear-gradient(135deg, #FFB840, #FFD080, #FFD8A0, #FFB0C0, #FF8EB4)',
-      Sad:       'linear-gradient(135deg, #70A8FF, #98B8FF, #B8A8FF, #FFB8D8, #FFB0CC)',
-      Anxious:   'linear-gradient(135deg, #FF80A8, #FFB0C0, #FFCCA8, #D0A8FF, #B880FF)',
-      Angry:     'linear-gradient(135deg, #FF7060, #FF9870, #FFCC90, #FFB0C0, #FF80B0)',
-      Exhausted: 'linear-gradient(135deg, #B880FF, #C8A8FF, #D0C0FF, #A8C8FF, #80B4FF)',
-      Boring:    'linear-gradient(135deg, #30E8D0, #60F8E0, #80FFF0, #90D8FF, #60B4FF)',
+      Good:      'linear-gradient(135deg, #1EE88A, #70F050, #D4F840, #70F050, #1EE88A)',
+      Happy:     'linear-gradient(135deg, #FFE020, #FFA828, #FF6840, #FFA828, #FFE020)',
+      Grateful:  'linear-gradient(135deg, #FFA030, #FF6858, #FF38A0, #FF6858, #FFA030)',
+      Sad:       'linear-gradient(135deg, #4888FF, #8050FF, #C040FF, #8050FF, #4888FF)',
+      Anxious:   'linear-gradient(135deg, #FF50A0, #C040E0, #7040FF, #C040E0, #FF50A0)',
+      Angry:     'linear-gradient(135deg, #FF3030, #FF7018, #FFB840, #FF7018, #FF3030)',
+      Exhausted: 'linear-gradient(135deg, #9050FF, #5050E8, #2880FF, #5050E8, #9050FF)',
+      Boring:    'linear-gradient(135deg, #10D8C8, #10A8FF, #3060FF, #10A8FF, #10D8C8)',
     };
 
     /* ── Inject CSS keyframes once for the animated gradient ── */
@@ -730,7 +730,7 @@
                       <div style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.30)', backdropFilter:'blur(6px)', WebkitBackdropFilter:'blur(6px)', borderRadius:'inherit' }} />
 
                       {/* Full-gradient card — animated flowing background */}
-                      <div style={{ position:'relative', width:'100%', borderRadius:32, overflow:'hidden', background: cardGradient, backgroundSize:'300% 300%', animation:'mgFlow 7s ease infinite', boxShadow:'0px 25px 50px -12px rgba(0,0,0,0.35)', padding:'32px 24px 28px', boxSizing:'border-box' }}>
+                      <div style={{ position:'relative', width:'100%', borderRadius:32, overflow:'hidden', background: cardGradient, backgroundSize:'400% 400%', animation:'mgFlow 4s ease infinite', boxShadow:'0px 25px 50px -12px rgba(0,0,0,0.35)', padding:'32px 24px 28px', boxSizing:'border-box' }}>
 
                         {/* Dot grid decoration — top right (3×3) */}
                         <div style={{ position:'absolute', top:28, right:28, display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:7 }}>

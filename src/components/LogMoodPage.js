@@ -221,6 +221,7 @@
               mh = moodId==='Happy', mgr = moodId==='Grateful',
               man = moodId==='Angry', mex = moodId==='Exhausted', mbr = moodId==='Boring',
               max = moodId==='Anxious';
+        const charSrc = ms ? imgSadChar : moodCharSrc(moodId);
         const ci = mh ? imgHappyChar : mgr ? imgGratefulChar : mg ? imgGoodChar :
                    man ? imgAngryChar : mex ? imgExhaustedChar : mbr ? '' : max ? imgAnxiousChar : imgLogCloudChar;
         const cf = mg || mh || mgr || man || mex || mbr || max ? 'none' : !ms ? 'saturate(0.2) brightness(0.85) hue-rotate(250deg)' : 'none';
@@ -231,7 +232,7 @@
                    mex ? 'cloudExhausted 5s ease-in-out infinite' :
                    max ? 'cloudAngry 2.5s ease-in-out infinite' :
                    ms  ? 'cloudSad 3s ease-in-out infinite' : 'cloudSad 3s ease-in-out infinite';
-        const ec = mg ? '#141413' : ms ? '#58c2ff' : (!mh && !mgr && !man && !mex && !mbr && !max) ? '#9090b0' : null;
+        const ec = mg ? '#141413' : (!ms && !mh && !mgr && !man && !mex && !mbr && !max) ? '#9090b0' : null;
         const esy = !ms && !mg && !mh && !mgr && !man && !mex && !mbr && !max ? 0.45 : 1;
         const bi = mg ? imgGoodBubble : imgLogBubble;
         const bws = mgr
@@ -277,7 +278,7 @@
             {/* Character */}
             <div style={{ position:'absolute', left:'50%', marginLeft:-143.5, top: mgr ? 220 : man ? 215 : mh ? 205 : 195, width:287, height:287 }}>
               <div style={{ position:'relative', width:'100%', height:'100%', filter:cf, animation:ca }}>
-                <img alt="" style={{ position:'absolute', display:'block', inset:0, maxWidth:'none', width:'100%', height:'100%' }} src={moodCharSrc(moodId)} onError={e=>e.target.style.display='none'} />
+                <img alt="" style={{ position:'absolute', display:'block', inset:0, maxWidth:'none', width:'100%', height:'100%' }} src={charSrc} onError={e=>e.target.style.display='none'} />
                 {mbr && <>
                   <img alt="" style={{ position:'absolute', top:0, bottom:0, left:0, right:'75%', width:'25%', height:'100%', display:'block' }} src={imgBoringChar1} onError={e=>e.target.style.display='none'} />
                   <img alt="" style={{ position:'absolute', top:0, bottom:0, left:'24.99%', right:'50%', width:'25.01%', height:'100%', display:'block' }} src={imgBoringChar2} onError={e=>e.target.style.display='none'} />
@@ -402,12 +403,6 @@
                 {!mg && !mh && !mgr && ec && <>
                   <div style={{ position:'absolute', background:ec, height:11, left:183, borderRadius:20, top:133, width:21, transform:`scaleY(${esy})`, transformOrigin:'center', animation:'eyeIdle 4s ease-in-out 0.3s infinite' }} />
                   <div style={{ position:'absolute', background:ec, height:11, left:82,  borderRadius:20, top:133, width:21, transform:`scaleY(${esy})`, transformOrigin:'center', animation:'eyeIdle 4s ease-in-out 0.5s infinite' }} />
-                </>}
-                {ms && <>
-                  <div style={{ position:'absolute', width:5, height:9, borderRadius:'50% 50% 50% 50% / 40% 40% 60% 60%', background:'#58c2ff', left:89,  top:148, animation:'tearFall 2s ease-in 0s   infinite' }} />
-                  <div style={{ position:'absolute', width:5, height:9, borderRadius:'50% 50% 50% 50% / 40% 40% 60% 60%', background:'#58c2ff', left:89,  top:148, animation:'tearFall 2s ease-in 1s   infinite' }} />
-                  <div style={{ position:'absolute', width:5, height:9, borderRadius:'50% 50% 50% 50% / 40% 40% 60% 60%', background:'#58c2ff', left:192, top:148, animation:'tearFall 2s ease-in 0.5s infinite' }} />
-                  <div style={{ position:'absolute', width:5, height:9, borderRadius:'50% 50% 50% 50% / 40% 40% 60% 60%', background:'#58c2ff', left:192, top:148, animation:'tearFall 2s ease-in 1.5s infinite' }} />
                 </>}
                 {max && <>
                   {/* Face overlay (eyes + mouth + sweat drop) from Figma node 52:397 */}
@@ -789,4 +784,3 @@
         </div>
       );
     }
-

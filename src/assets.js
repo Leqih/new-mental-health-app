@@ -23,6 +23,8 @@
     const imgGoodChar     = 'https://www.figma.com/api/mcp/asset/22680cba-6ca8-4ee6-adfe-ee9eac16e64b';
     const imgGoodFace     = 'https://www.figma.com/api/mcp/asset/fbb42262-19c1-445e-84a3-d170d9441f0c';
     const imgGoodBubble   = 'https://www.figma.com/api/mcp/asset/a8904e24-0184-4c00-8d82-46c76d23b296';
+    /* Sad mood (node 52-238) – refreshed 2026-05-01 */
+    const imgSadChar      = 'https://www.figma.com/api/mcp/asset/1759fe8a-29c7-4118-96d9-6175f135a3ad';
     /* Happy mood (node 60-232) – fresh URLs */
     const imgHappyChar    = 'https://www.figma.com/api/mcp/asset/aeea785e-9b8c-4a0d-b250-0629845886f3';
     const imgHappyFaceL   = 'https://www.figma.com/api/mcp/asset/50e40067-7a72-4ec9-8b66-eaedbe4942cf';

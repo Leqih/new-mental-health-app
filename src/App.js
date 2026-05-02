@@ -1,4 +1,14 @@
     const { useEffect, useState } = React;
+
+    /* ── Inject gradient keyframes once (shared with LogMoodPage) ── */
+    (() => {
+      if (document.getElementById('_mgAnim')) return;
+      const s = document.createElement('style');
+      s.id = '_mgAnim';
+      s.textContent = '@keyframes mgFlow{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}';
+      document.head.appendChild(s);
+    })();
+
     /* ── APP ── */
     function App() {
       const todayKey = new Date().toDateString();
@@ -172,41 +182,58 @@
 
               {/* ── PROACTIVE AI MODAL ── */}
               {moodBanner && (
-                <div style={{ position:'absolute', inset:0, zIndex:500, display:'flex', alignItems:'center', justifyContent:'center', padding:'0 24px' }}
+                <div style={{ position:'absolute', inset:0, zIndex:500, display:'flex', alignItems:'center', justifyContent:'center', padding:'0 20px' }}
                   onClick={() => setBannerDismissed(true)}>
                   {/* Scrim */}
-                  <div style={{ position:'absolute', inset:0, background:'rgba(10,8,20,0.52)', backdropFilter:'blur(4px)', WebkitBackdropFilter:'blur(4px)' }} />
-                  {/* Card — frosted glass, single unified surface */}
+                  <div style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.30)', backdropFilter:'blur(6px)', WebkitBackdropFilter:'blur(6px)' }} />
+                  {/* Card — animated gradient, matches LogMoodPage success card */}
                   <div onClick={e => e.stopPropagation()}
-                    style={{ position:'relative', width:'100%', background:'rgba(255,255,255,0.72)', backdropFilter:'blur(40px)', WebkitBackdropFilter:'blur(40px)', borderRadius:28, overflow:'hidden', boxShadow:'0 2px 0 rgba(255,255,255,0.9) inset, 0 24px 60px rgba(0,0,0,0.22)', border:'1px solid rgba(255,255,255,0.55)', padding:'32px 22px 24px', display:'flex', flexDirection:'column', alignItems:'center', gap:18 }}>
-                      {/* Orb */}
-                      <div style={{ width:76, height:76, borderRadius:38, background:'linear-gradient(145deg,#c4a8f8,#9b72e8)', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 10px 36px rgba(124,92,252,0.50), 0 2px 8px rgba(124,92,252,0.22)' }}>
-                        <svg width="34" height="34" viewBox="0 0 24 24" fill="none">
-                          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.27 2 8.5 2 5.41 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.08C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.41 22 8.5c0 3.77-3.4 6.86-8.55 11.53L12 21.35z" fill="rgba(255,255,255,0.96)"/>
+                    style={{ position:'relative', width:'100%', borderRadius:32, overflow:'hidden',
+                      background:'linear-gradient(135deg, #EADCFA, #E2DCF8, #DCE4FA, #E2DCF8, #EADCFA)',
+                      backgroundSize:'400% 400%', animation:'mgFlow 4s ease infinite',
+                      boxShadow:'0px 25px 50px -12px rgba(0,0,0,0.28)',
+                      padding:'32px 24px 28px', boxSizing:'border-box' }}>
+
+                    {/* Dot grid — top right */}
+                    <div style={{ position:'absolute', top:28, right:28, display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:7 }}>
+                      {Array.from({length:9}).map((_,i) => (
+                        <div key={i} style={{ width:5, height:5, borderRadius:'50%', background:'rgba(0,0,0,0.18)' }} />
+                      ))}
+                    </div>
+
+                    {/* Heart badge */}
+                    <div style={{ width:56, height:56, borderRadius:28, background:'rgba(255,255,255,0.52)', backdropFilter:'blur(14px)', WebkitBackdropFilter:'blur(14px)', border:'1.5px solid rgba(255,255,255,0.85)', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:20, boxShadow:'0 2px 0 rgba(255,255,255,0.8) inset' }}>
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.27 2 8.5 2 5.41 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.08C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.41 22 8.5c0 3.77-3.4 6.86-8.55 11.53L12 21.35z" fill="rgba(80,50,140,0.70)"/>
+                      </svg>
+                    </div>
+
+                    {/* Title */}
+                    <p style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:26, fontWeight:700, color:'#111', letterSpacing:'-0.5px', margin:'0 0 8px', lineHeight:1.2, paddingRight:44 }}>
+                      Aiden noticed 💜
+                    </p>
+                    {/* Subtitle */}
+                    <p style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:14, fontWeight:400, color:'rgba(10,8,20,0.58)', lineHeight:1.55, margin:'0 0 28px' }}>
+                      {moodBanner.text}
+                    </p>
+
+                    {/* White pill CTA */}
+                    <div onClick={() => handleChatWithMood(moodBanner.moodCtx)}
+                      style={{ width:'100%', height:50, borderRadius:999, background:'white', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 18px 0 20px', boxSizing:'border-box', marginBottom:14, boxShadow:'0 4px 20px rgba(0,0,0,0.10)' }}>
+                      <span style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:600, fontSize:15, color:'#111', letterSpacing:'0.1px' }}>Talk to Aiden</span>
+                      <div style={{ width:30, height:30, borderRadius:15, background:'rgba(0,0,0,0.07)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                          <path d="M5 12h14M13 6l6 6-6 6" stroke="#111" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
                       </div>
-                      {/* Text */}
-                      <div style={{ textAlign:'center' }}>
-                        <p style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:22, fontWeight:700, color:'#141413', letterSpacing:'-0.4px', margin:'0 0 8px', lineHeight:1.2 }}>Aiden noticed 💜</p>
-                        <p style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:14.5, fontWeight:400, color:'rgba(20,20,19,0.60)', lineHeight:1.55, margin:0 }}>{moodBanner.text}</p>
-                      </div>
-                      {/* Divider */}
-                      <div style={{ width:'100%', height:1, background:'rgba(20,20,19,0.08)' }} />
-                      {/* Actions */}
-                      <div style={{ width:'100%', display:'flex', flexDirection:'column', gap:10 }}>
-                        <div onClick={() => handleChatWithMood(moodBanner.moodCtx)}
-                          style={{ background:'linear-gradient(135deg,#9b72e8,#7C5CFC)', borderRadius:16, height:52, display:'flex', alignItems:'center', justifyContent:'center', gap:8, cursor:'pointer', boxShadow:'0 6px 20px rgba(124,92,252,0.40)' }}>
-                          <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-                            <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" fill="rgba(255,255,255,0.95)"/>
-                          </svg>
-                          <span style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:16, fontWeight:700, color:'white', letterSpacing:'-0.2px' }}>Talk to Aiden</span>
-                        </div>
-                        <div onClick={() => setBannerDismissed(true)}
-                          style={{ height:40, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}>
-                          <span style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:14, fontWeight:500, color:'rgba(20,20,19,0.36)' }}>Maybe later</span>
-                        </div>
-                      </div>
                     </div>
+
+                    {/* Maybe later */}
+                    <div onClick={() => setBannerDismissed(true)} style={{ width:'100%', textAlign:'center', cursor:'pointer', padding:'4px 0' }}>
+                      <span style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:14, fontWeight:500, color:'rgba(10,8,20,0.45)' }}>Maybe later</span>
+                    </div>
+
+                  </div>
                 </div>
               )}
 

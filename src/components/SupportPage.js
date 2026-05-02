@@ -1,4 +1,293 @@
-    const { useRef, useState } = React;
+    const { useEffect: useEffectSP, useRef, useState } = React;
+
+    /* ══════════════════════════════════════════
+       BOOKING PAGE — multi-step appointment flow
+       ══════════════════════════════════════════ */
+    function BookingPage({ onClose, preService, userName }) {
+      const SF = 'Sofia Sans,sans-serif';
+      const ID = 'Inter Display,sans-serif';
+      const [step, setStep]       = useState(preService ? 1 : 0);
+      const [service, setService] = useState(preService || null);
+      const [concern, setConcern] = useState('');
+      const [urgency, setUrgency] = useState(null);
+      const [timeSlot, setTimeSlot] = useState(null);
+      const [format, setFormat]   = useState(null);
+      const [done, setDone]       = useState(false);
+
+      const SERVICES = [
+        { key:'caps',           icon:'🏛️', title:'CAPS Counseling',       sub:'Individual therapy · ongoing support',   color:'#3b82f6', phone:'(217) 333-3704', url:'counselingcenter.illinois.edu' },
+        { key:'letsTalk',       icon:'💬', title:"Let's Talk",             sub:'Free 15-min consult · schedule online',  color:'#7c3aed', phone:'(217) 333-3704', url:'counselingcenter.illinois.edu/lets-talk' },
+        { key:'mckinley',       icon:'🏥', title:'McKinley Mental Health', sub:'Psychiatry & medication management',     color:'#059669', phone:'(217) 333-2700', url:'mckinley.illinois.edu/mental-health' },
+        { key:'groupCounseling',icon:'👥', title:'Group Counseling',       sub:'Therapeutic group sessions at CAPS',     color:'#0ea5e9', phone:'(217) 333-3704', url:'counselingcenter.illinois.edu' },
+      ];
+      const URGENCY = [
+        { v:'flexible',  label:'I can wait a few weeks',   icon:'😌' },
+        { v:'week',      label:'Within the next week',     icon:'🙏' },
+        { v:'soon',      label:'As soon as possible',      icon:'😟' },
+        { v:'urgent',    label:'It feels urgent right now',icon:'😰' },
+      ];
+      const TIMES   = ['Morning','Afternoon','Evening','Flexible'];
+      const FORMATS = ['In-person','Video call','No preference'];
+      const TOTAL   = 3; // steps 0–2 before confirm
+
+      const sel = SERVICES.find(s => s.key === service);
+      const canNext = step === 0 ? !!service
+                    : step === 1 ? !!urgency
+                    : step === 2 ? (!!timeSlot && !!format)
+                    : false;
+
+      const next = () => { if (canNext) setStep(s => s + 1); };
+      const back = () => { if (step > 0) setStep(s => s - 1); else onClose(); };
+
+      const progressW = ((step + 1) / (TOTAL + 1)) * 100;
+
+      if (done) return (
+        <div style={{ position:'absolute', inset:0, zIndex:600, background:'white', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'40px 28px', gap:20 }}>
+          <div style={{ width:72, height:72, borderRadius:36, background:'linear-gradient(135deg,#4ade80,#22c55e)', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 8px 28px rgba(74,222,128,0.35)' }}>
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </div>
+          <div style={{ textAlign:'center' }}>
+            <p style={{ margin:'0 0 8px', fontSize:22, fontWeight:800, color:'#141413', fontFamily:SF, letterSpacing:'-0.4px' }}>Request Saved</p>
+            <p style={{ margin:0, fontSize:13, color:'rgba(20,20,19,0.52)', fontFamily:SF, lineHeight:1.5 }}>Your preferences are saved. Call or go online to confirm your appointment — the details below will help.</p>
+          </div>
+          {sel && (
+            <div style={{ width:'100%', background:'rgba(20,20,19,0.03)', borderRadius:16, border:'1px solid rgba(20,20,19,0.07)', padding:'14px 16px' }}>
+              <div style={{ display:'flex', alignItems:'center', gap:9, marginBottom:10 }}>
+                <div style={{ width:34, height:34, borderRadius:10, background:`${sel.color}18`, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                  <span style={{ fontSize:16 }}>{sel.icon}</span>
+                </div>
+                <div>
+                  <p style={{ margin:0, fontSize:13, fontWeight:700, color:'#141413', fontFamily:SF }}>{sel.title}</p>
+                  <p style={{ margin:0, fontSize:10.5, color:'rgba(20,20,19,0.44)', fontFamily:SF }}>{sel.sub}</p>
+                </div>
+              </div>
+              {[
+                ['Urgency', URGENCY.find(u=>u.v===urgency)?.label],
+                ['Time', timeSlot],
+                ['Format', format],
+                concern && ['Note', concern.slice(0,60) + (concern.length > 60 ? '…' : '')],
+              ].filter(Boolean).map(([label, val]) => (
+                <div key={label} style={{ display:'flex', gap:8, marginBottom:5 }}>
+                  <span style={{ fontSize:10.5, fontWeight:700, color:'rgba(20,20,19,0.38)', fontFamily:SF, width:52, flexShrink:0 }}>{label}</span>
+                  <span style={{ fontSize:10.5, color:'rgba(20,20,19,0.65)', fontFamily:SF, lineHeight:1.4 }}>{val}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          <div style={{ width:'100%', display:'flex', flexDirection:'column', gap:10 }}>
+            <a href={`tel:${sel?.phone?.replace(/[^0-9]/g,'')}`} style={{ textDecoration:'none' }}>
+              <div style={{ background:sel?.color || '#3b82f6', borderRadius:14, padding:'14px 18px', display:'flex', alignItems:'center', justifyContent:'space-between', cursor:'pointer', boxShadow:`0 4px 16px ${sel?.color || '#3b82f6'}44` }}>
+                <div>
+                  <p style={{ margin:0, fontSize:13, fontWeight:700, color:'white', fontFamily:SF }}>Call to Confirm</p>
+                  <p style={{ margin:0, fontSize:11, color:'rgba(255,255,255,0.7)', fontFamily:SF }}>{sel?.phone}</p>
+                </div>
+                <div style={{ width:34, height:34, borderRadius:17, background:'rgba(255,255,255,0.18)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.18 6.18l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
+                </div>
+              </div>
+            </a>
+            <div style={{ background:'rgba(20,20,19,0.05)', borderRadius:14, padding:'14px 18px', display:'flex', alignItems:'center', justifyContent:'space-between', cursor:'pointer', border:'1px solid rgba(20,20,19,0.08)' }} onClick={() => window.open(`https://${sel?.url}`, '_blank')}>
+              <div>
+                <p style={{ margin:0, fontSize:13, fontWeight:700, color:'#141413', fontFamily:SF }}>Book Online</p>
+                <p style={{ margin:0, fontSize:11, color:'rgba(20,20,19,0.44)', fontFamily:SF }}>{sel?.url}</p>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(20,20,19,0.5)" strokeWidth="2" strokeLinecap="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </div>
+          </div>
+          <div onClick={onClose} style={{ padding:'10px 24px', borderRadius:99, border:'1px solid rgba(20,20,19,0.10)', cursor:'pointer' }}>
+            <span style={{ fontSize:13, fontWeight:600, color:'rgba(20,20,19,0.55)', fontFamily:SF }}>Back to chat</span>
+          </div>
+        </div>
+      );
+
+      return (
+        <div style={{ position:'absolute', inset:0, zIndex:600, background:'white', display:'flex', flexDirection:'column' }}>
+          {/* Header */}
+          <div style={{ flexShrink:0, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'52px 20px 14px' }}>
+            <div onClick={back} style={{ width:34, height:34, borderRadius:99, background:'rgba(20,20,19,0.05)', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}>
+              <svg width="8" height="14" viewBox="0 0 8 14" fill="none"><path d="M7 1L1 7L7 13" stroke="#141413" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </div>
+            <span style={{ fontSize:14, fontWeight:700, color:'#141413', fontFamily:SF }}>Book Appointment</span>
+            <div onClick={onClose} style={{ width:34, height:34, borderRadius:99, background:'rgba(20,20,19,0.05)', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="#141413" strokeWidth="1.7" strokeLinecap="round"/></svg>
+            </div>
+          </div>
+          {/* Progress bar */}
+          <div style={{ flexShrink:0, padding:'0 20px 20px' }}>
+            <div style={{ height:3, borderRadius:99, background:'rgba(20,20,19,0.07)', overflow:'hidden' }}>
+              <div style={{ height:'100%', width:`${progressW}%`, background:'linear-gradient(90deg,#9b6ef3,#7c5cfc)', borderRadius:99, transition:'width 0.4s ease' }} />
+            </div>
+            <p style={{ margin:'7px 0 0', fontSize:10.5, color:'rgba(20,20,19,0.38)', fontFamily:SF }}>
+              {step === 0 ? 'Choose a service' : step === 1 ? 'Describe your concern' : step === 2 ? 'Your preferences' : 'Review & confirm'}
+            </p>
+          </div>
+
+          {/* Body */}
+          <div style={{ flex:1, overflowY:'auto', padding:'0 20px' }}>
+
+            {/* ── Step 0: Service selection ── */}
+            {step === 0 && (
+              <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+                <p style={{ margin:'0 0 6px', fontSize:18, fontWeight:800, color:'#141413', fontFamily:SF, letterSpacing:'-0.3px' }}>Which service?</p>
+                {SERVICES.map(s => (
+                  <div key={s.key} onClick={() => setService(s.key)}
+                    style={{ padding:'14px 16px', borderRadius:16, border:`2px solid ${service===s.key ? s.color : 'rgba(20,20,19,0.08)'}`, background: service===s.key ? `${s.color}0e` : 'white', cursor:'pointer', transition:'all 0.18s', display:'flex', alignItems:'center', gap:12 }}>
+                    <div style={{ width:40, height:40, borderRadius:12, background:`${s.color}18`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                      <span style={{ fontSize:18 }}>{s.icon}</span>
+                    </div>
+                    <div style={{ flex:1 }}>
+                      <p style={{ margin:'0 0 2px', fontSize:13.5, fontWeight:700, color:'#141413', fontFamily:SF }}>{s.title}</p>
+                      <p style={{ margin:0, fontSize:11, color:'rgba(20,20,19,0.44)', fontFamily:SF }}>{s.sub}</p>
+                    </div>
+                    {service === s.key && (
+                      <div style={{ width:20, height:20, borderRadius:10, background:s.color, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 2.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* ── Step 1: Concern + urgency ── */}
+            {step === 1 && (
+              <div style={{ display:'flex', flexDirection:'column', gap:18 }}>
+                <p style={{ margin:'0 0 2px', fontSize:18, fontWeight:800, color:'#141413', fontFamily:SF, letterSpacing:'-0.3px' }}>What's been going on?</p>
+                <div>
+                  <textarea value={concern} onChange={e => setConcern(e.target.value)} placeholder="Briefly describe what you've been experiencing... (optional)" rows={4}
+                    style={{ width:'100%', border:'1.5px solid rgba(20,20,19,0.10)', borderRadius:14, padding:'12px 14px', fontSize:13, fontFamily:SF, color:'#141413', background:'rgba(20,20,19,0.02)', resize:'none', outline:'none', lineHeight:1.5, boxSizing:'border-box' }} />
+                  <p style={{ margin:'5px 0 0', fontSize:10, color:'rgba(20,20,19,0.32)', fontFamily:SF }}>This won't be sent anywhere — it's just to help you remember what to say when you call.</p>
+                </div>
+                <div>
+                  <p style={{ margin:'0 0 10px', fontSize:13, fontWeight:700, color:'rgba(20,20,19,0.55)', fontFamily:SF, letterSpacing:'0.2px', textTransform:'uppercase', fontSize:10.5 }}>How urgent is this?</p>
+                  <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+                    {URGENCY.map(u => (
+                      <div key={u.v} onClick={() => setUrgency(u.v)}
+                        style={{ padding:'11px 14px', borderRadius:14, border:`1.5px solid ${urgency===u.v ? '#9b6ef3' : 'rgba(20,20,19,0.08)'}`, background: urgency===u.v ? 'rgba(155,110,243,0.07)' : 'white', cursor:'pointer', transition:'all 0.15s', display:'flex', alignItems:'center', gap:10 }}>
+                        <span style={{ fontSize:18 }}>{u.icon}</span>
+                        <span style={{ fontSize:13, fontWeight: urgency===u.v ? 700 : 500, color: urgency===u.v ? '#7c5cfc' : '#141413', fontFamily:SF }}>{u.label}</span>
+                        {urgency === u.v && (
+                          <div style={{ marginLeft:'auto', width:18, height:18, borderRadius:9, background:'#9b6ef3', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                            <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5l2 2L7.5 2" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── Step 2: Preferences ── */}
+            {step === 2 && (
+              <div style={{ display:'flex', flexDirection:'column', gap:22 }}>
+                <p style={{ margin:'0 0 2px', fontSize:18, fontWeight:800, color:'#141413', fontFamily:SF, letterSpacing:'-0.3px' }}>Your preferences</p>
+                <div>
+                  <p style={{ margin:'0 0 10px', fontSize:10.5, fontWeight:700, color:'rgba(20,20,19,0.38)', fontFamily:SF, letterSpacing:'0.5px', textTransform:'uppercase' }}>Preferred time of day</p>
+                  <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
+                    {TIMES.map(t => (
+                      <div key={t} onClick={() => setTimeSlot(t)}
+                        style={{ padding:'9px 16px', borderRadius:99, border:`1.5px solid ${timeSlot===t ? '#9b6ef3' : 'rgba(20,20,19,0.10)'}`, background: timeSlot===t ? 'rgba(155,110,243,0.09)' : 'white', cursor:'pointer', transition:'all 0.15s' }}>
+                        <span style={{ fontSize:12.5, fontWeight:600, color: timeSlot===t ? '#7c5cfc' : 'rgba(20,20,19,0.6)', fontFamily:SF }}>{t}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <p style={{ margin:'0 0 10px', fontSize:10.5, fontWeight:700, color:'rgba(20,20,19,0.38)', fontFamily:SF, letterSpacing:'0.5px', textTransform:'uppercase' }}>Appointment format</p>
+                  <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+                    {FORMATS.map(f => (
+                      <div key={f} onClick={() => setFormat(f)}
+                        style={{ padding:'12px 16px', borderRadius:14, border:`1.5px solid ${format===f ? '#9b6ef3' : 'rgba(20,20,19,0.08)'}`, background: format===f ? 'rgba(155,110,243,0.07)' : 'white', cursor:'pointer', transition:'all 0.15s', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                        <span style={{ fontSize:13, fontWeight: format===f ? 700 : 500, color: format===f ? '#7c5cfc' : '#141413', fontFamily:SF }}>{f}</span>
+                        {format === f && (
+                          <div style={{ width:18, height:18, borderRadius:9, background:'#9b6ef3', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                            <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5l2 2L7.5 2" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── Step 3: Review ── */}
+            {step === 3 && (
+              <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
+                <p style={{ margin:'0 0 2px', fontSize:18, fontWeight:800, color:'#141413', fontFamily:SF, letterSpacing:'-0.3px' }}>Review your request</p>
+                <p style={{ margin:0, fontSize:12.5, color:'rgba(20,20,19,0.50)', fontFamily:SF, lineHeight:1.5 }}>Nothing gets submitted automatically — you'll confirm by calling or booking online.</p>
+                {sel && (
+                  <div style={{ borderRadius:16, border:'1.5px solid rgba(20,20,19,0.08)', overflow:'hidden' }}>
+                    <div style={{ padding:'12px 16px', background:`${sel.color}0d`, borderBottom:'1px solid rgba(20,20,19,0.06)', display:'flex', alignItems:'center', gap:10 }}>
+                      <span style={{ fontSize:20 }}>{sel.icon}</span>
+                      <div>
+                        <p style={{ margin:0, fontSize:13, fontWeight:700, color:'#141413', fontFamily:SF }}>{sel.title}</p>
+                        <p style={{ margin:0, fontSize:10.5, color:'rgba(20,20,19,0.44)', fontFamily:SF }}>{sel.sub}</p>
+                      </div>
+                    </div>
+                    <div style={{ padding:'12px 16px', display:'flex', flexDirection:'column', gap:8 }}>
+                      {[
+                        ['Urgency', URGENCY.find(u=>u.v===urgency)?.label],
+                        ['Time', timeSlot],
+                        ['Format', format],
+                        concern && ['Your note', concern],
+                      ].filter(Boolean).map(([label, val]) => (
+                        <div key={label} style={{ display:'flex', gap:10, alignItems:'flex-start' }}>
+                          <span style={{ fontSize:11, fontWeight:700, color:'rgba(20,20,19,0.35)', fontFamily:SF, width:58, flexShrink:0, paddingTop:1 }}>{label}</span>
+                          <span style={{ fontSize:12, color:'rgba(20,20,19,0.7)', fontFamily:SF, lineHeight:1.45, flex:1 }}>{val}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+                  <a href={`tel:${sel?.phone?.replace(/[^0-9]/g,'')}`} style={{ textDecoration:'none' }}>
+                    <div style={{ background: sel?.color || '#3b82f6', borderRadius:14, padding:'14px 18px', display:'flex', alignItems:'center', justifyContent:'space-between', cursor:'pointer', boxShadow:`0 4px 16px ${sel?.color || '#3b82f6'}33` }}>
+                      <div>
+                        <p style={{ margin:0, fontSize:13.5, fontWeight:700, color:'white', fontFamily:SF }}>Call to Book</p>
+                        <p style={{ margin:0, fontSize:11, color:'rgba(255,255,255,0.68)', fontFamily:SF }}>{sel?.phone} · M–F 8am–5pm</p>
+                      </div>
+                      <div style={{ width:36, height:36, borderRadius:18, background:'rgba(255,255,255,0.18)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.18 6.18l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
+                      </div>
+                    </div>
+                  </a>
+                  <div onClick={() => window.open(`https://${sel?.url}`, '_blank')} style={{ background:'rgba(20,20,19,0.04)', borderRadius:14, padding:'14px 18px', display:'flex', alignItems:'center', justifyContent:'space-between', cursor:'pointer', border:'1.5px solid rgba(20,20,19,0.08)' }}>
+                    <div>
+                      <p style={{ margin:0, fontSize:13.5, fontWeight:700, color:'#141413', fontFamily:SF }}>Book Online</p>
+                      <p style={{ margin:0, fontSize:11, color:'rgba(20,20,19,0.42)', fontFamily:SF }}>{sel?.url}</p>
+                    </div>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(20,20,19,0.4)" strokeWidth="2" strokeLinecap="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div style={{ height: 120 }} />
+          </div>
+
+          {/* Bottom CTA */}
+          {step < 3 ? (
+            <div style={{ flexShrink:0, padding:'12px 20px 40px', background:'white', borderTop:'1px solid rgba(20,20,19,0.06)' }}>
+              <div onClick={next} style={{ background: canNext ? 'linear-gradient(135deg,#9b6ef3,#7c5cfc)' : 'rgba(20,20,19,0.07)', borderRadius:14, padding:'15px', display:'flex', alignItems:'center', justifyContent:'center', cursor: canNext ? 'pointer' : 'default', transition:'all 0.2s', boxShadow: canNext ? '0 4px 16px rgba(124,92,252,0.30)' : 'none' }}>
+                <span style={{ fontSize:14, fontWeight:700, color: canNext ? 'white' : 'rgba(20,20,19,0.3)', fontFamily:SF }}>
+                  {step === 0 ? 'Choose Service' : step === 1 ? 'Next' : 'Review Request'}
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div style={{ flexShrink:0, padding:'12px 20px 40px', background:'white', borderTop:'1px solid rgba(20,20,19,0.06)' }}>
+              <div onClick={() => setDone(true)} style={{ background:'linear-gradient(135deg,#4ade80,#22c55e)', borderRadius:14, padding:'15px', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', boxShadow:'0 4px 16px rgba(74,222,128,0.30)' }}>
+                <span style={{ fontSize:14, fontWeight:700, color:'white', fontFamily:SF }}>Save Request</span>
+              </div>
+            </div>
+          )}
+
+          <style>{`@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}`}</style>
+        </div>
+      );
+    }
 
     /* ── CHAT HISTORY SIDEBAR ── */
     const CHAT_SIDEBAR_ICON_SEARCH = 'https://www.figma.com/api/mcp/asset/94a3b85e-f910-4850-8871-e5de092b6d76';
@@ -113,7 +402,26 @@
       const [chatTopic, setChatTopic] = useState(null);
       const [chatMoodCtx, setChatMoodCtx] = useState(null);
       const [sidebarOpen, setSidebarOpen] = useState(false);
+      const [bookingOpen, setBookingOpen] = useState(false);
+      const [bookingService, setBookingService] = useState(null);
+      const [isChatBookingMode, setIsChatBookingMode] = useState(false);
       const moodOpenedRef = useRef(false);
+
+      const openBooking = (serviceKey) => {
+        setBookingService(serviceKey || null);
+        setIsChatBookingMode(true);
+        setChatTopic(null);
+        setChatMoodCtx(null);
+        setTypeChat(true);
+      };
+
+      const closeTypeChat = () => {
+        setTypeChat(false);
+        setChatTopic(null);
+        setChatMoodCtx(null);
+        setBookingService(null);
+        setIsChatBookingMode(false);
+      };
 
       /* Auto-open AI chat when navigated from mood log */
       useEffect(() => {
@@ -175,7 +483,7 @@
           {/* Voice mode overlay */}
           {voiceMode && <VoiceModeOverlay onClose={() => setVoiceMode(false)} />}
           {/* Type chat overlay */}
-          {typeChat && <TypeChatPage onBack={() => { setTypeChat(false); setChatTopic(null); setChatMoodCtx(null); }} userName={userName} initialTopic={chatMoodCtx ? null : chatTopic} moodContext={chatMoodCtx} />}
+          {typeChat && <TypeChatPage onBack={closeTypeChat} userName={userName} initialTopic={chatMoodCtx ? null : chatTopic} moodContext={chatMoodCtx} onBook={openBooking} bookingMode={isChatBookingMode} preService={bookingService} />}
           {/* Shared warp filter */}
           <svg style={{ position:'absolute', width:0, height:0, overflow:'hidden' }}>
             <defs>
@@ -362,8 +670,16 @@
                 </div>
               </div>
 
-              {/* ── Start Chat button (top:596.5 per Figma, centered) ── */}
-              <div style={{ position:'absolute', top:597, left:0, right:0, display:'flex', justifyContent:'center', zIndex:4 }}>
+              {/* ── Book Appointment button ── */}
+              <div style={{ position:'absolute', top:597, left:0, right:0, display:'flex', justifyContent:'center', gap:10, zIndex:4 }}>
+                <div onClick={() => openBooking(null)} style={{ background:'linear-gradient(135deg,#9b6ef3,#7c5cfc)', display:'inline-flex', alignItems:'center', gap:6, padding:'9px 16px', borderRadius:99, boxShadow:'0 4px 14px rgba(124,92,252,0.32)', cursor:'pointer' }}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  <span style={{ color:'white', fontSize:12, fontWeight:700, fontFamily:'Sofia Sans,sans-serif', whiteSpace:'nowrap' }}>Book Appointment</span>
+                </div>
+              </div>
+
+              {/* ── Start Chat button ── */}
+              <div style={{ position:'absolute', top:644, left:0, right:0, display:'flex', justifyContent:'center', zIndex:4 }}>
                 <div onClick={() => setTypeChat(true)} style={{ background:'white', display:'inline-flex', alignItems:'center', gap:4, padding:'8px 10px', borderRadius:99, boxShadow:'0 0 0 1px rgba(3,7,18,0.04), 0 2px 4px rgba(3,7,18,0.04)', cursor:'pointer', overflow:'hidden' }}>
                   <div style={{ width:14, height:14, position:'relative', overflow:'hidden', flexShrink:0 }}>
                     <div style={{ position:'absolute', top:'20.83%', bottom:'20.83%', left:'20.83%', right:'20.83%' }}>

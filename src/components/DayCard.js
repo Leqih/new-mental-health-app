@@ -98,125 +98,27 @@
       );
     }
 
+    /* ── MOOD CHARACTER SVGs — self-contained, no external URLs ── */
+    const moodCharSVG = (mood) => {
+      const s = (mood || '').toLowerCase();
+      const cloud = (c1, c2, face) => {
+        const rid = Math.random().toString(36).slice(2,6);
+        return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:100%"><defs><radialGradient id="g${rid}" cx="42%" cy="32%" r="68%"><stop offset="0%" stop-color="${c1}"/><stop offset="100%" stop-color="${c2}"/></radialGradient></defs><circle cx="36" cy="56" r="24" fill="url(#g${rid})"/><circle cx="52" cy="44" r="28" fill="url(#g${rid})"/><circle cx="68" cy="56" r="22" fill="url(#g${rid})"/><rect x="19" y="56" width="62" height="22" rx="11" fill="url(#g${rid})"/><ellipse cx="46" cy="33" rx="9" ry="5" fill="white" opacity="0.38"/>${face}</svg>`;
+      };
+      if (s === 'good')      return cloud('#edfae8','#80d070', `<circle cx="42" cy="58" r="4" fill="#1a2a1a"/><circle cx="60" cy="58" r="4" fill="#1a2a1a"/><path d="M40 67 Q51 75 62 67" stroke="#1a2a1a" stroke-width="2.5" fill="none" stroke-linecap="round"/>`);
+      if (s === 'happy')     return cloud('#fdf8cc','#e8c810', `<path d="M37 55 Q41 51 45 55" stroke="#2a2000" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M57 55 Q61 51 65 55" stroke="#2a2000" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M38 65 Q51 76 64 65" stroke="#2a2000" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M38 65 Q51 76 64 65 L64 70 Q51 80 38 70 Z" fill="#e05030" opacity="0.8"/>`);
+      if (s === 'grateful')  return cloud('#fef3e0','#f0a840', `<circle cx="42" cy="58" r="4.2" fill="#3a1a00"/><circle cx="60" cy="58" r="4.2" fill="#3a1a00"/><path d="M40 68 Q51 75 62 68" stroke="#3a1a00" stroke-width="2.8" fill="none" stroke-linecap="round"/><path d="M26 40 L28 35 L30 40 L35 38 L31 41 L33 46 L28 43 L23 46 L25 41 L21 38 Z" fill="#ff9020" opacity="0.9"/>`);
+      if (s === 'angry')     return cloud('#ffe8e8','#f06060', `<path d="M36 51 L42 46 L47 51" stroke="#3a0000" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M55 51 L61 46 L66 51" stroke="#3a0000" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="42" cy="57" r="4" fill="#3a0000"/><circle cx="60" cy="57" r="4" fill="#3a0000"/><path d="M40 67 Q51 63 62 67" stroke="#3a0000" stroke-width="2.5" fill="none" stroke-linecap="round"/>`);
+      if (s === 'exhausted') return cloud('#f0ecff','#a888d0', `<path d="M37 53 L45 61 M45 53 L37 61" stroke="#1a0a3a" stroke-width="2.8" stroke-linecap="round"/><path d="M57 53 L65 61 M65 53 L57 61" stroke="#1a0a3a" stroke-width="2.8" stroke-linecap="round"/><path d="M39 70 Q43 66 47 69 Q51 72 55 68 Q59 64 63 68" stroke="#1a0a3a" stroke-width="2.5" fill="none" stroke-linecap="round"/>`);
+      if (s === 'boring')    return cloud('#e0f8f6','#48b8b2', `<line x1="38" y1="56" x2="46" y2="56" stroke="#002a28" stroke-width="2.5" stroke-linecap="round"/><line x1="56" y1="56" x2="64" y2="56" stroke="#002a28" stroke-width="2.5" stroke-linecap="round"/><path d="M40 67 Q51 64 62 67" stroke="#002a28" stroke-width="2.5" fill="none" stroke-linecap="round"/>`);
+      if (s === 'anxious')   return cloud('#ffe8f4','#f06090', `<circle cx="42" cy="57" r="5" fill="#2a001a"/><circle cx="60" cy="57" r="5" fill="#2a001a"/><path d="M39 68 Q43 65 47 68 Q51 71 55 68 Q59 65 63 68" stroke="#2a001a" stroke-width="2.5" fill="none" stroke-linecap="round"/>`);
+      return cloud('#e8f5ff','#70c0f0', `<circle cx="42" cy="58" r="4" fill="#1a1a3a"/><circle cx="60" cy="58" r="4" fill="#1a1a3a"/><path d="M40 70 Q51 63 62 70" stroke="#1a1a3a" stroke-width="2.8" fill="none" stroke-linecap="round"/><ellipse cx="38" cy="66" rx="2.2" ry="3.5" fill="#50b8f0" opacity="0.85"/>`);
+    };
+
     /* ── TODAY PHYSICS CARD ── */
-    /* Maps mood label → character image src from Log Mood page */
-    const moodCharSrc = m => {
-      switch ((m || '').toLowerCase()) {
-        case 'good':      return imgGoodChar;
-        case 'happy':     return imgHappyChar;
-        case 'grateful':  return imgGratefulChar;
-        case 'angry':     return imgAngryChar;
-        case 'exhausted': return imgExhaustedChar;
-        case 'boring':    return imgBoringChar1;
-        case 'anxious':   return imgAnxiousChar;
-        case 'sad':
-        default:          return imgLogCloudChar;
-      }
-    };
+    const moodCharSrc = m => `data:image/svg+xml,${encodeURIComponent(moodCharSVG(m))}`;
 
-    const buildIconHTML = (moodLabel) => {
-      const s = (moodLabel || '').toLowerCase();
-      const base = (src) => `<img alt="" src="${src}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block">`;
-
-      if (s === 'sad') return base(imgLogCloudChar); // face baked in
-
-      if (s === 'good') return `
-        ${base(imgGoodChar)}
-        <div style="position:absolute;left:33.8%;top:45.6%;width:32.1%;height:19.5%;clip-path:inset(43% 0 0 0);overflow:visible">
-          <img alt="" src="${imgGoodFace}" style="display:block;width:100%;height:100%">
-        </div>
-        <div style="position:absolute;left:33.8%;top:45.6%;width:32.1%;height:19.5%;clip-path:inset(0 0 57% 0);overflow:visible">
-          <img alt="" src="${imgGoodFace}" style="display:block;width:100%;height:100%">
-        </div>`;
-
-      if (s === 'happy') return `
-        ${base(imgHappyChar)}
-        <div style="position:absolute;top:35.54%;right:56.79%;bottom:55.75%;left:36.24%;overflow:visible">
-          <div style="position:absolute;top:-30%;right:-28.63%;bottom:-30%;left:-37.51%">
-            <img alt="" src="${imgHappyFaceL}" style="display:block;width:100%;height:100%">
-          </div>
-        </div>
-        <div style="position:absolute;top:35.54%;right:36.24%;bottom:55.75%;left:56.79%;overflow:visible">
-          <div style="position:absolute;top:-30%;right:-28.63%;bottom:-30%;left:-37.51%;transform:scaleX(-1)">
-            <img alt="" src="${imgHappyFaceR}" style="display:block;width:100%;height:100%">
-          </div>
-        </div>
-        <div style="position:absolute;top:46.34%;right:43.9%;bottom:45.47%;left:44.25%;overflow:visible">
-          <div style="position:absolute;top:-25.53%;right:-13.01%;bottom:-25.53%;left:-13.01%">
-            <img alt="" src="${imgHappyFaceM}" style="display:block;width:100%;height:100%">
-          </div>
-        </div>`;
-
-      if (s === 'grateful') return `
-        ${base(imgGratefulChar)}
-        <div style="position:absolute;top:35.82%;right:52.25%;bottom:52.84%;left:36.68%">
-          <img alt="" src="${imgGratefulFaceB}" style="position:absolute;inset:0;display:block;width:100%;height:100%">
-        </div>
-        <div style="position:absolute;top:37.59%;right:39.1%;bottom:53.55%;left:53.98%;overflow:visible">
-          <div style="position:absolute;top:-30%;right:-28.63%;bottom:-30%;left:-37.51%;transform:scaleX(-1)">
-            <img alt="" src="${imgGratefulFaceC}" style="display:block;width:100%;height:100%">
-          </div>
-        </div>
-        <div style="position:absolute;top:48.58%;right:41.18%;bottom:42.2%;left:40.83%">
-          <img alt="" src="${imgGratefulFaceA}" style="position:absolute;inset:0;display:block;width:100%;height:100%;transform:rotate(180deg) scaleX(-1)">
-        </div>`;
-
-      if (s === 'angry') return `
-        ${base(imgAngryChar)}
-        <div style="position:absolute;top:32.18%;right:35.6%;bottom:52.35%;left:35.89%;overflow:visible">
-          <div style="position:absolute;top:-7.92%;right:-12.22%;bottom:0%;left:-12.22%">
-            <img alt="" src="${imgAngryFaceA}" style="display:block;width:100%;height:100%">
-          </div>
-        </div>
-        <div style="position:absolute;top:48.1%;right:45.6%;bottom:42.2%;left:46.0%">
-          <img alt="" src="${imgAngryFaceB}" style="position:absolute;inset:0;display:block;width:100%;height:100%">
-        </div>`;
-
-      if (s === 'exhausted') return `
-        ${base(imgExhaustedChar)}
-        <div style="position:absolute;top:34.5%;left:34.5%;right:55.1%;bottom:56.3%;overflow:visible">
-          <div style="position:absolute;inset:-29.85% -26.67%">
-            <img alt="" src="${imgExhaustedEyeA}" style="display:block;width:100%;height:100%">
-          </div>
-        </div>
-        <div style="position:absolute;top:34.5%;left:34.5%;right:55.1%;bottom:56.3%;overflow:visible">
-          <div style="position:absolute;inset:-29.85% -26.67%;transform:rotate(180deg) scaleY(-1)">
-            <img alt="" src="${imgExhaustedEyeB}" style="display:block;width:100%;height:100%">
-          </div>
-        </div>
-        <div style="position:absolute;top:34.5%;left:55.5%;right:34.1%;bottom:56.3%;overflow:visible">
-          <div style="position:absolute;inset:-29.85% -26.67%">
-            <img alt="" src="${imgExhaustedEyeA}" style="display:block;width:100%;height:100%">
-          </div>
-        </div>
-        <div style="position:absolute;top:34.5%;left:55.5%;right:34.1%;bottom:56.3%;overflow:visible">
-          <div style="position:absolute;inset:-29.85% -26.67%;transform:rotate(180deg) scaleY(-1)">
-            <img alt="" src="${imgExhaustedEyeB}" style="display:block;width:100%;height:100%">
-          </div>
-        </div>`;
-
-      if (s === 'boring') return `
-        <img alt="" src="${imgBoringChar1}" style="position:absolute;top:0;bottom:0;left:0;right:75%;width:25%;height:100%;display:block;object-fit:cover">
-        <img alt="" src="${imgBoringChar2}" style="position:absolute;top:0;bottom:0;left:24.99%;right:50%;width:25.01%;height:100%;display:block;object-fit:cover">
-        <img alt="" src="${imgBoringChar1}" style="position:absolute;top:0;bottom:0;left:50%;right:24.99%;width:25.01%;height:100%;display:block;object-fit:cover">
-        <img alt="" src="${imgBoringChar2}" style="position:absolute;top:0;bottom:0;left:75%;right:0;width:25%;height:100%;display:block;object-fit:cover">
-        <svg style="position:absolute;left:37.6%;top:39.4%;width:10.8%;height:7%;overflow:visible" viewBox="0 0 32 20" fill="none">
-          <path d="M7.50195 12.2736L23.8186 7.50196" stroke="black" stroke-width="15" stroke-linecap="round"/>
-        </svg>
-        <svg style="position:absolute;left:54.4%;top:39.4%;width:10.8%;height:7%;overflow:visible" viewBox="0 0 32 20" fill="none">
-          <path d="M23.8186 12.2736L7.50199 7.50196" stroke="black" stroke-width="15" stroke-linecap="round"/>
-        </svg>
-        <img alt="" src="${imgBoringMthA}" style="position:absolute;left:40.4%;top:47.7%;width:17.8%;height:6.6%;display:block">
-        <img alt="" src="${imgBoringMthB}" style="position:absolute;left:55.4%;top:46%;width:7%;height:11.8%;display:block">`;
-
-      if (s === 'anxious') return `
-        ${base(imgAnxiousChar)}
-        <div style="position:absolute;left:0;top:0;width:26.1%;height:32.1%;">
-          <img alt="" src="${imgAnxiousFace}" style="display:block;width:100%;height:100%">
-        </div>`;
-
-      return base(imgLogCloudChar); // fallback
-    };
+    const buildIconHTML = (moodLabel) => moodCharSVG(moodLabel);
 
     function TodayPhysicsCard({ dateStr, moods, onMoodClick }) {
       const containerRef = useRef(null);

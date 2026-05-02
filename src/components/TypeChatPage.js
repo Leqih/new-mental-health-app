@@ -34,15 +34,31 @@
     /* Inject _key into each resource for canBook checks */
     Object.keys(UIUC_RESOURCES).forEach(k => { UIUC_RESOURCES[k]._key = k; });
     const BOOKABLE_KEYS = new Set(['caps','letsTalk','mckinley','resilience']);
+    const RESOURCE_SHORT_DETAIL = res => (res.detail || '').split('·')[0].trim();
+    const THERAPIST_FIT_LINE = t => `Best for ${t.specializations.slice(0,2).map(s => s[0].toUpperCase() + s.slice(1)).join(' + ')}`;
 
-    function ResourceCard({ res, SF, onBook }) {
+    function ResourceCard({ res, SF, onBook, priorityIndex = 0, horizontal = false }) {
       const BADGE = { 1:['URGENT','#dc2626','rgba(254,226,226,0.95)'], 2:['START HERE','#7c3aed','rgba(237,233,254,0.95)'], 3:['RECOMMENDED','#059669','rgba(209,250,229,0.95)'], 4:['HELPFUL','#0891b2','rgba(224,242,254,0.95)'] };
       const [bLabel, bText, bBg] = BADGE[res.level] || BADGE[3];
       const canBook = onBook && res._key && BOOKABLE_KEYS.has(res._key);
+      const priorityLabel = priorityIndex === 0 ? 'Top pick' : priorityIndex === 1 ? 'Next' : 'Backup';
+      const priorityTint  = priorityIndex === 0 ? `${res.color}16` : priorityIndex === 1 ? 'rgba(20,20,19,0.018)' : 'rgba(20,20,19,0.01)';
+      const priorityShadow = priorityIndex === 0 ? `0 16px 38px ${res.color}24` : '0 2px 14px rgba(20,20,19,0.09)';
+      const microDetail = RESOURCE_SHORT_DETAIL(res);
       return (
-        <div style={{ marginLeft:36, maxWidth:'86%', background:'rgba(255,255,255,0.96)', borderRadius:16, overflow:'hidden', boxShadow:'0 2px 14px rgba(20,20,19,0.09)', border:'1px solid rgba(20,20,19,0.06)', display:'flex' }}>
-          <div style={{ width:3, background:res.color, flexShrink:0 }} />
-          <div style={{ flex:1, padding:'11px 13px' }}>
+        <div style={{ marginLeft:horizontal ? 0 : 36, width:horizontal ? 286 : undefined, minWidth:horizontal ? 286 : undefined, maxWidth:horizontal ? 286 : '86%', background:horizontal ? `linear-gradient(163deg, ${res.color}24 2%, rgba(255,255,255,0.96) 30%, rgba(255,255,255,0.97) 100%)` : `linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.96)), ${priorityTint}`, borderRadius:22, overflow:'hidden', boxShadow:priorityShadow, border:`1px solid ${priorityIndex === 0 ? `${res.color}35` : 'rgba(20,20,19,0.06)'}`, display:'flex', flexShrink:0, scrollSnapAlign:'start', position:'relative' }}>
+          {horizontal && <div style={{ position:'absolute', inset:0, background:`radial-gradient(circle at 78% 18%, ${res.color}16 0%, transparent 28%), radial-gradient(circle at 18% 100%, rgba(255,255,255,0.88) 0%, transparent 42%)`, pointerEvents:'none' }} />}
+          <div style={{ width:horizontal ? 0 : (priorityIndex === 0 ? 5 : 3), background:res.color, flexShrink:0 }} />
+          <div style={{ flex:1, padding: horizontal ? '12px 12px 12px' : '11px 13px', position:'relative', zIndex:1 }}>
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:8, marginBottom:9 }}>
+              <div style={{ display:'inline-flex', alignItems:'center', gap:6, background:priorityIndex === 0 ? `${res.color}16` : 'rgba(20,20,19,0.04)', borderRadius:99, padding:'4px 8px', border:`1px solid ${priorityIndex === 0 ? `${res.color}24` : 'rgba(20,20,19,0.06)'}` }}>
+                <span style={{ fontSize:9.5, fontWeight:800, color:priorityIndex === 0 ? res.color : 'rgba(20,20,19,0.52)', fontFamily:SF, letterSpacing:'0.3px', textTransform:'uppercase' }}>{priorityIndex + 1}</span>
+                <span style={{ fontSize:9.5, fontWeight:800, color:priorityIndex === 0 ? res.color : 'rgba(20,20,19,0.52)', fontFamily:SF, letterSpacing:'0.3px', textTransform:'uppercase' }}>{priorityLabel}</span>
+              </div>
+              <div style={{ flexShrink:0, background:bBg, borderRadius:99, padding:'3px 8px', marginTop:1 }}>
+                <span style={{ fontSize:9, fontWeight:800, color:bText, fontFamily:SF, letterSpacing:'0.5px' }}>{bLabel}</span>
+              </div>
+            </div>
             {/* Header: icon + title + priority badge */}
             <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:8 }}>
               <div style={{ display:'flex', alignItems:'center', gap:9 }}>
@@ -51,21 +67,18 @@
                 </div>
                 <div>
                   <p style={{ margin:0, fontSize:13, fontWeight:700, color:'#141413', fontFamily:SF, letterSpacing:'-0.2px', lineHeight:1.3 }}>{res.title}</p>
-                  <p style={{ margin:0, fontSize:10.5, color:'rgba(20,20,19,0.44)', fontFamily:SF, lineHeight:1.3 }}>{res.sub}</p>
+                  <p style={{ margin:0, fontSize:10.5, color:'rgba(20,20,19,0.44)', fontFamily:SF, lineHeight:1.3, display:'-webkit-box', WebkitLineClamp:1, WebkitBoxOrient:'vertical', overflow:'hidden' }}>{res.sub}</p>
                 </div>
-              </div>
-              <div style={{ flexShrink:0, background:bBg, borderRadius:99, padding:'3px 8px', marginTop:1 }}>
-                <span style={{ fontSize:9, fontWeight:800, color:bText, fontFamily:SF, letterSpacing:'0.5px' }}>{bLabel}</span>
               </div>
             </div>
             {/* Tagline */}
-            {res.tagline && (
-              <p style={{ margin:'7px 0 7px', fontSize:11.5, color:'rgba(20,20,19,0.56)', fontFamily:SF, lineHeight:1.45 }}>{res.tagline}</p>
+            {(horizontal ? microDetail : res.tagline) && (
+              <p style={{ margin:'4px 0 8px', fontSize:11, color:'rgba(20,20,19,0.56)', fontFamily:SF, lineHeight:1.4, display:'-webkit-box', WebkitLineClamp: horizontal ? 2 : 'unset', WebkitBoxOrient:'vertical', overflow:'hidden' }}>{horizontal ? microDetail : res.tagline}</p>
             )}
             {/* Attribute chips */}
             {res.tags && (
               <div style={{ display:'flex', flexWrap:'wrap', gap:5, marginBottom:8 }}>
-                {res.tags.map(t => (
+                {(horizontal ? res.tags.slice(0, 2) : res.tags).map(t => (
                   <div key={t} style={{ background:`${res.color}14`, border:`1px solid ${res.color}30`, borderRadius:99, padding:'3px 9px' }}>
                     <span style={{ fontSize:10.5, fontWeight:700, color:res.color, fontFamily:SF }}>{t}</span>
                   </div>
@@ -73,19 +86,19 @@
               </div>
             )}
             {/* Footer: location + book + call buttons */}
-            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:8 }}>
-              <p style={{ margin:0, fontSize:10, color:'rgba(20,20,19,0.34)', fontFamily:SF, letterSpacing:'0.1px', lineHeight:1.4, flex:1 }}>{res.detail}</p>
-              <div style={{ display:'flex', gap:6, flexShrink:0 }}>
+            <div style={{ display:'flex', flexDirection:horizontal ? 'column' : 'row', alignItems:horizontal ? 'stretch' : 'center', justifyContent:'space-between', gap:8 }}>
+              {!horizontal && <p style={{ margin:0, fontSize:10, color:'rgba(20,20,19,0.34)', fontFamily:SF, letterSpacing:'0.1px', lineHeight:1.4, flex:1 }}>{res.detail}</p>}
+              <div style={{ display:'flex', gap:6, flexShrink:0, justifyContent:horizontal ? 'space-between' : 'flex-start', background:horizontal ? 'rgba(255,255,255,0.82)' : 'transparent', border:horizontal ? '1px solid rgba(20,20,19,0.05)' : 'none', borderRadius:18, padding:horizontal ? '8px' : 0, boxShadow:horizontal ? '0 8px 20px rgba(20,20,19,0.05)' : 'none' }}>
                 {canBook && (
-                  <div onClick={onBook} style={{ display:'flex', alignItems:'center', gap:4, background:`${res.color}15`, borderRadius:99, padding:'5px 10px', cursor:'pointer', border:`1px solid ${res.color}30` }}>
+                  <div onClick={onBook} style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:4, background:horizontal ? `linear-gradient(135deg, ${res.color}, ${res.color}cc)` : `${res.color}15`, borderRadius:99, padding:horizontal ? '10px 12px' : '5px 10px', cursor:'pointer', border:horizontal ? 'none' : `1px solid ${res.color}30`, boxShadow:horizontal ? `0 8px 18px ${res.color}33` : 'none', flex:horizontal ? 1 : 'unset' }}>
                     <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke={res.color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                    <span style={{ fontSize:10.5, fontWeight:700, color:res.color, fontFamily:SF, whiteSpace:'nowrap' }}>Book</span>
+                    <span style={{ fontSize:10.5, fontWeight:700, color:horizontal ? 'white' : res.color, fontFamily:SF, whiteSpace:'nowrap' }}>{priorityIndex === 0 ? 'Start' : 'Book'}</span>
                   </div>
                 )}
                 {res.phone && (
-                  <div style={{ display:'flex', alignItems:'center', gap:4, background:res.color, borderRadius:99, padding:'5px 11px', cursor:'pointer', boxShadow:`0 2px 8px ${res.color}44` }}>
+                  <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:4, background:horizontal && !canBook ? `linear-gradient(135deg, ${res.color}, ${res.color}cc)` : res.color, borderRadius:99, padding:horizontal ? '10px 12px' : '5px 11px', cursor:'pointer', boxShadow:`0 2px 8px ${res.color}44`, flex:horizontal ? 1 : 'unset' }}>
                     <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.18 6.18l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
-                    <span style={{ fontSize:11, fontWeight:700, color:'white', fontFamily:SF, whiteSpace:'nowrap' }}>{res.phone}</span>
+                    <span style={{ fontSize:11, fontWeight:700, color:'white', fontFamily:SF, whiteSpace:'nowrap' }}>{horizontal ? 'Call now' : res.phone}</span>
                   </div>
                 )}
               </div>
@@ -95,24 +108,61 @@
       );
     }
 
+    function ResourceRail({ resources, SF, onBook }) {
+      return (
+        <div style={{ marginLeft:36, width:'calc(100% - 36px)', display:'flex', flexDirection:'column', gap:8, animation:'msgIn 0.28s ease-out' }}>
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:10 }}>
+            <span style={{ fontSize:10, fontWeight:800, color:'rgba(20,20,19,0.34)', fontFamily:SF, letterSpacing:'0.55px', textTransform:'uppercase' }}>Suggested support</span>
+            <span style={{ fontSize:10, fontWeight:700, color:'rgba(111,94,255,0.72)', fontFamily:SF }}>Swipe across</span>
+          </div>
+          <div style={{ display:'flex', gap:12, overflowX:'auto', paddingRight:18, paddingBottom:6, scrollSnapType:'x proximity', scrollPaddingLeft:0, scrollbarWidth:'none', msOverflowStyle:'none' }}>
+            {resources.map((item, idx) => (
+              <ResourceCard key={`${item.res._key || item.res.title}-${idx}`} res={item.res} SF={SF} onBook={BOOKABLE_KEYS.has(item.res?._key) ? onBook : null} priorityIndex={item.priorityIndex || idx} horizontal />
+            ))}
+          </div>
+        </div>
+      );
+    }
+
     /* ── INLINE WIDGETS ── */
     function DurationWidget({ onAnswer, answered, SF }) {
       const [sel, setSel] = useState(null);
       const opts = ['Just today','A few days','About a week','2–3 weeks','Over a month','A long time'];
+      const hints = {
+        'Just today':'recent spike',
+        'A few days':'this week',
+        'About a week':'lingering',
+        '2–3 weeks':'sticking around',
+        'Over a month':'ongoing',
+        'A long time':'hard to remember otherwise',
+      };
       if (answered) return (
         <div style={{ marginLeft:36, display:'inline-flex', alignItems:'center', gap:6, background:'rgba(130,90,220,0.09)', borderRadius:99, padding:'5px 13px', border:'1px solid rgba(130,90,220,0.18)', animation:'msgIn 0.25s ease-out' }}>
           <span style={{ fontSize:12, color:'rgba(110,65,200,0.9)', fontFamily:SF, fontWeight:700 }}>✓ {answered}</span>
         </div>
       );
       return (
-        <div style={{ marginLeft:36, maxWidth:'86%', background:'rgba(255,255,255,0.95)', borderRadius:14, overflow:'hidden', border:'1px solid rgba(20,20,19,0.055)', boxShadow:'0 1px 8px rgba(20,20,19,0.06)', animation:'msgIn 0.28s ease-out' }}>
-          <div style={{ borderLeft:'3px solid #9b6ef3', padding:'10px 12px' }}>
-            <p style={{ margin:'0 0 9px', fontSize:10.5, fontWeight:700, color:'rgba(20,20,19,0.38)', fontFamily:SF, letterSpacing:'0.5px', textTransform:'uppercase' }}>How long?</p>
-            <div style={{ display:'flex', gap:6, overflowX:'auto', paddingBottom:2 }}>
+        <div style={{ marginLeft:36, maxWidth:'82%', background:'linear-gradient(180deg, rgba(255,255,255,0.99), rgba(252,248,255,0.97))', borderRadius:24, overflow:'hidden', border:'1px solid rgba(124,92,252,0.14)', boxShadow:'0 14px 32px rgba(20,20,19,0.07)', animation:'msgIn 0.28s ease-out', position:'relative' }}>
+          <div style={{ position:'absolute', inset:0, background:'radial-gradient(circle at 88% 14%, rgba(155,110,243,0.12) 0%, transparent 22%), radial-gradient(circle at 10% 100%, rgba(255,229,214,0.55) 0%, transparent 36%)', pointerEvents:'none' }} />
+          <div style={{ padding:'12px 12px 12px', position:'relative', zIndex:1 }}>
+            <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:10, marginBottom:10 }}>
+              <div>
+                <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:4 }}>
+                  <div style={{ width:7, height:7, borderRadius:'50%', background:'linear-gradient(135deg,#9b6ef3,#7b4fd4)', boxShadow:'0 0 0 4px rgba(155,110,243,0.10)' }} />
+                  <p style={{ margin:0, fontSize:10.5, fontWeight:800, color:'#7b4fd4', fontFamily:SF, letterSpacing:'0.7px', textTransform:'uppercase' }}>How long?</p>
+                </div>
+                <p style={{ margin:0, fontSize:10, color:'rgba(20,20,19,0.42)', fontFamily:SF, lineHeight:1.35 }}>Choose one.</p>
+              </div>
+              <div style={{ background:'rgba(124,92,252,0.08)', borderRadius:99, padding:'5px 8px', border:'1px solid rgba(124,92,252,0.12)' }}>
+                <span style={{ fontSize:9, fontWeight:800, color:'#7b4fd4', fontFamily:SF, letterSpacing:'0.35px' }}>ONE TAP</span>
+              </div>
+            </div>
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(3, minmax(0, 1fr))', gap:7, background:'rgba(255,255,255,0.68)', border:'1px solid rgba(20,20,19,0.05)', borderRadius:18, padding:8, boxShadow:'inset 0 1px 0 rgba(255,255,255,0.6)' }}>
               {opts.map(o => (
                 <div key={o} onClick={() => { setSel(o); setTimeout(() => onAnswer(o), 220); }}
-                  style={{ flexShrink:0, padding:'7px 13px', borderRadius:99, border:`1.5px solid ${sel===o?'#9b6ef3':'rgba(20,20,19,0.12)'}`, background:sel===o?'#9b6ef3':'transparent', cursor:'pointer', transition:'all 0.16s' }}>
-                  <span style={{ fontSize:12.5, fontWeight:600, color:sel===o?'white':'rgba(20,20,19,0.65)', fontFamily:SF, whiteSpace:'nowrap' }}>{o}</span>
+                  style={{ minHeight:50, padding:'9px 10px', borderRadius:16, border:`1.5px solid ${sel===o?'#9b6ef3':'rgba(20,20,19,0.08)'}`, background:sel===o?'linear-gradient(135deg,#9b6ef3,#7b4fd4)':'rgba(248,248,252,0.9)', cursor:'pointer', transition:'all 0.16s', display:'flex', flexDirection:'column', justifyContent:'center', gap:2 }}>
+                  <span style={{ fontSize:11.5, fontWeight:700, color:sel===o?'white':'rgba(20,20,19,0.76)', fontFamily:SF, lineHeight:1.15 }}>{o}</span>
+                  <span style={{ fontSize:9, fontWeight:600, color:sel===o?'rgba(255,255,255,0.82)':'rgba(20,20,19,0.36)', fontFamily:SF, lineHeight:1.15 }}>{hints[o]}</span>
                 </div>
               ))}
             </div>
@@ -123,7 +173,12 @@
 
     function TagWidget({ options, label, onAnswer, answered, SF }) {
       const [picks, setPicks] = useState([]);
+      const [expanded, setExpanded] = useState(false);
       const toggle = t => setPicks(p => p.includes(t) ? p.filter(x=>x!==t) : [...p,t]);
+      const roomy = options.some(o => o.length > 18) || options.length > 5;
+      const compactGrid = options.length >= 10 && options.every(o => o.length <= 24);
+      const needsProgressiveReveal = compactGrid && options.length > 8;
+      const visibleOptions = needsProgressiveReveal && !expanded ? options.slice(0, 6) : options;
       if (answered) return (
         <div style={{ marginLeft:36, display:'flex', flexWrap:'wrap', gap:5, maxWidth:'86%', animation:'msgIn 0.25s ease-out' }}>
           {answered.split(' · ').map(t => (
@@ -134,23 +189,65 @@
         </div>
       );
       return (
-        <div style={{ marginLeft:36, maxWidth:'86%', background:'rgba(255,255,255,0.95)', borderRadius:14, overflow:'hidden', border:'1px solid rgba(20,20,19,0.055)', boxShadow:'0 1px 8px rgba(20,20,19,0.06)', animation:'msgIn 0.28s ease-out' }}>
-          <div style={{ borderLeft:'3px solid #9b6ef3', padding:'10px 12px' }}>
-            <p style={{ margin:'0 0 9px', fontSize:10.5, fontWeight:700, color:'rgba(20,20,19,0.38)', fontFamily:SF, letterSpacing:'0.5px', textTransform:'uppercase' }}>{label || 'Pick any that apply'}</p>
-            <div style={{ display:'flex', flexWrap:'wrap', gap:6, marginBottom:10 }}>
-              {options.map(t => (
+        <div style={{ marginLeft:36, maxWidth:'82%', background:'linear-gradient(180deg, rgba(255,255,255,0.99), rgba(252,248,255,0.97))', borderRadius:24, overflow:'hidden', border:'1px solid rgba(124,92,252,0.14)', boxShadow:'0 14px 32px rgba(20,20,19,0.07)', animation:'msgIn 0.28s ease-out', position:'relative' }}>
+          <div style={{ position:'absolute', inset:0, background:'radial-gradient(circle at 88% 14%, rgba(155,110,243,0.12) 0%, transparent 22%), radial-gradient(circle at 10% 100%, rgba(255,229,214,0.45) 0%, transparent 36%)', pointerEvents:'none' }} />
+          <div style={{ padding:'12px 12px 0', position:'relative', zIndex:1 }}>
+            <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:10, marginBottom:10 }}>
+              <div>
+                <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:4 }}>
+                  <div style={{ width:7, height:7, borderRadius:'50%', background:'linear-gradient(135deg,#9b6ef3,#7b4fd4)', boxShadow:'0 0 0 4px rgba(155,110,243,0.10)' }} />
+                  <p style={{ margin:0, fontSize:10.5, fontWeight:800, color:'#7b4fd4', fontFamily:SF, letterSpacing:'0.7px', textTransform:'uppercase' }}>{label || 'Pick any that apply'}</p>
+                </div>
+                <p style={{ margin:0, fontSize:10, color:'rgba(20,20,19,0.42)', fontFamily:SF, lineHeight:1.35 }}>{roomy ? 'Pick what fits.' : 'Pick one or more.'}</p>
+              </div>
+              <div style={{ background:'rgba(124,92,252,0.08)', borderRadius:99, padding:'5px 8px', border:'1px solid rgba(124,92,252,0.12)' }}>
+                <span style={{ fontSize:9, fontWeight:800, color:'#7b4fd4', fontFamily:SF, letterSpacing:'0.35px' }}>{picks.length ? `${picks.length} PICKED` : 'MULTI'}</span>
+              </div>
+            </div>
+            <div style={{ display:compactGrid ? 'grid' : 'flex', gridTemplateColumns:compactGrid ? 'repeat(2, minmax(0, 1fr))' : undefined, flexDirection:compactGrid ? undefined : 'column', gap:8, maxHeight: compactGrid ? 208 : (roomy ? 216 : 176), overflowY:'auto', WebkitOverflowScrolling:'touch', padding:8, paddingRight:10, marginBottom:0, background:'rgba(255,255,255,0.68)', border:'1px solid rgba(20,20,19,0.05)', borderRadius:18, boxShadow:'inset 0 1px 0 rgba(255,255,255,0.6)' }}>
+              {visibleOptions.map(t => (
                 <div key={t} onClick={() => toggle(t)}
-                  style={{ padding:'6px 12px', borderRadius:99, border:`1.5px solid ${picks.includes(t)?'#9b6ef3':'rgba(20,20,19,0.11)'}`, background:picks.includes(t)?'rgba(155,110,243,0.1)':'transparent', cursor:'pointer', transition:'all 0.15s' }}>
-                  <span style={{ fontSize:12.5, fontWeight:600, color:picks.includes(t)?'#7b4fd4':'rgba(20,20,19,0.62)', fontFamily:SF }}>{t}</span>
+                  style={{
+                    padding:compactGrid ? '10px 11px' : '11px 12px',
+                    borderRadius:16,
+                    border:`1.5px solid ${picks.includes(t)?'#9b6ef3':'rgba(20,20,19,0.08)'}`,
+                    background:picks.includes(t)?'rgba(155,110,243,0.09)':'rgba(248,248,252,0.92)',
+                    cursor:'pointer',
+                    transition:'all 0.15s',
+                    display:'flex',
+                    alignItems:'center',
+                    justifyContent:'space-between',
+                    gap:10,
+                    minHeight:compactGrid ? 44 : 46,
+                  }}>
+                  <span style={{ fontSize:compactGrid ? 11.5 : 12.5, fontWeight:700, color:picks.includes(t)?'#7b4fd4':'rgba(20,20,19,0.72)', fontFamily:SF, lineHeight:1.28, paddingRight:6 }}>{t}</span>
+                  <div style={{ width:18, height:18, borderRadius:9, background:picks.includes(t)?'#9b6ef3':'rgba(20,20,19,0.04)', border:`1px solid ${picks.includes(t)?'#9b6ef3':'rgba(20,20,19,0.08)'}`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                    <span style={{ fontSize:11, fontWeight:900, color:picks.includes(t)?'white':'transparent', fontFamily:SF }}>✓</span>
+                  </div>
                 </div>
               ))}
             </div>
-            {picks.length > 0 && (
-              <div onClick={() => onAnswer(picks.join(' · '))}
-                style={{ display:'inline-flex', alignItems:'center', gap:5, background:'linear-gradient(135deg,#9b6ef3,#7b4fd4)', borderRadius:99, padding:'7px 16px', cursor:'pointer', boxShadow:'0 2px 8px rgba(120,70,220,0.28)' }}>
-                <span style={{ fontSize:12.5, fontWeight:700, color:'white', fontFamily:SF }}>Done  →</span>
+            {needsProgressiveReveal && !expanded && (
+              <div style={{ display:'flex', justifyContent:'flex-start', paddingTop:8 }}>
+                <div onClick={() => setExpanded(true)} style={{ display:'inline-flex', alignItems:'center', gap:6, background:'rgba(20,20,19,0.045)', border:'1px solid rgba(20,20,19,0.06)', borderRadius:99, padding:'7px 10px', cursor:'pointer' }}>
+                  <span style={{ fontSize:11, fontWeight:700, color:'rgba(20,20,19,0.58)', fontFamily:SF }}>Show all {options.length}</span>
+                  <span style={{ fontSize:11, fontWeight:800, color:'rgba(20,20,19,0.42)', fontFamily:SF }}>↓</span>
+                </div>
               </div>
             )}
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:10, padding:'10px 0 12px', marginTop:8, borderTop:'1px solid rgba(20,20,19,0.05)', background:'linear-gradient(180deg, rgba(255,255,255,0.82), rgba(255,255,255,0.98))' }}>
+              <p style={{ margin:0, fontSize:11, color:'rgba(20,20,19,0.44)', fontFamily:SF }}>{picks.length ? `${picks.length} selected` : 'Pick at least one'}</p>
+              {picks.length > 0 ? (
+                <div onClick={() => onAnswer(picks.join(' · '))}
+                  style={{ display:'inline-flex', alignItems:'center', gap:5, background:'linear-gradient(135deg,#9b6ef3,#7b4fd4)', borderRadius:99, padding:'8px 16px', cursor:'pointer', boxShadow:'0 2px 8px rgba(120,70,220,0.28)' }}>
+                  <span style={{ fontSize:12.5, fontWeight:700, color:'white', fontFamily:SF }}>Done →</span>
+                </div>
+              ) : (
+                <div style={{ display:'inline-flex', alignItems:'center', gap:5, background:'rgba(20,20,19,0.05)', borderRadius:99, padding:'8px 14px', border:'1px solid rgba(20,20,19,0.06)' }}>
+                  <span style={{ fontSize:12, fontWeight:700, color:'rgba(20,20,19,0.28)', fontFamily:SF }}>Done →</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       );
@@ -176,8 +273,9 @@
       }
       const containerWidth = width || 'min(92%, 360px)';
       return (
-        <div style={{ marginLeft:36, width:containerWidth, background:'rgba(255,255,255,0.97)', borderRadius:16, overflow:'hidden', border:'1px solid rgba(20,20,19,0.055)', boxShadow:'0 2px 12px rgba(20,20,19,0.07)', animation:'msgIn 0.28s ease-out' }}>
-          <div style={{ borderLeft:'3px solid #9b6ef3', padding:'11px 13px 13px' }}>
+        <div style={{ marginLeft:36, width:containerWidth, background:'linear-gradient(180deg, rgba(255,255,255,0.99), rgba(252,248,255,0.97))', borderRadius:22, overflow:'hidden', border:'1px solid rgba(124,92,252,0.12)', boxShadow:'0 12px 28px rgba(20,20,19,0.07)', animation:'msgIn 0.28s ease-out', position:'relative' }}>
+          <div style={{ position:'absolute', inset:0, background:'radial-gradient(circle at 88% 14%, rgba(155,110,243,0.10) 0%, transparent 24%), radial-gradient(circle at 10% 100%, rgba(255,229,214,0.35) 0%, transparent 36%)', pointerEvents:'none' }} />
+          <div style={{ borderLeft:'3px solid #9b6ef3', padding:'11px 13px 13px', position:'relative', zIndex:1 }}>
             <p style={{ margin:'0 0 10px', fontSize:10, fontWeight:700, color:'rgba(20,20,19,0.35)', fontFamily:SF, letterSpacing:'0.6px', textTransform:'uppercase' }}>{label || 'How intense does it feel?'}</p>
             <div style={{ display:'flex', gap:6 }}>
               {opts.map(o => {
@@ -207,6 +305,54 @@
             </div>
             {/* intensity bar */}
             <div style={{ marginTop:8, height:3, borderRadius:99, background:'linear-gradient(to right, #4ade80, #a3e635, #facc15, #fb923c, #f87171)', opacity: sel ? 1 : 0.25, transition:'opacity 0.3s' }} />
+          </div>
+        </div>
+      );
+    }
+
+    function ChoiceWidget({ options, label, onAnswer, answered, SF, helper }) {
+      const [sel, setSel] = useState(null);
+      const twoCol = options.length >= 4;
+      if (answered) return (
+        <div style={{ marginLeft:36, display:'inline-flex', alignItems:'center', gap:6, background:'rgba(130,90,220,0.09)', borderRadius:99, padding:'5px 13px', border:'1px solid rgba(130,90,220,0.18)', animation:'msgIn 0.25s ease-out' }}>
+          <span style={{ fontSize:12, color:'rgba(110,65,200,0.9)', fontFamily:SF, fontWeight:700 }}>✓ {answered}</span>
+        </div>
+      );
+      return (
+        <div style={{ marginLeft:36, maxWidth:'82%', background:'linear-gradient(180deg, rgba(255,255,255,0.99), rgba(252,248,255,0.97))', borderRadius:24, overflow:'hidden', border:'1px solid rgba(124,92,252,0.14)', boxShadow:'0 14px 32px rgba(20,20,19,0.07)', animation:'msgIn 0.28s ease-out', position:'relative' }}>
+          <div style={{ position:'absolute', inset:0, background:'radial-gradient(circle at 88% 14%, rgba(155,110,243,0.12) 0%, transparent 22%), radial-gradient(circle at 10% 100%, rgba(255,229,214,0.45) 0%, transparent 36%)', pointerEvents:'none' }} />
+          <div style={{ padding:'12px', position:'relative', zIndex:1 }}>
+            <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:4 }}>
+              <div style={{ width:7, height:7, borderRadius:'50%', background:'linear-gradient(135deg,#9b6ef3,#7b4fd4)', boxShadow:'0 0 0 4px rgba(155,110,243,0.10)' }} />
+              <p style={{ margin:0, fontSize:10.5, fontWeight:800, color:'#7b4fd4', fontFamily:SF, letterSpacing:'0.7px', textTransform:'uppercase' }}>{label || 'Choose one'}</p>
+            </div>
+            {helper && <p style={{ margin:'0 0 10px', fontSize:10, color:'rgba(20,20,19,0.42)', fontFamily:SF, lineHeight:1.35 }}>{helper}</p>}
+            <div style={{ display:'grid', gridTemplateColumns: twoCol ? 'repeat(2, minmax(0, 1fr))' : '1fr', gap:8, background:'rgba(255,255,255,0.68)', border:'1px solid rgba(20,20,19,0.05)', borderRadius:18, padding:8, boxShadow:'inset 0 1px 0 rgba(255,255,255,0.6)' }}>
+              {options.map(o => (
+                <div
+                  key={o}
+                  onClick={() => { setSel(o); setTimeout(() => onAnswer(o), 220); }}
+                  style={{
+                    minHeight:46,
+                    padding:'10px 12px',
+                    borderRadius:16,
+                    border:`1.5px solid ${sel===o ? '#9b6ef3' : 'rgba(20,20,19,0.08)'}`,
+                    background: sel===o ? 'linear-gradient(135deg,#9b6ef3,#7b4fd4)' : 'rgba(248,248,252,0.92)',
+                    cursor:'pointer',
+                    transition:'all 0.15s',
+                    display:'flex',
+                    alignItems:'center',
+                    justifyContent:'space-between',
+                    gap:10,
+                  }}
+                >
+                  <span style={{ fontSize:12, fontWeight:700, color:sel===o ? 'white' : 'rgba(20,20,19,0.72)', fontFamily:SF, lineHeight:1.25 }}>{o}</span>
+                  <div style={{ width:18, height:18, borderRadius:9, background:sel===o ? 'rgba(255,255,255,0.18)' : 'rgba(20,20,19,0.04)', border:`1px solid ${sel===o ? 'rgba(255,255,255,0.16)' : 'rgba(20,20,19,0.08)'}`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                    <span style={{ fontSize:11, fontWeight:900, color:sel===o ? 'white' : 'transparent', fontFamily:SF }}>✓</span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       );
@@ -254,14 +400,21 @@
 
     function TherapistMatchWidget({ matches, SF }) {
       const [requested, setRequested] = useState(null);
+      const [requestMeta, setRequestMeta] = useState(null);
       const APPROACH_LABEL = { structured:'Structured & tools', exploratory:'Open & exploratory', balanced:'Mixed approach' };
       const APPROACH_COLOR = { structured:'#3b82f6', exploratory:'#7c3aed', balanced:'#059669' };
       return (
-        <div style={{ marginLeft:36, maxWidth:'92%', display:'flex', flexDirection:'column', gap:10, animation:'msgIn 0.28s ease-out' }}>
+        <div style={{ marginLeft:36, width:'calc(100% - 36px)', display:'flex', flexDirection:'column', gap:8, animation:'msgIn 0.28s ease-out' }}>
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:10 }}>
+            <span style={{ fontSize:10, fontWeight:800, color:'rgba(20,20,19,0.34)', fontFamily:SF, letterSpacing:'0.55px', textTransform:'uppercase' }}>Top matches</span>
+            <span style={{ fontSize:10, fontWeight:700, color:'rgba(111,94,255,0.72)', fontFamily:SF }}>Swipe across</span>
+          </div>
+          <div style={{ display:'flex', gap:12, overflowX:'auto', paddingRight:18, paddingBottom:6, scrollSnapType:'x proximity', scrollPaddingLeft:0, scrollbarWidth:'none', msOverflowStyle:'none' }}>
           {matches.map((t, idx) => (
-            <div key={t.id} style={{ borderRadius:16, border:`1.5px solid ${requested===t.id ? '#9b6ef3' : 'rgba(20,20,19,0.08)'}`, overflow:'hidden', boxShadow:'0 2px 12px rgba(20,20,19,0.07)', background: requested===t.id ? 'rgba(155,110,243,0.03)' : 'white', transition:'all 0.2s' }}>
+            <div key={t.id} style={{ width:304, minWidth:304, borderRadius:22, border:`1.5px solid ${requested===t.id ? '#9b6ef3' : idx === 0 ? `${t.color}35` : 'rgba(20,20,19,0.08)'}`, overflow:'hidden', boxShadow:idx === 0 ? `0 18px 40px ${t.color}22` : '0 10px 26px rgba(20,20,19,0.07)', background:idx === 0 ? `linear-gradient(160deg, ${t.color}36 0%, rgba(255,255,255,0.96) 28%, rgba(255,255,255,0.98) 100%)` : `linear-gradient(160deg, ${t.color}20 0%, rgba(255,255,255,0.97) 30%, rgba(255,255,255,0.98) 100%)`, transition:'all 0.2s', flexShrink:0, scrollSnapAlign:'start', position:'relative' }}>
+              <div style={{ position:'absolute', inset:0, background:idx === 0 ? `radial-gradient(circle at 82% 16%, ${t.color}22 0%, transparent 28%), radial-gradient(circle at 16% 100%, rgba(255,255,255,0.90) 0%, transparent 42%)` : `radial-gradient(circle at 82% 16%, ${t.color}14 0%, transparent 25%), radial-gradient(circle at 16% 100%, rgba(255,255,255,0.86) 0%, transparent 40%)`, pointerEvents:'none' }} />
               {/* Avatar + name + badge */}
-              <div style={{ padding:'12px 14px 8px', display:'flex', alignItems:'center', gap:11 }}>
+              <div style={{ padding:'12px 14px 8px', display:'flex', alignItems:'center', gap:11, position:'relative', zIndex:1 }}>
                 <div style={{ width:44, height:44, borderRadius:22, background:t.color, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, boxShadow:`0 2px 10px ${t.color}55` }}>
                   <span style={{ fontSize:15, fontWeight:800, color:'white', fontFamily:SF }}>{t.initials}</span>
                 </div>
@@ -278,12 +431,12 @@
                 </div>
               </div>
               {/* Bio */}
-              <div style={{ padding:'0 14px 9px' }}>
-                <p style={{ margin:0, fontSize:11.5, color:'rgba(20,20,19,0.60)', fontFamily:SF, lineHeight:1.45 }}>{t.bio}</p>
+              <div style={{ padding:'0 14px 8px', position:'relative', zIndex:1 }}>
+                <p style={{ margin:0, fontSize:11, color:'rgba(20,20,19,0.58)', fontFamily:SF, lineHeight:1.4, display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden' }}>{THERAPIST_FIT_LINE(t)}</p>
               </div>
               {/* Specialty + approach tags */}
-              <div style={{ padding:'0 14px 10px', display:'flex', flexWrap:'wrap', gap:5 }}>
-                {t.specializations.slice(0, 3).map(spec => (
+              <div style={{ padding:'0 14px 10px', display:'flex', flexWrap:'wrap', gap:5, position:'relative', zIndex:1 }}>
+                {t.specializations.slice(0, 2).map(spec => (
                   <div key={spec} style={{ background:'rgba(124,92,252,0.08)', borderRadius:99, padding:'3px 9px', border:'1px solid rgba(124,92,252,0.16)' }}>
                     <span style={{ fontSize:10, fontWeight:700, color:'#7c5cfc', fontFamily:SF, textTransform:'capitalize' }}>{spec}</span>
                   </div>
@@ -293,19 +446,40 @@
                 </div>
               </div>
               {/* Footer: availability + CTA */}
-              <div style={{ padding:'9px 14px 12px', borderTop:'1px solid rgba(20,20,19,0.05)', display:'flex', alignItems:'center', justifyContent:'space-between', gap:8 }}>
-                <div>
-                  <p style={{ margin:0, fontSize:10, color:'rgba(20,20,19,0.44)', fontFamily:SF }}><span style={{ color:'#22c55e', fontWeight:700 }}>●</span> {t.availability}</p>
-                  <p style={{ margin:'2px 0 0', fontSize:10, color:'rgba(20,20,19,0.34)', fontFamily:SF }}>Estimated wait: {t.wait}</p>
+              <div style={{ padding:'9px 14px 12px', borderTop:'1px solid rgba(20,20,19,0.05)', display:'flex', flexDirection:'column', alignItems:'stretch', justifyContent:'space-between', gap:10, position:'relative', zIndex:1 }}>
+                <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
+                  <div style={{ background:'rgba(34,197,94,0.10)', border:'1px solid rgba(34,197,94,0.18)', borderRadius:99, padding:'4px 9px' }}>
+                    <span style={{ fontSize:10, fontWeight:700, color:'#16a34a', fontFamily:SF }}>{t.availability}</span>
+                  </div>
+                  <div style={{ background:'rgba(20,20,19,0.04)', border:'1px solid rgba(20,20,19,0.07)', borderRadius:99, padding:'4px 9px' }}>
+                    <span style={{ fontSize:10, fontWeight:700, color:'rgba(20,20,19,0.58)', fontFamily:SF }}>Wait {t.wait}</span>
+                  </div>
                 </div>
-                <div onClick={() => setRequested(t.id)} style={{ background: requested===t.id ? 'linear-gradient(135deg,#4ade80,#22c55e)' : 'linear-gradient(135deg,#9b6ef3,#7c5cfc)', borderRadius:11, padding:'9px 15px', cursor:'pointer', boxShadow:`0 3px 10px ${requested===t.id ? 'rgba(74,222,128,0.35)' : 'rgba(124,92,252,0.32)'}`, flexShrink:0, transition:'all 0.25s' }}>
+                <div onClick={() => {
+                  setRequested(t.id);
+                  setRequestMeta({ id:t.id, when:'Just now' });
+                }} style={{ background: requested===t.id ? 'linear-gradient(135deg,#4ade80,#22c55e)' : 'linear-gradient(135deg,#9b6ef3,#7c5cfc)', borderRadius:11, padding:'10px 15px', cursor:'pointer', boxShadow:`0 3px 10px ${requested===t.id ? 'rgba(74,222,128,0.35)' : 'rgba(124,92,252,0.32)'}`, flexShrink:0, transition:'all 0.25s', alignSelf:'stretch', display:'flex', justifyContent:'center' }}>
                   <span style={{ fontSize:12, fontWeight:700, color:'white', fontFamily:SF, whiteSpace:'nowrap' }}>
                     {requested===t.id ? '✓ Requested' : 'Request Session'}
                   </span>
                 </div>
               </div>
+              {requested===t.id && (
+                <div style={{ padding:'0 14px 12px' }}>
+                  <div style={{ background:'rgba(34,197,94,0.08)', border:'1px solid rgba(34,197,94,0.18)', borderRadius:12, padding:'10px 12px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:10 }}>
+                    <div style={{ display:'flex', flexDirection:'column', gap:2 }}>
+                      <p style={{ margin:0, fontSize:11.5, fontWeight:800, color:'#16a34a', fontFamily:SF }}>Saved in this chat</p>
+                      <p style={{ margin:0, fontSize:10.5, color:'rgba(20,20,19,0.44)', fontFamily:SF }}>Requested {requestMeta?.when || 'Just now'}</p>
+                    </div>
+                    <div style={{ flexShrink:0, background:'rgba(34,197,94,0.12)', borderRadius:99, padding:'5px 8px', border:'1px solid rgba(34,197,94,0.15)' }}>
+                      <span style={{ fontSize:9.5, fontWeight:800, color:'#16a34a', fontFamily:SF, letterSpacing:'0.3px' }}>TRACKED</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
+          </div>
         </div>
       );
     }
@@ -395,9 +569,12 @@
           setMessages(m => [...m,
             { from:'user', text:`${SCALE_EMOJI[value] || ''} ${value}` },
             { from:'ai', text:`Got it. Have you worked with a therapist or counselor before?` },
+            { type:'widget', _wt:'intake-choice', id:'intake-therapyHistory', intakeField:'therapyHistory',
+              label:'Therapy history',
+              helper:'Choose the closest fit.',
+              options:["Yes, I have","No, this would be my first time","Briefly, once or twice"] },
           ]);
-          setChips(["Yes, I have","No, this would be my first time","Briefly, once or twice"]);
-          pendingIntakeField.current = 'therapyHistory';
+          setChips([]);
         } else if (field === 'therapyHistory') {
           const hadTherapy = value !== "No, this would be my first time";
           if (hadTherapy) {
@@ -431,16 +608,22 @@
           setMessages(m => [...m,
             { from:'user', text: value.split(' · ').join(', ') },
             { from:'ai', text:`Almost there — just a couple of quick preferences. Do you have a gender preference for your therapist?` },
+            { type:'widget', _wt:'intake-choice', id:'intake-genderPref', intakeField:'genderPref',
+              label:'Therapist preference',
+              helper:'Optional, but helpful for matching.',
+              options:["No preference","Woman","Man","Non-binary"] },
           ]);
-          setChips(["No preference","Woman","Man","Non-binary"]);
-          pendingIntakeField.current = 'genderPref';
+          setChips([]);
         } else if (field === 'genderPref') {
           setMessages(m => [...m,
             { from:'user', text: value },
             { from:'ai', text:`And what kind of therapy style feels right for you?` },
+            { type:'widget', _wt:'intake-choice', id:'intake-approachPref', intakeField:'approachPref',
+              label:'Therapy style',
+              helper:'Pick the one that feels most natural.',
+              options:["Structured & practical (CBT / tools)","Open & exploratory (just talk)","A mix of both","Not sure"] },
           ]);
-          setChips(["Structured & practical (CBT / tools)","Open & exploratory (just talk)","A mix of both","Not sure"]);
-          pendingIntakeField.current = 'approachPref';
+          setChips([]);
         } else if (field === 'approachPref') {
           const matches = matchTherapists({ ...updated });
           setMessages(m => [...m,
@@ -453,10 +636,8 @@
       };
 
       const AI_AVATAR = (
-        <div style={{ width:26, height:26, borderRadius:13, background:'linear-gradient(145deg,#c4a8f8,#9b72e8)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginBottom:2, boxShadow:'0 2px 8px rgba(140,100,220,0.32)' }}>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.27 2 8.5 2 5.41 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.08C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.41 22 8.5c0 3.77-3.4 6.86-8.55 11.53L12 21.35z" fill="rgba(255,255,255,0.9)" stroke="none"/>
-          </svg>
+        <div style={{ width:26, height:26, borderRadius:13, background:'radial-gradient(circle at 35% 30%, #ffffff 0%, #d8c7ff 20%, #8f7cff 52%, #5bcdf6 100%)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginBottom:2, boxShadow:'0 4px 12px rgba(111,95,255,0.22)' }}>
+          <div style={{ width:8, height:8, borderRadius:'50%', background:'rgba(255,255,255,0.95)', filter:'blur(0.2px)' }} />
         </div>
       );
 
@@ -584,9 +765,9 @@
             ...m,
             { from:'ai', text: resp.text },
             ...widgetMsg,
-            ...(resp.resources || []).map(res => {
+            ...(resp.resources || []).map((res, idx) => {
               const resKey = Object.entries(R).find(([,v]) => v === res)?.[0];
-              return { type:'resource', res, resKey };
+              return { type:'resource', res, resKey, priorityIndex: idx };
             }),
           ]);
           setChips(resp.chips);
@@ -628,16 +809,24 @@
       };
 
       const ID = 'Inter Display,sans-serif';
+      const activeWidget = [...messages].reverse().find(msg => msg.type === 'widget' && !widgetAnswers[msg.id]);
+      const visibleChips = activeWidget ? [] : chips.slice(0, 4);
       return (
         <div
-          style={{ position:'absolute', inset:0, zIndex:400, display:'flex', flexDirection:'column', overflow:'hidden', background:'white' }}
+          style={{ position:'absolute', inset:0, zIndex:400, display:'flex', flexDirection:'column', overflow:'hidden', background:'linear-gradient(180deg, #fffdfa 0%, #ffffff 32%, #ffffff 100%)' }}
           onMouseDown={e => e.stopPropagation()}
           onMouseUp={e => e.stopPropagation()}
           onTouchStart={e => e.stopPropagation()}
           onTouchEnd={e => e.stopPropagation()}
         >
+          <div style={{ position:'absolute', inset:0, pointerEvents:'none', overflow:'hidden' }}>
+            <div style={{ position:'absolute', top:82, left:'-10%', width:230, height:230, borderRadius:'50%', background:'radial-gradient(circle, rgba(255,214,173,0.28) 0%, rgba(255,214,173,0) 72%)', filter:'blur(18px)' }} />
+            <div style={{ position:'absolute', top:126, right:'-6%', width:210, height:210, borderRadius:'50%', background:'radial-gradient(circle, rgba(203,234,255,0.26) 0%, rgba(203,234,255,0) 70%)', filter:'blur(20px)' }} />
+            <div style={{ position:'absolute', top:210, left:'28%', width:180, height:180, borderRadius:'50%', background:'radial-gradient(circle, rgba(239,191,255,0.18) 0%, rgba(239,191,255,0) 72%)', filter:'blur(24px)' }} />
+          </div>
+
           {/* Header — solid white bg so orb disappears cleanly behind it when scrolled */}
-          <div style={{ position:'relative', zIndex:15, flexShrink:0, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'52px 20px 12px', background:'white' }}>
+          <div style={{ position:'relative', zIndex:15, flexShrink:0, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'52px 20px 12px', background:'linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,255,255,0.86))', backdropFilter:'blur(14px)', WebkitBackdropFilter:'blur(14px)' }}>
             <div onClick={onBack} style={{ background:'white', borderRadius:99, width:34, height:34, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', flexShrink:0, boxShadow:'0 0 0 1px rgba(3,7,18,0.04),0 2px 4px rgba(3,7,18,0.04)' }}>
               <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M7 1L1 7L7 13" stroke="#141413" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
@@ -657,16 +846,16 @@
           </div>
 
           {/* Messages — orb is first child so it scrolls away naturally */}
-          <div ref={messagesRef} style={{ position:'relative', zIndex:2, flex:1, overflowY:'auto', display:'flex', flexDirection:'column', gap:4, paddingTop:0, paddingLeft:0, paddingRight:0, background:'white' }}>
+          <div ref={messagesRef} style={{ position:'relative', zIndex:2, flex:1, overflowY:'auto', display:'flex', flexDirection:'column', gap:4, paddingTop:0, paddingLeft:0, paddingRight:0, background:'transparent' }}>
 
             {/* Orb section — scrolls with content, disappears as conversation grows */}
-            <div style={{ flexShrink:0, position:'relative', height:220, overflow:'hidden', pointerEvents:'none', background:'white' }}>
+            <div style={{ flexShrink:0, position:'relative', height:176, overflow:'hidden', pointerEvents:'none', background:'transparent' }}>
               {/* Pattern centered on orb ball (ball center ≈ 98px from section top) */}
-              <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%) translateY(-20px)', width:342.922, height:335 }}>
+              <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%) translateY(-24px)', width:318, height:310, opacity:0.82 }}>
                 <img alt="" src={imgAiPattern} style={{ width:'100%', height:'100%', display:'block' }} />
               </div>
               {/* Orb 155px wrapper — horizontally centered */}
-              <div style={{ position:'absolute', top:10, left:'calc(50% - 77.5px)', width:155, height:155 }}>
+              <div style={{ position:'absolute', top:0, left:'calc(50% - 68px)', width:136, height:136 }}>
                 <div style={{ position:'absolute', top:18.5, left:18.5, width:117.5, height:117.5, borderRadius:58.75, background:'rgba(255,255,255,0.72)', border:'2px solid rgba(255,255,255,0.5)', boxShadow:'0 64px 250px 0 #ef8c5a, 0 24px 54px 0 rgba(255,255,255,0.10), 0 3px 120px 0 #ccebff', overflow:'hidden' }}>
                   <div style={{ position:'absolute', top:-1.24, left:-1.24, width:115.984, height:115.984, background:'rgba(255,255,255,0.28)' }} />
                   <div style={{ position:'absolute', top:22, left:8, width:102.242, height:75.127, overflow:'visible' }}>
@@ -678,39 +867,48 @@
                 </div>
               </div>
               {/* Fade to white at bottom */}
-              <div style={{ position:'absolute', bottom:0, left:0, right:0, height:90, background:'linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.9) 60%, white 90%)' }} />
+              <div style={{ position:'absolute', bottom:0, left:0, right:0, height:84, background:'linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.92) 58%, white 88%)' }} />
             </div>
 
             <div style={{ paddingLeft:20, paddingRight:20, display:'flex', flexDirection:'column', gap:4 }}>
             {messages.map((msg, i) => {
+              if (msg.type === 'resource' && messages[i-1]?.type === 'resource') return null;
               const prevFrom = i > 0 ? messages[i-1].from : null;
               const nextMsg = messages[i+1];
               const isLastInGroup = !nextMsg || nextMsg.from !== msg.from || nextMsg.type === 'resource';
               const isFirstInGroup = prevFrom !== msg.from;
               const gap = (msg.type === 'resource' || (prevFrom && messages[i-1]?.type === 'resource')) ? 3 : (isFirstInGroup ? 14 : 4);
+              const railItems = msg.type === 'resource'
+                ? (() => {
+                    const items = [];
+                    for (let j = i; j < messages.length; j += 1) {
+                      if (messages[j]?.type !== 'resource') break;
+                      items.push(messages[j]);
+                    }
+                    return items;
+                  })()
+                : [];
               return (
                 <div key={i} style={{ display:'flex', flexDirection:'column', alignItems: msg.from==='user' ? 'flex-end' : 'flex-start', marginTop: gap, animation:'msgIn 0.28s ease-out both' }}>
                   {msg.from === 'ai' && (
-                    <div style={{ display:'flex', flexDirection:'column', gap:6, maxWidth:'88%' }}>
-                      {isFirstInGroup && (
-                        <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                          {/* Brutalism X logo — inline SVG, never expires */}
-                          <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink:0 }}>
-                            <rect width="21" height="21" rx="5" fill="#7C5CFC"/>
-                            <path d="M6 6L15 15M15 6L6 15" stroke="white" strokeWidth="2.2" strokeLinecap="round"/>
-                          </svg>
-                          <span style={{ fontSize:14, fontWeight:500, color:'#0d0d12', fontFamily:ID, letterSpacing:-0.14, lineHeight:1.25 }}>Answer</span>
-                        </div>
-                      )}
-                      <p style={{ margin:0, fontSize:12, lineHeight:1.4, color:'#37394a', fontFamily:SF, fontWeight:500 }}>{msg.text}</p>
+                    <div style={{ display:'flex', alignItems:'flex-start', gap:10, maxWidth:'88%' }}>
+                      {isFirstInGroup ? AI_AVATAR : <div style={{ width:26, flexShrink:0 }} />}
+                      <div style={{ background:'linear-gradient(180deg, rgba(255,255,255,0.98), rgba(252,248,255,0.95))', borderRadius:24, padding:'11px 13px 12px', boxShadow:'0 1px 2px rgba(3,7,18,0.03), 0 10px 22px rgba(20,20,19,0.05)', border:'1px solid rgba(124,92,252,0.10)', maxWidth:'100%' }}>
+                        {isFirstInGroup && (
+                          <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:6 }}>
+                            <span style={{ fontSize:10.5, fontWeight:800, color:'#6f5eff', fontFamily:ID, letterSpacing:'0.35px', lineHeight:1, textTransform:'uppercase' }}>Guide</span>
+                          </div>
+                        )}
+                        <p style={{ margin:0, fontSize:12.5, lineHeight:1.52, color:'#37394a', fontFamily:SF, fontWeight:500 }}>{msg.text}</p>
+                      </div>
                     </div>
                   )}
                   {msg.from === 'user' && (
-                    <div style={{ display:'flex', alignItems:'flex-end', paddingRight:8 }}>
-                      <div style={{ background:'white', borderRadius:16, padding:10, boxShadow:'0 0 0 1px rgba(3,7,18,0.04),0 1px 3px rgba(3,7,18,0.03)', maxWidth:257, marginRight:-8, overflow:'hidden', flexShrink:0 }}>
-                        <p style={{ margin:0, fontSize:12, lineHeight:1.25, color:'#0d0d12', fontFamily:ID }}>{msg.text}</p>
+                    <div style={{ display:'flex', alignItems:'flex-end', paddingRight:4 }}>
+                      <div style={{ background:'linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,252,0.96))', borderRadius:24, padding:'11px 14px', boxShadow:'0 1px 2px rgba(3,7,18,0.03),0 8px 18px rgba(20,20,19,0.04)', border:'1px solid rgba(20,20,19,0.05)', maxWidth:262, marginRight:-6, overflow:'hidden', flexShrink:0 }}>
+                        <p style={{ margin:0, fontSize:12.5, lineHeight:1.38, color:'#0d0d12', fontFamily:ID }}>{msg.text}</p>
                       </div>
-                      <div style={{ width:12.5, height:9.652, flexShrink:0, marginRight:-8, marginBottom:6 }}>
+                      <div style={{ width:12.5, height:9.652, flexShrink:0, marginRight:-6, marginBottom:8 }}>
                         {/* Speech bubble tail — inline SVG */}
                         <svg width="13" height="10" viewBox="0 0 13 10" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display:'block', width:'100%', height:'100%' }}>
                           <path d="M0.5 9.652 C3.5 9.652 12.5 9.652 12.5 1 L12.5 9.652 Z" fill="white"/>
@@ -718,9 +916,10 @@
                       </div>
                     </div>
                   )}
-                  {msg.type === 'resource' && <ResourceCard res={msg.res} SF={SF} onBook={BOOKABLE_KEYS.has(msg.res?._key) ? startIntakeInline : null} />}
+            {msg.type === 'resource' && <ResourceRail resources={railItems} SF={SF} onBook={startIntakeInline} />}
                   {msg.type === 'widget' && (
                     msg._wt === 'intake-tags'     ? <TagWidget     options={msg.options} label={msg.label} answered={widgetAnswers[msg.id]} onAnswer={v => advanceIntake(msg.intakeField, v)} SF={SF} /> :
+                    msg._wt === 'intake-choice'   ? <ChoiceWidget  options={msg.options} label={msg.label} helper={msg.helper} answered={widgetAnswers[msg.id]} onAnswer={v => advanceIntake(msg.intakeField, v)} SF={SF} /> :
                     msg._wt === 'intake-duration' ? <DurationWidget answered={widgetAnswers[msg.id]} onAnswer={v => advanceIntake('duration', v)} SF={SF} /> :
                     msg._wt === 'intake-severity' ? <ScaleWidget    label="How intense does it feel on a typical day?" answered={widgetAnswers[msg.id]} onAnswer={v => advanceIntake('severity', v)} SF={SF} /> :
                     msg._wt === 'intake-match'    ? <TherapistMatchWidget matches={msg.matches} SF={SF} /> :
@@ -734,18 +933,18 @@
 
             {/* Typing indicator */}
             {typing && (
-              <div style={{ display:'flex', flexDirection:'column', gap:6, marginTop:14, alignSelf:'flex-start', maxWidth:'88%' }}>
-                <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                  <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink:0 }}>
-                    <rect width="21" height="21" rx="5" fill="#7C5CFC"/>
-                    <path d="M6 6L15 15M15 6L6 15" stroke="white" strokeWidth="2.2" strokeLinecap="round"/>
-                  </svg>
-                  <span style={{ fontSize:14, fontWeight:500, color:'#0d0d12', fontFamily:ID, letterSpacing:-0.14 }}>Answer</span>
-                </div>
-                <div style={{ display:'flex', gap:4, alignItems:'center', paddingLeft:2 }}>
-                  {[0, 0.2, 0.4].map(d => (
-                    <div key={d} style={{ width:5, height:5, borderRadius:'50%', background:'rgba(55,57,74,0.4)', animation:`typingDot 1s ease-in-out ${d}s infinite` }} />
-                  ))}
+              <div style={{ display:'flex', alignItems:'flex-start', gap:10, marginTop:14, alignSelf:'flex-start', maxWidth:'88%' }}>
+                {AI_AVATAR}
+                <div style={{ background:'linear-gradient(180deg, rgba(255,255,255,0.98), rgba(252,248,255,0.95))', borderRadius:24, padding:'11px 13px 12px', boxShadow:'0 1px 2px rgba(3,7,18,0.03), 0 10px 22px rgba(20,20,19,0.05)', border:'1px solid rgba(124,92,252,0.10)' }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:6 }}>
+                    <span style={{ fontSize:10.5, fontWeight:800, color:'#6f5eff', fontFamily:ID, letterSpacing:'0.35px', lineHeight:1, textTransform:'uppercase' }}>Guide</span>
+                    <span style={{ fontSize:10.5, fontWeight:600, color:'rgba(20,20,19,0.34)', fontFamily:SF, lineHeight:1 }}>thinking…</span>
+                  </div>
+                  <div style={{ display:'flex', gap:4, alignItems:'center' }}>
+                    {[0, 0.2, 0.4].map(d => (
+                      <div key={d} style={{ width:6, height:6, borderRadius:'50%', background:'rgba(111,94,255,0.48)', animation:`typingDot 1s ease-in-out ${d}s infinite` }} />
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
@@ -754,38 +953,48 @@
           </div>
 
           {/* Chips + input panel */}
-          <div style={{ position:'relative', zIndex:3, flexShrink:0, background:'white' }}>
-            <div style={{ padding:'10px 16px 0', display:'flex', gap:6, overflowX:'auto' }}>
-              {chips.map(s => (
-                <div key={s} onClick={() => sendMessage(s)} style={{ background:'white', border:'1px solid rgba(0,0,0,0.08)', borderRadius:99, padding:'6px 13px', cursor:'pointer', flexShrink:0, boxShadow:'0 1px 3px rgba(0,0,0,0.04)' }}>
-                  <span style={{ color:'rgba(20,20,19,0.65)', fontSize:12, fontFamily:SF, fontWeight:600, whiteSpace:'nowrap' }}>{s}</span>
+          <div style={{ position:'relative', zIndex:3, flexShrink:0, background:'linear-gradient(180deg, rgba(255,255,255,0.40), rgba(255,255,255,0.95) 22%, rgba(255,255,255,1) 56%)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)' }}>
+            {visibleChips.length > 0 && (
+              <div style={{ padding:'6px 18px 0', display:'flex', alignItems:'center', justifyContent:'space-between', gap:10 }}>
+                <span style={{ fontSize:10, fontWeight:800, color:'rgba(20,20,19,0.34)', fontFamily:SF, letterSpacing:'0.55px', textTransform:'uppercase' }}>Suggested replies</span>
+                <span style={{ fontSize:10, fontWeight:700, color:'rgba(111,94,255,0.72)', fontFamily:SF }}>Tap to answer faster</span>
+              </div>
+            )}
+            <div style={{ padding:'8px 16px 0', display:'flex', gap:8, overflowX:'auto' }}>
+              {visibleChips.map(s => (
+                <div key={s} onClick={() => sendMessage(s)} style={{ background:'rgba(255,255,255,0.92)', border:'1px solid rgba(20,20,19,0.07)', borderRadius:99, padding:'8px 14px', cursor:'pointer', flexShrink:0, boxShadow:'0 1px 3px rgba(0,0,0,0.035)', display:'inline-flex', alignItems:'center', gap:7 }}>
+                  <div style={{ width:6, height:6, borderRadius:'50%', background:'linear-gradient(135deg,#9b6ef3,#7b4fd4)' }} />
+                  <span style={{ color:'rgba(20,20,19,0.68)', fontSize:11.5, fontFamily:SF, fontWeight:600, whiteSpace:'nowrap' }}>{s}</span>
                 </div>
               ))}
             </div>
-            <div style={{ padding:'8px 18px 34px', display:'flex', alignItems:'center', gap:8 }}>
-              <div style={{ flex:1, background:'white', borderRadius:8, padding:'9px 12px', boxShadow:'0 0 0 1px rgba(3,7,18,0.04),0 1px 3px rgba(3,7,18,0.03)', display:'flex', alignItems:'center', border:'none' }}>
+            <div style={{ padding:'10px 16px 24px', display:'flex', alignItems:'flex-end', gap:8 }}>
+              <div style={{ width:36, height:36, borderRadius:18, background:'rgba(255,255,255,0.96)', boxShadow:'0 0 0 1px rgba(3,7,18,0.04),0 10px 18px rgba(3,7,18,0.05)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, cursor:'pointer' }}>
+                <span style={{ fontSize:19, lineHeight:1, color:'rgba(20,20,19,0.72)', fontFamily:SF, marginTop:-2 }}>+</span>
+              </div>
+              <div style={{ flex:1, background:'linear-gradient(180deg, rgba(255,255,255,0.98), rgba(252,252,255,0.96))', borderRadius:24, padding:'10px 12px 10px 14px', boxShadow:'0 0 0 1px rgba(3,7,18,0.04),0 12px 28px rgba(3,7,18,0.07)', display:'flex', alignItems:'flex-end', gap:10, border:'1px solid rgba(255,255,255,0.8)' }}>
                 <textarea
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={e => { if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
                   placeholder="Ask me anything..."
                   rows={1}
-                  style={{ display:'block', width:'100%', border:'none', outline:'none', background:'transparent', fontFamily:ID, fontSize:12, color:'#0d0d12', resize:'none', lineHeight:1.2, maxHeight:88, overflowY:'auto' }}
+                  style={{ display:'block', width:'100%', border:'none', outline:'none', background:'transparent', fontFamily:ID, fontSize:12.5, color:'#0d0d12', resize:'none', lineHeight:1.28, maxHeight:88, overflowY:'auto', paddingTop:2 }}
                 />
-              </div>
-              <div style={{ width:28, height:28, borderRadius:99, background:'#f6f8fa', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, cursor:'pointer', boxShadow:'0 0 0 0.7px rgba(3,7,18,0.06),0 8px 16px rgba(3,7,18,0.08)' }}>
-                {/* Mic icon — inline SVG */}
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect x="4.5" y="1" width="5" height="7" rx="2.5" fill="#141413"/>
-                  <path d="M2 7a5 5 0 0 0 10 0" stroke="#141413" strokeWidth="1.4" strokeLinecap="round"/>
-                  <line x1="7" y1="12" x2="7" y2="14" stroke="#141413" strokeWidth="1.4" strokeLinecap="round"/>
-                </svg>
-              </div>
-              <div onClick={() => sendMessage()} style={{ width:28, height:28, borderRadius:24, background:'#0d0d12', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, cursor:'pointer', boxShadow:'0 0 0 0.7px rgba(3,7,18,0.06),0 8px 16px rgba(3,7,18,0.08)' }}>
-                {/* Send icon — inline SVG arrow */}
-                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M1.5 11.5L11.5 1.5M11.5 1.5H4.5M11.5 1.5V8.5" stroke="white" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
+                <div style={{ display:'flex', alignItems:'center', gap:8, flexShrink:0 }}>
+                  <div style={{ width:32, height:32, borderRadius:16, background:'rgba(20,20,19,0.045)', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}>
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="4.5" y="1" width="5" height="7" rx="2.5" fill="#141413"/>
+                      <path d="M2 7a5 5 0 0 0 10 0" stroke="#141413" strokeWidth="1.4" strokeLinecap="round"/>
+                      <line x1="7" y1="12" x2="7" y2="14" stroke="#141413" strokeWidth="1.4" strokeLinecap="round"/>
+                    </svg>
+                  </div>
+                  <div onClick={() => sendMessage()} style={{ width:34, height:34, borderRadius:17, background:'#0d0d12', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', boxShadow:'0 12px 24px rgba(13,13,18,0.22)' }}>
+                    <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M1.5 11.5L11.5 1.5M11.5 1.5H4.5M11.5 1.5V8.5" stroke="white" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -803,4 +1012,3 @@
         </div>
       );
     }
-

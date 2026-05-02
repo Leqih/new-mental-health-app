@@ -19,6 +19,28 @@
     const imgLogEllipse1  = 'https://www.figma.com/api/mcp/asset/5790a353-34d1-411f-853c-5721dfaff6ee';
     const imgLogEllipse5  = 'https://www.figma.com/api/mcp/asset/dd6c9513-a1f5-4ab6-8b9e-38f73b4f0561';
     const imgLogBubble    = 'https://www.figma.com/api/mcp/asset/eb936309-40c6-42b3-8daa-3d2dc138e749';
+    /* Log Mood page exact Figma mood nodes */
+    const imgLogGoodBody       = 'https://www.figma.com/api/mcp/asset/39d87076-5812-4c51-a38e-4d983da33722';
+    const imgLogGoodHighlight  = 'https://www.figma.com/api/mcp/asset/7d39f7a3-20b6-4b78-b4cb-054cec08e06b';
+    const imgLogSadBody        = 'https://www.figma.com/api/mcp/asset/1759fe8a-29c7-4118-96d9-6175f135a3ad';
+    const imgLogAngryBody      = 'https://www.figma.com/api/mcp/asset/b754a07a-c752-4564-8767-6d9e914e8e50';
+    const imgLogAngryFace      = 'https://www.figma.com/api/mcp/asset/15249f1a-b70f-4377-b7d0-b46e80bacfc7';
+    const imgLogAngryMouth     = 'https://www.figma.com/api/mcp/asset/d32aeb75-01f0-4eb0-ad13-056ada5c85b3';
+    const imgLogExhaustedBody  = 'https://www.figma.com/api/mcp/asset/a9f55ff4-dce1-459c-9df1-8322f2447d2b';
+    const imgLogExhaustedEyeA  = 'https://www.figma.com/api/mcp/asset/b6730bc6-7223-42c8-a7c8-9d22a9a86452';
+    const imgLogExhaustedEyeB  = 'https://www.figma.com/api/mcp/asset/d876ed3f-375e-4327-a582-df3497a0c957';
+    const imgLogExhaustedMthA  = 'https://www.figma.com/api/mcp/asset/81f9fe6a-4ed6-40f5-be5b-e0a3ec660508';
+    const imgLogExhaustedMthB  = 'https://www.figma.com/api/mcp/asset/6099ba23-674c-45b1-b6e3-39591b3d4ca9';
+    const imgLogAnxiousBody    = 'https://www.figma.com/api/mcp/asset/1bebb429-6a25-4c36-bd96-e56b6d4cd869';
+    const imgLogAnxiousFace    = 'https://www.figma.com/api/mcp/asset/7ec07da7-3427-4f2c-9b4c-a96ceff3a350';
+    const imgLogHappyBody      = 'https://www.figma.com/api/mcp/asset/03fb8391-ef9f-4fb5-b1bb-e0a8242d15da';
+    const imgLogHappyEyeL      = 'https://www.figma.com/api/mcp/asset/9eafb21a-4f56-4447-8894-a2fa5bfa3344';
+    const imgLogHappyEyeR      = 'https://www.figma.com/api/mcp/asset/7675101f-4e0a-44fc-b01b-8df5a410d04c';
+    const imgLogHappyMouth     = 'https://www.figma.com/api/mcp/asset/8cc9a0ab-13f8-49fa-a152-61924b3f791d';
+    const imgLogGratefulBody   = 'https://www.figma.com/api/mcp/asset/6d8750aa-c338-40f4-aca5-a76f94789116';
+    const imgLogGratefulMouth  = 'https://www.figma.com/api/mcp/asset/4665c6d3-a643-4fa5-922e-e62b4b71cfae';
+    const imgLogGratefulEyeL   = 'https://www.figma.com/api/mcp/asset/20fbb3cb-45d7-4117-ab49-aed967cc758e';
+    const imgLogGratefulEyeR   = 'https://www.figma.com/api/mcp/asset/52989d6f-61bf-4f2b-954a-49f4fc49a2a6';
     /* Good mood (node 52-340) – refreshed 2026-05-01 */
     const imgGoodChar     = 'https://www.figma.com/api/mcp/asset/22680cba-6ca8-4ee6-adfe-ee9eac16e64b';
     const imgGoodFace     = 'https://www.figma.com/api/mcp/asset/fbb42262-19c1-445e-84a3-d170d9441f0c';
@@ -48,11 +70,13 @@
     const imgExhaustedEyeB= 'https://www.figma.com/api/mcp/asset/e3d09b1b-a3bb-452d-9a5e-3834d6a70fee'; // X-eye stroke 2
     const imgExhaustedMthA= 'https://www.figma.com/api/mcp/asset/a3ca156f-bdfa-4858-bfa8-027db80a5730'; // wavy mouth left
     const imgExhaustedMthB= 'https://www.figma.com/api/mcp/asset/33266ffd-2fef-4106-8f34-8f41542cf5c7'; // wavy mouth right
-    /* Boring mood (node 56-60) – fresh URLs */
-    const imgBoringChar1  = 'https://www.figma.com/api/mcp/asset/186eeb73-8cd4-4c23-a6c2-88b092faeff1'; // body blob fill (slices 1+3)
-    const imgBoringChar2  = 'https://www.figma.com/api/mcp/asset/87a4a9f4-bcf9-46c9-a83b-e982b89973a2'; // body blob highlight (slices 2+4)
-    const imgBoringMthA   = 'https://www.figma.com/api/mcp/asset/c5843b11-010a-43df-92d7-a92dddecd5e2'; // mouth frown line
-    const imgBoringMthB   = 'https://www.figma.com/api/mcp/asset/10796ac7-43e5-48e3-9284-625390f98358'; // mouth accent curve
+    /* Boring mood (node 56-60) – refreshed 2026-05-01 */
+    const imgBoringChar1  = 'https://www.figma.com/api/mcp/asset/f2fb9c09-de10-434e-8fcb-7918149d6d6b'; // body slice A (1+3)
+    const imgBoringChar2  = 'https://www.figma.com/api/mcp/asset/ff8c8510-5b23-4928-8d60-f9ce3de044a9'; // body slice B (2+4)
+    const imgBoringEyeL   = 'https://www.figma.com/api/mcp/asset/7841e5c3-420c-46f4-9315-db99fae9322b';
+    const imgBoringEyeR   = 'https://www.figma.com/api/mcp/asset/8db05fb5-3dae-40fb-b89d-e5c1a08266fd';
+    const imgBoringMthA   = 'https://www.figma.com/api/mcp/asset/309a7b2d-2620-4891-a357-9ae157fae78b'; // mouth line
+    const imgBoringMthB   = 'https://www.figma.com/api/mcp/asset/7441948b-cdf3-4743-9674-f93100d1d218'; // mouth accent curve
     /* Calm Mode card (node 30-2147) – fresh URLs */
     const imgMesshu       = 'https://www.figma.com/api/mcp/asset/5a332c7d-7d8e-42e2-aea9-681e6326d905';
     const imgHourglass    = 'https://www.figma.com/api/mcp/asset/82c4a6f8-649d-45e5-b608-6372f1ba9c5e';
@@ -167,3 +191,85 @@
       const h = new Date().getHours();
       return h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
     }
+
+    window.buildFigmaMoodIconHTML = (moodLabel) => {
+      const s = String(moodLabel || '').toLowerCase();
+      const shell = (inner) => `<div style="position:relative;width:100%;height:100%;display:block;">${inner}</div>`;
+      const img = (src, style) => `<img alt="" src="${src}" style="position:absolute;display:block;max-width:none;${style}">`;
+
+      if (s === 'good') {
+        return shell(
+          img(imgGoodChar, 'inset:0;width:100%;height:100%;') +
+          `<div style="position:absolute;left:33.8%;top:45.6%;width:32.1%;height:19.5%;clip-path:inset(43% 0 0 0);overflow:hidden;">${img(imgGoodFace, 'inset:0;width:100%;height:100%;')}</div>` +
+          `<div style="position:absolute;left:33.8%;top:45.6%;width:32.1%;height:19.5%;clip-path:inset(0 0 57% 0);overflow:hidden;">${img(imgGoodFace, 'inset:0;width:100%;height:100%;')}</div>`
+        );
+      }
+
+      if (s === 'sad') {
+        return shell(
+          img(imgLogSadBody, 'inset:0;width:100%;height:100%;') +
+          `<div style="position:absolute;left:28.6%;top:46.34%;width:7.32%;height:3.83%;border-radius:999px;background:#58c2ff;"></div>` +
+          `<div style="position:absolute;left:63.76%;top:46.34%;width:7.32%;height:3.83%;border-radius:999px;background:#58c2ff;"></div>`
+        );
+      }
+
+      if (s === 'happy' || s === 'excited') {
+        return shell(
+          img(imgLogHappyBody, 'inset:0;width:100%;height:100%;') +
+          `<div style="position:absolute;top:35.54%;right:56.79%;bottom:55.75%;left:36.24%;overflow:visible;"><div style="position:absolute;top:-30%;right:-28.63%;bottom:-30%;left:-37.51%;">${img(imgLogHappyEyeL, 'inset:0;width:100%;height:100%;')}</div></div>` +
+          `<div style="position:absolute;top:35.54%;right:36.24%;bottom:55.75%;left:56.79%;overflow:visible;"><div style="position:absolute;top:-30%;right:-28.63%;bottom:-30%;left:-37.51%;transform:scaleX(-1);">${img(imgLogHappyEyeR, 'inset:0;width:100%;height:100%;')}</div></div>` +
+          `<div style="position:absolute;top:46.34%;right:43.9%;bottom:45.47%;left:44.25%;overflow:visible;"><div style="position:absolute;top:-25.53%;right:-13.01%;bottom:-25.53%;left:-13.01%;">${img(imgLogHappyMouth, 'inset:0;width:100%;height:100%;')}</div></div>`
+        );
+      }
+
+      if (s === 'grateful') {
+        return shell(
+          img(imgLogGratefulBody, 'left:1.28%;right:1.28%;top:0;bottom:0;width:97.44%;height:100%;') +
+          `<div style="position:absolute;top:48.58%;right:41.18%;bottom:42.2%;left:40.83%;">${img(imgLogGratefulMouth, 'inset:0;width:100%;height:100%;transform:rotate(180deg) scaleX(-1);')}</div>` +
+          `<div style="position:absolute;top:35.82%;right:52.25%;bottom:52.84%;left:36.68%;">${img(imgLogGratefulEyeL, 'inset:0;width:100%;height:100%;')}</div>` +
+          `<div style="position:absolute;top:37.59%;right:39.1%;bottom:53.55%;left:53.98%;overflow:visible;"><div style="position:absolute;top:-30%;right:-28.63%;bottom:-30%;left:-37.51%;transform:scaleX(-1);">${img(imgLogGratefulEyeR, 'inset:0;width:100%;height:100%;')}</div></div>`
+        );
+      }
+
+      if (s === 'angry') {
+        return shell(
+          img(imgLogAngryBody, 'inset:0;width:100%;height:100%;') +
+          `<div style="position:absolute;top:32.18%;right:35.6%;bottom:52.35%;left:35.89%;overflow:visible;"><div style="position:absolute;top:-7.92%;right:-12.22%;bottom:0;left:-12.22%;">${img(imgLogAngryFace, 'inset:0;width:100%;height:100%;')}</div></div>` +
+          `<div style="position:absolute;left:46%;top:48.1%;width:8.36%;height:9.69%;">${img(imgLogAngryMouth, 'inset:0;width:100%;height:100%;')}</div>`
+        );
+      }
+
+      if (s === 'exhausted') {
+        return shell(
+          img(imgLogExhaustedBody, 'inset:0;width:100%;height:100%;') +
+          `<div style="position:absolute;top:34.5%;left:34.5%;right:55.1%;bottom:56.3%;overflow:visible;"><div style="position:absolute;inset:-29.85% -26.67%;">${img(imgLogExhaustedEyeA, 'inset:0;width:100%;height:100%;')}</div></div>` +
+          `<div style="position:absolute;top:34.5%;left:34.5%;right:55.1%;bottom:56.3%;overflow:visible;"><div style="position:absolute;inset:-29.85% -26.67%;transform:rotate(180deg) scaleY(-1);">${img(imgLogExhaustedEyeB, 'inset:0;width:100%;height:100%;')}</div></div>` +
+          `<div style="position:absolute;top:34.5%;left:55.5%;right:34.1%;bottom:56.3%;overflow:visible;"><div style="position:absolute;inset:-29.85% -26.67%;">${img(imgLogExhaustedEyeA, 'inset:0;width:100%;height:100%;')}</div></div>` +
+          `<div style="position:absolute;top:34.5%;left:55.5%;right:34.1%;bottom:56.3%;overflow:visible;"><div style="position:absolute;inset:-29.85% -26.67%;transform:rotate(180deg) scaleY(-1);">${img(imgLogExhaustedEyeB, 'inset:0;width:100%;height:100%;')}</div></div>` +
+          `<div style="position:absolute;top:50.2%;left:36.2%;right:49.8%;bottom:45.6%;overflow:visible;"><div style="position:absolute;top:-52.64%;right:-15.87%;bottom:-52.64%;left:-15.88%;">${img(imgLogExhaustedMthA, 'inset:0;width:100%;height:100%;')}</div></div>` +
+          `<div style="position:absolute;top:50.2%;left:50.2%;right:35.9%;bottom:45.6%;overflow:visible;"><div style="position:absolute;top:-52.64%;right:-15.87%;bottom:-52.64%;left:-15.88%;transform:rotate(180deg) scaleY(-1);">${img(imgLogExhaustedMthB, 'inset:0;width:100%;height:100%;')}</div></div>`
+        );
+      }
+
+      if (s === 'boring') {
+        return shell(
+          img(imgBoringChar1, 'top:0;bottom:0;left:0;right:75%;width:25%;height:100%;') +
+          img(imgBoringChar2, 'top:0;bottom:0;left:24.99%;right:50%;width:25.01%;height:100%;') +
+          img(imgBoringChar1, 'top:0;bottom:0;left:50%;right:24.99%;width:25.01%;height:100%;') +
+          img(imgBoringChar2, 'top:0;bottom:0;left:75%;right:0;width:25%;height:100%;') +
+          `<div style="position:absolute;top:41.96%;left:40.07%;right:54.25%;bottom:56.37%;overflow:visible;"><div style="position:absolute;top:-7.5px;right:-44.12%;bottom:-7.5px;left:-44.12%;">${img(imgBoringEyeL, 'inset:0;width:100%;height:100%;')}</div></div>` +
+          `<div style="position:absolute;top:41.96%;left:56.79%;right:37.52%;bottom:56.37%;overflow:visible;"><div style="position:absolute;top:-7.5px;right:-44.12%;bottom:-7.5px;left:-44.12%;">${img(imgBoringEyeR, 'inset:0;width:100%;height:100%;')}</div></div>` +
+          `<div style="position:absolute;top:50.35%;left:42.86%;right:44.6%;bottom:48.25%;overflow:visible;"><div style="position:absolute;top:-187.5%;right:-20.84%;bottom:-187.55%;left:-20.84%;">${img(imgBoringMthA, 'inset:0;width:100%;height:100%;')}</div></div>` +
+          `<div style="position:absolute;top:48.6%;left:57.84%;right:40.42%;bottom:44.76%;overflow:visible;"><div style="position:absolute;top:-39.48%;right:-150.04%;bottom:-39.48%;left:-150%;">${img(imgBoringMthB, 'inset:0;width:100%;height:100%;')}</div></div>`
+        );
+      }
+
+      if (s === 'anxious') {
+        return shell(
+          img(imgLogAnxiousBody, 'inset:0;width:100%;height:100%;') +
+          `<div style="position:absolute;left:0;top:0;width:26.1%;height:32.1%;">${img(imgLogAnxiousFace, 'inset:0;width:100%;height:100%;')}</div>`
+        );
+      }
+
+      return shell(img(imgLogCloudChar, 'inset:0;width:100%;height:100%;'));
+    };

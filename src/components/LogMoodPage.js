@@ -29,14 +29,14 @@
     /* ── Mood-specific CSS gradients — pastel, S≈25% L≈91% ──
        Mixed ~50% toward white for bright airy feel. A→B→C→B→A loop. */
     const MOOD_CARD_GRADIENT = {
-      Good:      'linear-gradient(135deg, #C0EAC8, #CEEEA8, #E0F0A8, #CEEEA8, #C0EAC8)',
-      Happy:     'linear-gradient(135deg, #F8EDB8, #F8D8B8, #F8CCB8, #F8D8B8, #F8EDB8)',
-      Grateful:  'linear-gradient(135deg, #F8DEBB, #F8C4C4, #EEB8CC, #F8C4C4, #F8DEBB)',
-      Sad:       'linear-gradient(135deg, #BCCEF6, #CAC4F0, #D8B8EA, #CAC4F0, #BCCEF6)',
-      Anxious:   'linear-gradient(135deg, #F4C8D8, #E4C0EC, #CEC0F6, #E4C0EC, #F4C8D8)',
-      Angry:     'linear-gradient(135deg, #F4BCBC, #F4D4B8, #F4EAB8, #F4D4B8, #F4BCBC)',
-      Exhausted: 'linear-gradient(135deg, #D8BEF0, #C0C0EC, #BAD0EC, #C0C0EC, #D8BEF0)',
-      Boring:    'linear-gradient(135deg, #C8EAE6, #C8DCEE, #D4D8EE, #C8DCEE, #C8EAE6)',
+      Good:      'linear-gradient(135deg, #C8F0B4, #BDEB9A, #AEE17D, #BDEB9A, #C8F0B4)',
+      Happy:     'linear-gradient(135deg, #FFF1A6, #FFE783, #FFD85A, #FFE783, #FFF1A6)',
+      Grateful:  'linear-gradient(135deg, #F9E0B6, #F7C985, #EEA34E, #F7C985, #F9E0B6)',
+      Sad:       'linear-gradient(135deg, #CFE9FB, #B9DCF7, #9FD0F2, #B9DCF7, #CFE9FB)',
+      Anxious:   'linear-gradient(135deg, #FFD7E7, #FFB7D3, #F58AB3, #FFB7D3, #FFD7E7)',
+      Angry:     'linear-gradient(135deg, #FFD5D0, #FFAAA0, #FF7D6D, #FFAAA0, #FFD5D0)',
+      Exhausted: 'linear-gradient(135deg, #E6D4FA, #D0B7F1, #B391E5, #D0B7F1, #E6D4FA)',
+      Boring:    'linear-gradient(135deg, #CFF3F0, #AEEAE5, #7ED9D0, #AEEAE5, #CFF3F0)',
     };
 
     /* ── Inject CSS keyframes once for the animated gradient ── */
@@ -201,7 +201,7 @@
       /* ── Per-mood helpers ── */
       const moodBgFilter = (id) =>
         id==='Grateful'  ? 'hue-rotate(-200deg) saturate(1.1) brightness(1.1)'  :
-        id==='Happy'     ? 'hue-rotate(-180deg) saturate(1.1) brightness(1.12)' :
+        id==='Happy'     ? 'hue-rotate(-180deg) saturate(1.12) brightness(0.98)' :
         id==='Good'      ? 'hue-rotate(-120deg) saturate(1.3) brightness(1.15)' :
         id==='Sad'       ? 'hue-rotate(0deg)'   :
         id==='Angry'     ? 'hue-rotate(140deg) saturate(1.4) brightness(1.05)' :
@@ -211,7 +211,7 @@
 
       /* Solid fallback color — always opaque even if images fail to load */
       const moodBgColor = (id) =>
-        id==='Grateful'  ? '#fde4c0' : id==='Happy'    ? '#fef5a0' :
+        id==='Grateful'  ? '#fde4c0' : id==='Happy'    ? '#f2de69' :
         id==='Good'      ? '#aadf6a' : id==='Sad'      ? '#c2e4f5' :
         id==='Angry'     ? '#ffd0d0' : id==='Boring'   ? '#c0ecea' :
         id==='Anxious'   ? '#ffd0e8' : '#d8c8f5';
@@ -221,7 +221,15 @@
               mh = moodId==='Happy', mgr = moodId==='Grateful',
               man = moodId==='Angry', mex = moodId==='Exhausted', mbr = moodId==='Boring',
               max = moodId==='Anxious';
-        const charSrc = ms ? imgSadChar : moodCharSrc(moodId);
+        const charSrc = mg ? imgGoodChar
+          : ms ? imgLogSadBody
+          : mh ? imgLogHappyBody
+          : mgr ? imgLogGratefulBody
+          : man ? imgLogAngryBody
+          : mex ? imgLogExhaustedBody
+          : max ? imgLogAnxiousBody
+          : mbr ? ''
+          : moodCharSrc(moodId);
         const ci = mh ? imgHappyChar : mgr ? imgGratefulChar : mg ? imgGoodChar :
                    man ? imgAngryChar : mex ? imgExhaustedChar : mbr ? '' : max ? imgAnxiousChar : imgLogCloudChar;
         const cf = mg || mh || mgr || man || mex || mbr || max ? 'none' : !ms ? 'saturate(0.2) brightness(0.85) hue-rotate(250deg)' : 'none';
@@ -278,7 +286,7 @@
             {/* Character */}
             <div style={{ position:'absolute', left:'50%', marginLeft:-143.5, top: mgr ? 220 : man ? 215 : mh ? 205 : 195, width:287, height:287 }}>
               <div style={{ position:'relative', width:'100%', height:'100%', filter:cf, animation:ca }}>
-                <img alt="" style={{ position:'absolute', display:'block', inset:0, maxWidth:'none', width:'100%', height:'100%' }} src={charSrc} onError={e=>e.target.style.display='none'} />
+                {charSrc && <img alt="" style={{ position:'absolute', display:'block', inset:0, maxWidth:'none', width:'100%', height:'100%' }} src={charSrc} onError={e=>e.target.style.display='none'} />}
                 {mbr && <>
                   <img alt="" style={{ position:'absolute', top:0, bottom:0, left:0, right:'75%', width:'25%', height:'100%', display:'block' }} src={imgBoringChar1} onError={e=>e.target.style.display='none'} />
                   <img alt="" style={{ position:'absolute', top:0, bottom:0, left:'24.99%', right:'50%', width:'25.01%', height:'100%', display:'block' }} src={imgBoringChar2} onError={e=>e.target.style.display='none'} />
@@ -286,11 +294,10 @@
                   <img alt="" style={{ position:'absolute', top:0, bottom:0, left:'75%', right:0, width:'25%', height:'100%', display:'block' }} src={imgBoringChar2} onError={e=>e.target.style.display='none'} />
                 </>}
                 {mg && <>
-                  {/* Mouth layer — static, full height so smile isn't clipped */}
+                  {/* Good face overlay from Figma */}
                   <div style={{ position:'absolute', height:56, left:97, top:131, width:92, clipPath:'inset(43% 0 0 0)' }}>
                     <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgGoodFace} onError={e=>e.target.style.display='none'} />
                   </div>
-                  {/* Eyes layer — blinks, top portion only */}
                   <div style={{ position:'absolute', height:56, left:97, top:131, width:92, clipPath:'inset(0 0 57% 0)',
                     transformOrigin:'center top', animation:'faceBlink 4s ease-in-out 0.5s infinite' }}>
                     <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgGoodFace} onError={e=>e.target.style.display='none'} />
@@ -300,114 +307,126 @@
                   {/* Left eye */}
                   <div style={{ position:'absolute', top:'35.54%', right:'56.79%', bottom:'55.75%', left:'36.24%', overflow:'visible' }}>
                     <div style={{ position:'absolute', top:'-30%', right:'-28.63%', bottom:'-30%', left:'-37.51%' }}>
-                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgHappyFaceL} onError={e=>e.target.style.display='none'} />
+                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgLogHappyEyeL} onError={e=>e.target.style.display='none'} />
                     </div>
                   </div>
                   {/* Right eye – mirrored */}
                   <div style={{ position:'absolute', top:'35.54%', right:'36.24%', bottom:'55.75%', left:'56.79%', overflow:'visible' }}>
                     <div style={{ position:'absolute', top:'-30%', right:'-28.63%', bottom:'-30%', left:'-37.51%', transform:'scaleX(-1)' }}>
-                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgHappyFaceR} onError={e=>e.target.style.display='none'} />
+                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgLogHappyEyeR} onError={e=>e.target.style.display='none'} />
                     </div>
                   </div>
                   {/* Mouth */}
                   <div style={{ position:'absolute', top:'46.34%', right:'43.9%', bottom:'45.47%', left:'44.25%', overflow:'visible' }}>
                     <div style={{ position:'absolute', top:'-25.53%', right:'-13.01%', bottom:'-25.53%', left:'-13.01%' }}>
-                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgHappyFaceM} onError={e=>e.target.style.display='none'} />
+                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgLogHappyMouth} onError={e=>e.target.style.display='none'} />
                     </div>
                   </div>
                 </>}
                 {mgr && <>
                   {/* Open eye (left) */}
                   <div style={{ position:'absolute', top:'35.82%', right:'52.25%', bottom:'52.84%', left:'36.68%' }}>
-                    <img alt="" style={{ position:'absolute', display:'block', inset:0, width:'100%', height:'100%' }} src={imgGratefulFaceB} onError={e=>e.target.style.display='none'} />
+                    <img alt="" style={{ position:'absolute', display:'block', inset:0, width:'100%', height:'100%' }} src={imgLogGratefulEyeL} onError={e=>e.target.style.display='none'} />
                   </div>
                   {/* Winking eye (right, mirrored) */}
                   <div style={{ position:'absolute', top:'37.59%', right:'39.1%', bottom:'53.55%', left:'53.98%', overflow:'visible' }}>
                     <div style={{ position:'absolute', top:'-30%', right:'-28.63%', bottom:'-30%', left:'-37.51%', transform:'scaleX(-1)' }}>
-                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgGratefulFaceC} onError={e=>e.target.style.display='none'} />
+                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgLogGratefulEyeR} onError={e=>e.target.style.display='none'} />
                     </div>
                   </div>
                   {/* Mouth (rotated 180° + mirrored) */}
                   <div style={{ position:'absolute', top:'48.58%', right:'41.18%', bottom:'42.2%', left:'40.83%' }}>
-                    <img alt="" style={{ position:'absolute', display:'block', inset:0, width:'100%', height:'100%', transform:'rotate(180deg) scaleX(-1)' }} src={imgGratefulFaceA} onError={e=>e.target.style.display='none'} />
+                    <img alt="" style={{ position:'absolute', display:'block', inset:0, width:'100%', height:'100%', transform:'rotate(180deg) scaleX(-1)' }} src={imgLogGratefulMouth} onError={e=>e.target.style.display='none'} />
                   </div>
                 </>}
                 {man && <>
                   {/* Angry eyebrows */}
                   <div style={{ position:'absolute', top:'32.18%', right:'35.6%', bottom:'52.35%', left:'35.89%', overflow:'visible' }}>
                     <div style={{ position:'absolute', top:'-7.92%', right:'-12.22%', bottom:'0%', left:'-12.22%' }}>
-                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgAngryFaceA} onError={e=>e.target.style.display='none'} />
+                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgLogAngryFace} onError={e=>e.target.style.display='none'} />
                     </div>
                   </div>
                   {/* Angry nose/mouth */}
-                  <div style={{ position:'absolute', top:'48.1%', right:'45.6%', bottom:'42.2%', left:'46.0%' }}>
-                    <img alt="" style={{ position:'absolute', display:'block', inset:0, width:'100%', height:'100%' }} src={imgAngryFaceB} onError={e=>e.target.style.display='none'} />
+                  <div style={{ position:'absolute', left:132, top:139, width:24, height:28 }}>
+                    <img alt="" style={{ position:'absolute', display:'block', inset:0, width:'100%', height:'100%' }} src={imgLogAngryMouth} onError={e=>e.target.style.display='none'} />
                   </div>
                 </>}
                 {mex && <>
                   {/* Left X-eye – stroke A */}
                   <div style={{ position:'absolute', top:'34.5%', left:'34.5%', right:'55.1%', bottom:'56.3%', overflow:'visible' }}>
                     <div style={{ position:'absolute', inset:'-29.85% -26.67%' }}>
-                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgExhaustedEyeA} onError={e=>e.target.style.display='none'} />
+                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgLogExhaustedEyeA} onError={e=>e.target.style.display='none'} />
                     </div>
                   </div>
                   {/* Left X-eye – stroke B */}
                   <div style={{ position:'absolute', top:'34.5%', left:'34.5%', right:'55.1%', bottom:'56.3%', overflow:'visible' }}>
                     <div style={{ position:'absolute', inset:'-29.85% -26.67%', transform:'rotate(180deg) scaleY(-1)' }}>
-                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgExhaustedEyeB} onError={e=>e.target.style.display='none'} />
+                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgLogExhaustedEyeB} onError={e=>e.target.style.display='none'} />
                     </div>
                   </div>
                   {/* Right X-eye – stroke A */}
                   <div style={{ position:'absolute', top:'34.5%', left:'55.5%', right:'34.1%', bottom:'56.3%', overflow:'visible' }}>
                     <div style={{ position:'absolute', inset:'-29.85% -26.67%' }}>
-                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgExhaustedEyeA} onError={e=>e.target.style.display='none'} />
+                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgLogExhaustedEyeA} onError={e=>e.target.style.display='none'} />
                     </div>
                   </div>
                   {/* Right X-eye – stroke B */}
                   <div style={{ position:'absolute', top:'34.5%', left:'55.5%', right:'34.1%', bottom:'56.3%', overflow:'visible' }}>
                     <div style={{ position:'absolute', inset:'-29.85% -26.67%', transform:'rotate(180deg) scaleY(-1)' }}>
-                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgExhaustedEyeB} onError={e=>e.target.style.display='none'} />
+                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgLogExhaustedEyeB} onError={e=>e.target.style.display='none'} />
                     </div>
                   </div>
                   {/* Wavy mouth – left half */}
                   <div style={{ position:'absolute', top:'50.2%', left:'36.2%', right:'49.8%', bottom:'45.6%', overflow:'visible' }}>
                     <div style={{ position:'absolute', top:'-52.64%', right:'-15.87%', bottom:'-52.64%', left:'-15.88%' }}>
-                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgExhaustedMthA} onError={e=>e.target.style.display='none'} />
+                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgLogExhaustedMthA} onError={e=>e.target.style.display='none'} />
                     </div>
                   </div>
                   {/* Wavy mouth – right half */}
                   <div style={{ position:'absolute', top:'50.2%', left:'50.2%', right:'35.9%', bottom:'45.6%', overflow:'visible' }}>
                     <div style={{ position:'absolute', top:'-52.64%', right:'-15.87%', bottom:'-52.64%', left:'-15.88%', transform:'rotate(180deg) scaleY(-1)' }}>
-                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgExhaustedMthB} onError={e=>e.target.style.display='none'} />
+                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgLogExhaustedMthB} onError={e=>e.target.style.display='none'} />
                     </div>
                   </div>
                 </>}
                 {mbr && <>
-                  {/* Left eye — Vector 21.svg inline, exact Figma coords */}
-                  <svg style={{ position:'absolute', left:108, top:113, width:31, height:20, overflow:'visible' }} viewBox="0 0 32 20" fill="none">
-                    <path d="M7.50195 12.2736L23.8186 7.50196" stroke="black" strokeWidth="15" strokeLinecap="round"/>
-                  </svg>
-                  {/* Right eye — Vector 32.svg inline, exact Figma coords */}
-                  <svg style={{ position:'absolute', left:156, top:113, width:31, height:20, overflow:'visible' }} viewBox="0 0 32 20" fill="none">
-                    <path d="M23.8186 12.2736L7.50199 7.50196" stroke="black" strokeWidth="15" strokeLinecap="round"/>
-                  </svg>
-                  {/* Mouth frown line — exact Figma coords */}
-                  <div style={{ position:'absolute', left:116, top:137, width:51, height:19 }}>
-                    <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgBoringMthA} onError={e=>e.target.style.display='none'} />
+                  {/* Left eye */}
+                  <div style={{ position:'absolute', top:'41.96%', left:'40.07%', right:'54.25%', bottom:'56.37%', overflow:'visible' }}>
+                    <div style={{ position:'absolute', top:-7.5, right:'-44.12%', bottom:-7.5, left:'-44.12%' }}>
+                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgBoringEyeL} onError={e=>e.target.style.display='none'} />
+                    </div>
                   </div>
-                  {/* Mouth accent blob — exact Figma coords */}
-                  <div style={{ position:'absolute', left:159, top:132, width:20, height:34 }}>
-                    <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgBoringMthB} onError={e=>e.target.style.display='none'} />
+                  {/* Right eye */}
+                  <div style={{ position:'absolute', top:'41.96%', left:'56.79%', right:'37.52%', bottom:'56.37%', overflow:'visible' }}>
+                    <div style={{ position:'absolute', top:-7.5, right:'-44.12%', bottom:-7.5, left:'-44.12%' }}>
+                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgBoringEyeR} onError={e=>e.target.style.display='none'} />
+                    </div>
+                  </div>
+                  {/* Mouth line */}
+                  <div style={{ position:'absolute', top:'50.35%', left:'42.86%', right:'44.6%', bottom:'48.25%', overflow:'visible' }}>
+                    <div style={{ position:'absolute', top:'-187.5%', right:'-20.84%', bottom:'-187.55%', left:'-20.84%' }}>
+                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgBoringMthA} onError={e=>e.target.style.display='none'} />
+                    </div>
+                  </div>
+                  {/* Mouth accent */}
+                  <div style={{ position:'absolute', top:'48.6%', left:'57.84%', right:'40.42%', bottom:'44.76%', overflow:'visible' }}>
+                    <div style={{ position:'absolute', top:'-39.48%', right:'-150.04%', bottom:'-39.48%', left:'-150%' }}>
+                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgBoringMthB} onError={e=>e.target.style.display='none'} />
+                    </div>
                   </div>
                 </>}
                 {!mg && !mh && !mgr && ec && <>
                   <div style={{ position:'absolute', background:ec, height:11, left:183, borderRadius:20, top:133, width:21, transform:`scaleY(${esy})`, transformOrigin:'center', animation:'eyeIdle 4s ease-in-out 0.3s infinite' }} />
                   <div style={{ position:'absolute', background:ec, height:11, left:82,  borderRadius:20, top:133, width:21, transform:`scaleY(${esy})`, transformOrigin:'center', animation:'eyeIdle 4s ease-in-out 0.5s infinite' }} />
                 </>}
+                {ms && <>
+                  <div style={{ position:'absolute', background:'#58c2ff', height:11, left:82, top:133, width:21, borderRadius:20 }} />
+                  <div style={{ position:'absolute', background:'#58c2ff', height:11, left:183, top:133, width:21, borderRadius:20 }} />
+                </>}
                 {max && <>
                   {/* Face overlay (eyes + mouth + sweat drop) from Figma node 52:397 */}
-                  <div style={{ position:'absolute', left:0, top:0, width:'26.1%', height:'32.1%' }}>
-                    <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgAnxiousFace} onError={e=>e.target.style.display='none'} />
+                  <div style={{ position:'absolute', left:0, top:0, width:75, height:92 }}>
+                    <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgLogAnxiousFace} onError={e=>e.target.style.display='none'} />
                   </div>
                 </>}
               </div>

@@ -118,7 +118,7 @@
     /* ── TODAY PHYSICS CARD ── */
     const moodCharSrc = m => `data:image/svg+xml,${encodeURIComponent(moodCharSVG(m))}`;
 
-    const buildIconHTML = (moodLabel) => moodCharSVG(moodLabel);
+    const buildIconHTML = (moodLabel) => window.buildIconHTML ? window.buildIconHTML(moodLabel) : moodCharSVG(moodLabel);
 
     function TodayPhysicsCard({ dateStr, moods, onMoodClick }) {
       const containerRef = useRef(null);
@@ -240,4 +240,3 @@
         </div>
       );
     }
-

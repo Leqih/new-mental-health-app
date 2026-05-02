@@ -199,16 +199,16 @@
         return _cloud('#e8f5ff','#70c0f0',`<circle cx="42" cy="58" r="4" fill="#1a1a3a"/><circle cx="60" cy="58" r="4" fill="#1a1a3a"/><path d="M40 70 Q51 63 62 70" stroke="#1a1a3a" stroke-width="2.8" fill="none" stroke-linecap="round"/><ellipse cx="38" cy="66" rx="2.2" ry="3.5" fill="#50b8f0" opacity="0.85"/>`);
       };
       window.moodCharSrc = m => `data:image/svg+xml,${encodeURIComponent(window.moodCharSVG(m))}`;
-      window.buildIconHTML = m => window.moodCharSVG(m);
+      window.buildIconHTML = m => window.buildFigmaMoodIconHTML ? window.buildFigmaMoodIconHTML(m) : window.moodCharSVG(m);
     })();
   </script>
   <script type="text/babel" src="src/components/LogMoodPage.js?v=15"></script>
-  <script type="text/babel" src="src/components/WeeklyBubbles.js"></script>
-  <script type="text/babel" src="src/components/StatsPage.js"></script>
+  <script type="text/babel" src="src/components/WeeklyBubbles.js?v=17"></script>
+  <script type="text/babel" src="src/components/StatsPage.js?v=17"></script>
   <script type="text/babel" src="src/components/MoodSheets.js"></script>
   <script type="text/babel" src="src/components/ProfilePage.js"></script>
   <script type="text/babel" src="src/components/CanvasOrbs.js"></script>
-  <script type="text/babel" src="src/components/TypeChatPage.js"></script>
+  <script type="text/babel" src="src/components/TypeChatPage.js?v=26"></script>
   <script type="text/babel" src="src/components/SupportPage.js"></script>
   <script type="text/babel" src="src/components/BottomNav.js"></script>
   <script type="text/babel" src="src/App.js"></script>

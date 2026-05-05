@@ -151,7 +151,7 @@
             width: '100%',
             height: '100dvh',
             display: 'flex',
-            alignItems: 'center',
+            alignItems: isDesktopPreview ? 'center' : 'flex-start',
             justifyContent: 'center',
             overflow: 'hidden',
             background: '#ddd7ce',

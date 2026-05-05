@@ -143,15 +143,15 @@
             (viewport.width - horizontalInset * 2) / FRAME_W,
             (viewport.height - verticalInset * 2) / FRAME_H
           )
-        : Math.min(1, viewport.width / FRAME_W);
+        : Math.min(viewport.width / FRAME_W, viewport.height / FRAME_H);
 
       return (
         <>
           <div style={{
             width: '100%',
-            minHeight: '100dvh',
+            height: '100dvh',
             display: 'flex',
-            alignItems: isDesktopPreview ? 'center' : 'flex-start',
+            alignItems: 'center',
             justifyContent: 'center',
             overflow: 'hidden',
             background: '#ddd7ce',

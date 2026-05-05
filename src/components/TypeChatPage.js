@@ -213,58 +213,35 @@
     function ResourceCard({ res, SF, onBook, priorityIndex = 0, horizontal = false }) {
       const canBook = onBook && res._key && BOOKABLE_KEYS.has(res._key);
       const hasCall = !!res.phone;
-      const primaryLabel = canBook ? 'Start Matching' : (hasCall ? 'Call now' : (RESOURCE_ACTION_COPY[res._key] || 'Explore'));
-      const secondaryLabel = canBook && hasCall ? 'Call instead' : (canBook ? 'Request in chat' : (hasCall ? res.phone : 'Self-guided'));
-      const actionEnabled = canBook || hasCall;
-      const descriptor = canBook ? (res._key === 'letsTalk' ? 'Consult Session' : 'Counseling Center') : hasCall ? 'Support Line' : 'Support Resource';
+      const primaryLabel = canBook ? 'Start matching' : (hasCall ? 'Call now' : (RESOURCE_ACTION_COPY[res._key] || 'Explore'));
       const heroLabel = res._key === 'caps' ? 'Illinois Counseling Center' : res.title;
-      const heroSub = res._key === 'caps' ? '*/ilcounseling' : canBook ? '*/booksupport' : (hasCall ? 'Immediate support' : 'Resource match');
-      const handlePrimaryAction = () => {
+      const CARD_GRADIENTS = {
+        caps:        'linear-gradient(155deg, #7864fc 0%, #a084ff 42%, #f5b8a0 100%)',
+        letsTalk:    'linear-gradient(155deg, #5b8dff 0%, #90b4ff 48%, #d8edff 100%)',
+        crisis988:   'linear-gradient(155deg, #ff6060 0%, #ff9880 52%, #ffd4b0 100%)',
+        crisisText:  'linear-gradient(155deg, #ff7070 0%, #ffaa88 52%, #ffe0c8 100%)',
+        breathe:     'linear-gradient(155deg, #22c77a 0%, #70e0b4 52%, #cdf5e4 100%)',
+      };
+      const cardGrad = CARD_GRADIENTS[res._key] || 'linear-gradient(155deg, #8c6eff 0%, #b8a0ff 50%, #f0d0ff 100%)';
+      const handleAction = () => {
         if (canBook) { onBook(); return; }
         if (hasCall) window.location.href = `tel:${res.phone}`;
       };
       return (
-        <div style={{ marginLeft:horizontal ? 0 : 36, width:horizontal ? 286 : undefined, minWidth:horizontal ? 286 : undefined, maxWidth:horizontal ? 286 : '86%', minHeight:horizontal ? 320 : undefined, background:FIGMA_RESOURCE_GRADIENT, borderRadius:22, overflow:'hidden', border:'2px solid rgba(255,255,255,0.5)', boxShadow:'0 22px 48px rgba(49,71,164,0.16), 0 14px 28px rgba(255,167,135,0.14)', display:'flex', flexDirection:'column', flexShrink:0, scrollSnapAlign:'start', position:'relative' }}>
-          <div style={{ position:'absolute', inset:0, background:'linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.02) 34%, rgba(255,255,255,0) 60%)', pointerEvents:'none' }} />
-          <div style={{ position:'absolute', inset:0, boxShadow:'inset 0 24px 54px rgba(255,255,255,0.10), inset 0 3px 120px rgba(204,235,255,0.38)', pointerEvents:'none' }} />
-          <div style={{ position:'relative', zIndex:1, display:'flex', flexDirection:'column', height:'100%', padding:14 }}>
-            <div style={{ position:'relative', background:FIGMA_HERO_PANEL, borderRadius:20, minHeight:170, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', textAlign:'center', padding:'20px 18px 18px', boxShadow:'inset 0 1px 0 rgba(255,255,255,0.12)' }}>
-              <div style={{ position:'absolute', inset:0, borderRadius:20, background:'linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0) 34%), radial-gradient(circle at 50% 52%, rgba(255,255,255,0.06), rgba(255,255,255,0) 48%)', pointerEvents:'none' }} />
-              <div style={{ position:'absolute', right:12, top:12, width:28, height:28, borderRadius:14, background:'rgba(255,255,255,0.7)', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                <span style={{ fontSize:13, lineHeight:1, color:'#141413', fontFamily:SF }}>↗</span>
-              </div>
-              <div style={{ width:74, height:74, borderRadius:'50%', background:'linear-gradient(180deg, rgba(31,47,112,0.86), rgba(22,37,87,0.92))', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:12, boxShadow:'0 10px 26px rgba(10,14,33,0.22)' }}>
-                <span style={{ fontSize:26, lineHeight:1 }}>{res.icon}</span>
-              </div>
-              <p style={{ margin:0, fontSize:14.5, fontWeight:800, color:'white', fontFamily:SF, lineHeight:1.2 }}>{heroLabel}</p>
-              <p style={{ margin:'3px 0 0', fontSize:10.5, fontWeight:700, color:'rgba(255,255,255,0.88)', fontFamily:SF, lineHeight:1.2 }}>{heroSub}</p>
-            </div>
-            <div style={{ paddingTop:12, display:'flex', flexDirection:'column', gap:10, flex:1 }}>
-              <div>
-                <p style={{ margin:0, fontSize:12.5, fontWeight:800, color:'white', fontFamily:SF, lineHeight:1.24 }}>{descriptor}</p>
-                <p style={{ margin:'8px 0 0', fontSize:10.5, color:'rgba(255,255,255,0.92)', fontFamily:SF, lineHeight:1.4, display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden' }}>{res.sub}</p>
-              </div>
-              <div style={{ display:'flex', flexWrap:'wrap', gap:7 }}>
-                {(res.tags || []).slice(0, 2).map(tag => (
-                  <div key={tag} style={{ minWidth:75, ...RAIL_WHITE_PILL_STYLE, padding:'8px 16px' }}>
-                    <span style={{ fontSize:12, fontWeight:500, color:'#3c3c3c', fontFamily:SF, lineHeight:1 }}>{tag}</span>
-                  </div>
-                ))}
-              </div>
-              <div style={{ marginTop:'auto', display:'flex', flexDirection:'column', gap:10 }}>
-                <div onClick={actionEnabled ? handlePrimaryAction : undefined} style={{ ...railPrimaryButtonStyle(false), cursor:actionEnabled ? 'pointer' : 'default', opacity:actionEnabled ? 1 : 0.68 }}>
-                  <span style={{ fontSize:12.5, fontWeight:500, color:'white', fontFamily:SF }}>{primaryLabel}</span>
-                  <div style={{ width:23, height:23, borderRadius:'50%', background:'white', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-                    <span style={{ fontSize:12, lineHeight:1, color:'#141413' }}>{canBook ? '→' : hasCall ? '↗' : '→'}</span>
-                  </div>
-                </div>
-                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:8 }}>
-                  <span style={{ fontSize:10.5, color:'rgba(255,255,255,0.82)', fontFamily:SF, lineHeight:1.35 }}>{canBook ? 'Book without leaving chat' : RESOURCE_SHORT_DETAIL(res)}</span>
-                  {secondaryLabel && <span style={{ fontSize:10.5, fontWeight:700, color:'white', fontFamily:SF }}>{secondaryLabel}</span>}
-                </div>
-              </div>
-            </div>
+        <div style={{ marginLeft:horizontal ? 0 : 36, width:horizontal ? 220 : undefined, minWidth:horizontal ? 220 : undefined, maxWidth:horizontal ? 220 : '86%', minHeight:horizontal ? 270 : undefined, background:cardGrad, borderRadius:22, display:'flex', flexDirection:'column', flexShrink:0, scrollSnapAlign:'start', position:'relative', overflow:'hidden', padding:'22px 20px 20px' }}>
+          <div style={{ position:'absolute', inset:0, background:'linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0) 42%)', pointerEvents:'none' }} />
+          <span style={{ position:'absolute', right:14, top:12, fontSize:20, opacity:0.5, lineHeight:1 }}>✦</span>
+          <div style={{ width:50, height:50, borderRadius:15, background:'rgba(255,255,255,0.22)', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:14, flexShrink:0, backdropFilter:'blur(4px)', WebkitBackdropFilter:'blur(4px)' }}>
+            <span style={{ fontSize:23, lineHeight:1 }}>{res.icon}</span>
           </div>
+          <p style={{ margin:'0 0 6px', fontSize:15, fontWeight:800, color:'white', fontFamily:SF, lineHeight:1.2, letterSpacing:'-0.25px' }}>{heroLabel}</p>
+          <p style={{ margin:0, fontSize:11, fontWeight:400, color:'rgba(255,255,255,0.72)', fontFamily:SF, lineHeight:1.5, flex:1, display:'-webkit-box', WebkitLineClamp:3, WebkitBoxOrient:'vertical', overflow:'hidden' }}>{res.sub}</p>
+          {(canBook || hasCall) && (
+            <div onClick={handleAction} style={{ marginTop:16, display:'flex', alignItems:'center', gap:5, cursor:'pointer' }}>
+              <span style={{ fontSize:12, fontWeight:700, color:'white', fontFamily:SF, textDecoration:'underline', textUnderlineOffset:3 }}>{primaryLabel}</span>
+              <span style={{ fontSize:12, color:'rgba(255,255,255,0.70)', lineHeight:1 }}>↗</span>
+            </div>
+          )}
         </div>
       );
     }
@@ -904,72 +881,60 @@
             <span style={{ fontSize:10, fontWeight:700, color:'rgba(111,94,255,0.72)', fontFamily:SF }}>Swipe across</span>
           </div>
           <div style={{ display:'flex', gap:12, overflowX:'auto', paddingRight:18, paddingBottom:6, scrollSnapType:'x mandatory', scrollPaddingLeft:0, scrollbarWidth:'none', msOverflowStyle:'none' }}>
-            {matches.map((t, idx) => (
-              <div key={t.id} style={{ width:292, minWidth:292, minHeight:360, background:FIGMA_RESOURCE_GRADIENT, borderRadius:24, overflow:'hidden', border:`2px solid ${requested===t.id ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.52)'}`, boxShadow:idx === 0 ? '0 28px 62px rgba(49,71,164,0.18), 0 18px 36px rgba(255,167,135,0.17)' : '0 18px 36px rgba(49,71,164,0.12), 0 12px 24px rgba(255,167,135,0.12)', display:'flex', flexDirection:'column', flexShrink:0, scrollSnapAlign:'start', position:'relative', transition:'all 0.2s ease' }}>
-                <div style={{ position:'absolute', inset:0, background:'linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.02) 34%, rgba(255,255,255,0) 60%)', pointerEvents:'none' }} />
-                <div style={{ position:'absolute', inset:0, boxShadow:'inset 0 24px 54px rgba(255,255,255,0.10), inset 0 3px 120px rgba(204,235,255,0.38)', pointerEvents:'none' }} />
-                <div style={{ position:'relative', zIndex:1, display:'flex', flexDirection:'column', height:'100%', padding:13 }}>
-                  <div style={{ position:'relative', background:FIGMA_HERO_PANEL, borderRadius:20, minHeight:154, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', textAlign:'center', padding:'16px 16px 14px', boxShadow:'inset 0 1px 0 rgba(255,255,255,0.12)' }}>
-                    <div style={{ position:'absolute', inset:0, borderRadius:20, background:'linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0) 34%), radial-gradient(circle at 50% 52%, rgba(255,255,255,0.06), rgba(255,255,255,0) 48%)', pointerEvents:'none' }} />
-                    <div style={{ position:'absolute', left:12, top:12, display:'flex', alignItems:'center', gap:8 }}>
-                      <div style={RAIL_SOFT_PILL_STYLE}>
-                        <span style={{ fontSize:10, fontWeight:800, color:'rgba(255,255,255,0.92)', fontFamily:SF, letterSpacing:'0.3px', textTransform:'uppercase' }}>{idx === 0 ? 'Top pick' : 'Match'}</span>
-                      </div>
-                    </div>
-                    <div style={{ position:'absolute', right:12, top:12, ...RAIL_SOFT_PILL_STYLE, padding:'6px 10px' }}>
-                      <span style={{ fontSize:10, fontWeight:800, color:'white', fontFamily:SF }}>{idx === 0 ? 'BEST MATCH' : 'PROFILE'}</span>
-                    </div>
-                    <div style={{ width:60, height:60, borderRadius:'50%', background:'linear-gradient(180deg, rgba(42,58,132,0.72), rgba(18,27,69,0.82))', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:10, boxShadow:'0 8px 20px rgba(10,14,33,0.22)' }}>
-                      <span style={{ fontSize:24, fontWeight:800, color:'white', fontFamily:SF }}>{t.initials}</span>
-                    </div>
-                    <p style={{ margin:0, fontSize:13.5, fontWeight:800, color:'white', fontFamily:SF, lineHeight:1.18 }}>{t.name}</p>
-                    <p style={{ margin:'4px 0 0', fontSize:10.5, fontWeight:600, color:'rgba(255,255,255,0.82)', fontFamily:SF, lineHeight:1.22 }}>{t.title}</p>
+            {matches.map((t, idx) => {
+              const THERAPIST_GRADS = [
+                'linear-gradient(155deg, #7864fc 0%, #a084ff 42%, #f5b8a0 100%)',
+                'linear-gradient(155deg, #5b8dff 0%, #90b4ff 48%, #d8edff 100%)',
+                'linear-gradient(155deg, #22c77a 0%, #70e0b4 52%, #cdf5e4 100%)',
+              ];
+              const cardGrad = THERAPIST_GRADS[idx % THERAPIST_GRADS.length];
+              return (
+              <div key={t.id} style={{ width:260, minWidth:260, minHeight:340, background:cardGrad, borderRadius:22, padding:'20px 18px 18px', display:'flex', flexDirection:'column', flexShrink:0, scrollSnapAlign:'start', position:'relative', overflow:'hidden', transition:'all 0.2s ease' }}>
+                <div style={{ position:'absolute', inset:0, background:'linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0) 42%)', pointerEvents:'none' }} />
+                <span style={{ position:'absolute', right:14, top:12, fontSize:20, opacity:0.5, lineHeight:1 }}>✦</span>
+                {/* Badges */}
+                <div style={{ display:'flex', gap:6, marginBottom:14 }}>
+                  <span style={{ fontSize:9, fontWeight:800, color:'white', background:'rgba(255,255,255,0.22)', borderRadius:99, padding:'4px 9px', letterSpacing:'0.4px', textTransform:'uppercase', fontFamily:SF }}>{idx===0 ? 'Top pick' : 'Match'}</span>
+                  <span style={{ fontSize:9, fontWeight:800, color:'white', background:'rgba(255,255,255,0.22)', borderRadius:99, padding:'4px 9px', letterSpacing:'0.4px', textTransform:'uppercase', fontFamily:SF }}>{idx===0 ? 'Best match' : 'Profile'}</span>
+                </div>
+                {/* Avatar */}
+                <div style={{ width:50, height:50, borderRadius:'50%', background:'rgba(255,255,255,0.22)', backdropFilter:'blur(4px)', WebkitBackdropFilter:'blur(4px)', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:10, flexShrink:0 }}>
+                  <span style={{ fontSize:18, fontWeight:800, color:'white', fontFamily:SF }}>{t.initials}</span>
+                </div>
+                {/* Name + title */}
+                <p style={{ margin:'0 0 2px', fontSize:15, fontWeight:800, color:'white', fontFamily:SF, lineHeight:1.2 }}>{t.name}</p>
+                <p style={{ margin:'0 0 12px', fontSize:10.5, color:'rgba(255,255,255,0.72)', fontFamily:SF, lineHeight:1.2 }}>{t.title}</p>
+                {/* Why this fit */}
+                <span style={{ fontSize:9, fontWeight:800, color:'rgba(255,255,255,0.6)', letterSpacing:'0.5px', textTransform:'uppercase', fontFamily:SF }}>Why this fit</span>
+                <p style={{ margin:'3px 0 4px', fontSize:13, fontWeight:800, color:'white', fontFamily:SF, lineHeight:1.2 }}>{THERAPIST_FIT_LINE(t)}</p>
+                <p style={{ margin:'0 0 12px', fontSize:10.5, color:'rgba(255,255,255,0.72)', fontFamily:SF, lineHeight:1.4, flex:1, display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden' }}>{t.bio}</p>
+                {/* Spec pills */}
+                <div style={{ display:'flex', flexWrap:'wrap', gap:6, marginBottom:10 }}>
+                  {t.specializations.slice(0,2).map(spec => (
+                    <span key={spec} style={{ fontSize:10.5, fontWeight:600, color:'white', background:'rgba(255,255,255,0.18)', borderRadius:99, padding:'5px 10px', fontFamily:SF, textTransform:'capitalize' }}>{spec}</span>
+                  ))}
+                  <span style={{ fontSize:10.5, fontWeight:600, color:'white', background:'rgba(255,255,255,0.18)', borderRadius:99, padding:'5px 10px', fontFamily:SF }}>{APPROACH_LABEL[t.approach]}</span>
+                </div>
+                {/* Avail + Wait */}
+                <div style={{ display:'grid', gridTemplateColumns:'1fr 72px', gap:6, marginBottom:14 }}>
+                  <div style={{ background:'rgba(255,255,255,0.14)', borderRadius:14, padding:'8px 10px' }}>
+                    <span style={{ fontSize:9, fontWeight:800, color:'rgba(255,255,255,0.6)', textTransform:'uppercase', letterSpacing:'0.3px', display:'block', fontFamily:SF }}>Availability</span>
+                    <span style={{ fontSize:10.5, fontWeight:700, color:'white', fontFamily:SF, lineHeight:1.2, marginTop:3, display:'block' }}>{t.availability}</span>
                   </div>
-                  <div style={{ paddingTop:12, display:'flex', flexDirection:'column', gap:12, flex:1 }}>
-                    <div style={{ display:'flex', flexDirection:'column', gap:5 }}>
-                      <span style={{ fontSize:10, fontWeight:800, color:'rgba(255,255,255,0.72)', fontFamily:SF, letterSpacing:'0.46px', textTransform:'uppercase' }}>Why this fit</span>
-                      <p style={{ margin:0, fontSize:13.5, fontWeight:800, color:'white', fontFamily:SF, lineHeight:1.2 }}>{THERAPIST_FIT_LINE(t)}</p>
-                      <p style={{ margin:0, fontSize:10.75, color:'rgba(255,255,255,0.92)', fontFamily:SF, lineHeight:1.42, display:'-webkit-box', WebkitLineClamp:3, WebkitBoxOrient:'vertical', overflow:'hidden' }}>{t.bio}</p>
-                    </div>
-                    <div style={{ display:'flex', flexWrap:'wrap', gap:7 }}>
-                      {t.specializations.slice(0, 2).map(spec => (
-                        <div key={spec} style={{ minWidth:72, ...RAIL_WHITE_PILL_STYLE, padding:'8px 14px' }}>
-                          <span style={{ fontSize:11, fontWeight:600, color:'#3c3c3c', fontFamily:SF, lineHeight:1, textTransform:'capitalize' }}>{spec}</span>
-                        </div>
-                      ))}
-                      <div style={{ minWidth:126, ...RAIL_WHITE_PILL_STYLE, padding:'8px 14px' }}>
-                        <span style={{ fontSize:11, fontWeight:600, color:'#3c3c3c', fontFamily:SF, lineHeight:1 }}>{APPROACH_LABEL[t.approach]}</span>
-                      </div>
-                    </div>
-                    <div style={{ display:'grid', gridTemplateColumns:'1fr 92px', gap:8 }}>
-                      <div style={{ background:'rgba(255,255,255,0.12)', border:'1px solid rgba(255,255,255,0.24)', borderRadius:18, padding:'10px 12px', minHeight:52, display:'flex', flexDirection:'column', justifyContent:'center' }}>
-                        <span style={{ fontSize:9.5, fontWeight:800, color:'rgba(255,255,255,0.7)', fontFamily:SF, letterSpacing:'0.3px', textTransform:'uppercase' }}>Availability</span>
-                        <span style={{ marginTop:4, fontSize:11, fontWeight:700, color:'white', fontFamily:SF, lineHeight:1.2 }}>{t.availability}</span>
-                      </div>
-                      <div style={{ background:'rgba(255,255,255,0.12)', border:'1px solid rgba(255,255,255,0.24)', borderRadius:18, padding:'10px 12px', minHeight:52, display:'flex', flexDirection:'column', justifyContent:'center' }}>
-                        <span style={{ fontSize:9.5, fontWeight:800, color:'rgba(255,255,255,0.7)', fontFamily:SF, letterSpacing:'0.3px', textTransform:'uppercase' }}>Wait</span>
-                        <span style={{ marginTop:4, fontSize:11, fontWeight:700, color:'white', fontFamily:SF, lineHeight:1.2 }}>{t.wait}</span>
-                      </div>
-                    </div>
-                    <div style={{ marginTop:'auto', display:'flex', flexDirection:'column', gap:10, paddingTop:2 }}>
-                      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:8 }}>
-                        <span style={{ fontSize:10.5, color:'rgba(255,255,255,0.82)', fontFamily:SF, lineHeight:1.3 }}>Good if you want a first conversation that feels clear and low-pressure.</span>
-                        <span style={{ fontSize:10, fontWeight:700, color:'white', fontFamily:SF, flexShrink:0 }}>{requested===t.id ? 'Saved' : 'Tap to request'}</span>
-                      </div>
-                      <div onClick={() => {
-                        setRequested(t.id);
-                        setRequestModal({ therapist:t, when:'Just now' });
-                      }} style={{ ...railPrimaryButtonStyle(requested===t.id), cursor:'pointer' }}>
-                        <span style={{ fontSize:12.5, fontWeight:700, color:'white', fontFamily:SF }}>{requested===t.id ? 'Requested' : 'Request session'}</span>
-                        <div style={{ width:23, height:23, borderRadius:'50%', background:'white', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-                          <span style={{ fontSize:12, lineHeight:1, color:'#141413' }}>{requested===t.id ? '✓' : '→'}</span>
-                        </div>
-                      </div>
-                    </div>
+                  <div style={{ background:'rgba(255,255,255,0.14)', borderRadius:14, padding:'8px 10px' }}>
+                    <span style={{ fontSize:9, fontWeight:800, color:'rgba(255,255,255,0.6)', textTransform:'uppercase', letterSpacing:'0.3px', display:'block', fontFamily:SF }}>Wait</span>
+                    <span style={{ fontSize:10.5, fontWeight:700, color:'white', fontFamily:SF, lineHeight:1.2, marginTop:3, display:'block' }}>{t.wait}</span>
                   </div>
                 </div>
+                {/* CTA */}
+                <div onClick={() => { setRequested(t.id); setRequestModal({therapist:t, when:'Just now'}); }}
+                  style={{ display:'flex', alignItems:'center', gap:5, cursor:'pointer' }}>
+                  <span style={{ fontSize:12, fontWeight:700, color:'white', fontFamily:SF, textDecoration:'underline', textUnderlineOffset:3 }}>{requested===t.id ? 'Requested ✓' : 'Request session'}</span>
+                  {requested!==t.id && <span style={{ fontSize:12, color:'rgba(255,255,255,0.7)', lineHeight:1 }}>↗</span>}
+                </div>
               </div>
-            ))}
+              );
+            })}
           </div>
           {requestModal && ReactDOM.createPortal(
             <div onClick={() => setRequestModal(null)} style={{ position:'fixed', inset:0, zIndex:9999, background:'rgba(13,16,26,0.16)', backdropFilter:'blur(12px)', WebkitBackdropFilter:'blur(12px)', display:'flex', alignItems:'center', justifyContent:'center', padding:'28px 18px', pointerEvents:'auto' }}>

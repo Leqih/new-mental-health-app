@@ -143,7 +143,7 @@
             (viewport.width - horizontalInset * 2) / FRAME_W,
             (viewport.height - verticalInset * 2) / FRAME_H
           )
-        : Math.min(viewport.width / FRAME_W, viewport.height / FRAME_H);
+        : viewport.width / FRAME_W;
 
       return (
         <>

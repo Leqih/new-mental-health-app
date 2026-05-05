@@ -39,7 +39,7 @@
       const CW        = CHART_W - Y_AXIS_W; // actual SVG drawing width
       const CHART_H   = 165;
       const MOOD_Y  = { Good:46, Happy:25, Grateful:30, Excited:22, Boring:88, Sad:138, Anxious:108, Angry:148, Exhausted:118 };
-      const weekMoods = ['Good','Sad', todayLabel||'Good', 'Anxious','Excited','Good','Boring'];
+      const weekMoods = ['Good','Sad', todayLabel||'Good', 'Anxious','Exhausted','Good','Boring'];
       const weekDays  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
       // Dot colors matching aurora gradient position left→right
       const DOT_COLORS = ['rgb(240,140,175)','rgb(180,150,240)','rgb(100,200,195)','rgb(140,200,140)','rgb(200,210,110)','rgb(210,190,85)','rgb(220,175,80)'];
@@ -338,4 +338,3 @@
         </div>
       );
     }
-

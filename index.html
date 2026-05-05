@@ -12,16 +12,14 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { width: 100%; height: 100%; overflow: hidden; }
+    html, body { width: 100%; min-height: 100%; overflow-x: hidden; }
     body {
       background: #ddd7ce;
-      display: flex; align-items: center; justify-content: center;
       font-family: 'Sofia Sans', system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
-      padding: 24px 0;
     }
-    @media (max-width: 430px) {
-      body { padding: 12px 0; align-items: flex-start; }
+    #root {
+      min-height: 100vh;
     }
     @keyframes slideUp {
       from { transform: translateY(100%); }
@@ -160,7 +158,15 @@
       from { transform: translateX(0); }
       to   { transform: translateX(100%); }
     }
-    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar {
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+    }
     @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
     .marquee-track { display: flex; gap: 8px; width: max-content; animation: marquee 14s linear infinite; }
     .marquee-track:hover { animation-play-state: paused; }
@@ -174,11 +180,11 @@
 </head>
 <body>
   <div id="root"></div>
-  <script type="text/babel" src="src/assets.js"></script>
+  <script type="text/babel" src="src/assets.js?v=69"></script>
   <script type="text/babel" src="src/components/FaceCells.js"></script>
   <script type="text/babel" src="src/components/HomeWidgets.js"></script>
-  <script type="text/babel" src="src/components/StickerZones.js"></script>
-  <script type="text/babel" src="src/components/DayCard.js?v=15"></script>
+  <script type="text/babel" src="src/components/StickerZones.js?v=69"></script>
+  <script type="text/babel" src="src/components/DayCard.js?v=17"></script>
   <script type="text/babel">
     /* inline override — cache-proof mood SVG characters */
     (function(){
@@ -199,19 +205,19 @@
         return _cloud('#e8f5ff','#70c0f0',`<circle cx="42" cy="58" r="4" fill="#1a1a3a"/><circle cx="60" cy="58" r="4" fill="#1a1a3a"/><path d="M40 70 Q51 63 62 70" stroke="#1a1a3a" stroke-width="2.8" fill="none" stroke-linecap="round"/><ellipse cx="38" cy="66" rx="2.2" ry="3.5" fill="#50b8f0" opacity="0.85"/>`);
       };
       window.moodCharSrc = m => `data:image/svg+xml,${encodeURIComponent(window.moodCharSVG(m))}`;
-      window.buildIconHTML = m => window.moodCharSVG(m);
+      window.buildIconHTML = m => window.buildFigmaMoodIconHTML ? window.buildFigmaMoodIconHTML(m) : window.moodCharSVG(m);
     })();
   </script>
   <script type="text/babel" src="src/components/LogMoodPage.js?v=15"></script>
-  <script type="text/babel" src="src/components/WeeklyBubbles.js"></script>
-  <script type="text/babel" src="src/components/StatsPage.js"></script>
+  <script type="text/babel" src="src/components/WeeklyBubbles.js?v=22"></script>
+  <script type="text/babel" src="src/components/StatsPage.js?v=17"></script>
   <script type="text/babel" src="src/components/MoodSheets.js"></script>
   <script type="text/babel" src="src/components/ProfilePage.js"></script>
   <script type="text/babel" src="src/components/CanvasOrbs.js"></script>
-  <script type="text/babel" src="src/components/TypeChatPage.js"></script>
-  <script type="text/babel" src="src/components/SupportPage.js"></script>
+  <script type="text/babel" src="src/components/TypeChatPage.js?v=65"></script>
+  <script type="text/babel" src="src/components/SupportPage.js?v=67"></script>
   <script type="text/babel" src="src/components/BottomNav.js"></script>
-  <script type="text/babel" src="src/App.js"></script>
+  <script type="text/babel" src="src/App.js?v=74"></script>
 
 </body>
 </html>

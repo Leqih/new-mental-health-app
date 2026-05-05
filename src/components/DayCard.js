@@ -75,21 +75,18 @@
     }
 
     /* ── WEEK DAY CARD — pixel-perfect from Figma 191-2586 ── */
-    function DayCard({ label, mood, onClick }) {
-      const isGood  = mood === 'good';
-      const isSad   = mood === 'sad';
-      const isToday = label === 'TODAY';
+function DayCard({ label, mood, onClick }) {
+  const isGood  = mood === 'good';
+  const isSad   = mood === 'sad';
 
-      return (
-        <div onClick={onClick} style={{
-          background: isToday ? 'rgba(255,255,255,0.96)' : 'rgba(255,255,255,0.88)',
-          border: isToday ? '1.5px solid rgba(90,170,24,0.45)' : '1px solid rgba(20,20,19,0.08)',
-          boxShadow: isToday
-            ? '0px 4px 16px rgba(90,170,24,0.18), 0 0 0 4px rgba(90,170,24,0.08)'
-            : '0px 4px 12px rgba(0,0,0,0.04)',
-          height:92, borderRadius:20, flexShrink:0, width:64,
-          cursor: onClick ? 'pointer' : 'default', position:'relative'
-        }}>
+  return (
+    <div onClick={onClick} style={{
+      background:'rgba(255,255,255,0.88)',
+      border:'1px solid rgba(20,20,19,0.08)',
+      boxShadow:'0px 4px 12px rgba(0,0,0,0.04)',
+      height:92, borderRadius:20, flexShrink:0, width:64,
+      cursor: onClick ? 'pointer' : 'default', position:'relative'
+    }}>
           <div style={{ display:'flex', flexDirection:'column', gap:4, alignItems:'center', justifyContent:'flex-end', paddingBottom:11, paddingTop:1, paddingLeft:1, paddingRight:1, width:'100%', height:'100%', boxSizing:'border-box', backgroundClip:'padding-box' }}>
             <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:600, lineHeight:'normal', flexShrink:0, fontSize:15, color:'black', letterSpacing:'-0.3px', textAlign:'center', whiteSpace:'nowrap', margin:0 }}>{label}</p>
             {isGood ? <GoodStickerZone /> : isSad ? <SadStickerZone /> : <EmptyStickerZone />}
@@ -118,7 +115,7 @@
     /* ── TODAY PHYSICS CARD ── */
     const moodCharSrc = m => `data:image/svg+xml,${encodeURIComponent(moodCharSVG(m))}`;
 
-    const buildIconHTML = (moodLabel) => moodCharSVG(moodLabel);
+    const buildIconHTML = (moodLabel) => window.buildIconHTML ? window.buildIconHTML(moodLabel) : moodCharSVG(moodLabel);
 
     function TodayPhysicsCard({ dateStr, moods, onMoodClick }) {
       const containerRef = useRef(null);
@@ -240,4 +237,3 @@
         </div>
       );
     }
-

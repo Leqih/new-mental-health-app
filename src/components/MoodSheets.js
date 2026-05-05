@@ -67,9 +67,6 @@
               <button onClick={onLogMood} style={{ width:'100%', fontFamily:'Sofia Sans,sans-serif', fontWeight:600, fontSize:15, color:'white', background:'#141413', border:'none', borderRadius:999, padding:'13px 0', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>
                 <span style={{ fontSize:17, lineHeight:1 }}>＋</span> Log Mood
               </button>
-              <button onClick={onClose} style={{ width:'100%', fontFamily:'Sofia Sans,sans-serif', fontWeight:600, fontSize:15, color:'#141413', background:'white', border:'1px solid rgba(20,20,19,0.12)', borderRadius:999, padding:'13px 0', cursor:'pointer' }}>
-                Close
-              </button>
             </div>
           </div>
         </div>
@@ -299,14 +296,7 @@
               </div>
             )}
 
-            {/* Close button */}
-            <div style={{ padding:'22px 22px 0' }}>
-              <button onClick={onClose} style={{ width:'100%', fontFamily:'Sofia Sans,sans-serif', fontWeight:600, fontSize:15, color:'#141413', background:'white', border:'1px solid rgba(20,20,19,0.12)', borderRadius:999, padding:'13px 0', cursor:'pointer', letterSpacing:'-0.2px' }}>
-                Close
-              </button>
-            </div>
           </div>
         </div>
       );
     }
-

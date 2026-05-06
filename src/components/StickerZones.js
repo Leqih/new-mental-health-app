@@ -14,11 +14,14 @@
       tired:     { bg:'rgba(216,208,248,0.94)', tab:'rgba(190,180,234,0.96)', emoji:'😴' },
     };
 
-    /* Pure-CSS folder sticker — never depends on Figma URLs */
+    /* Pure-CSS folder sticker — uses inline SVG mood characters, never expires */
     function CssFolderSticker({ mood, label }) {
       const m = (mood || '').toLowerCase();
-      const pal = FOLDER_PALETTE[m] || { bg:'rgba(230,230,230,0.94)', tab:'rgba(200,200,200,0.96)', emoji:'😐' };
+      const pal = FOLDER_PALETTE[m] || { bg:'rgba(230,230,230,0.94)', tab:'rgba(200,200,200,0.96)' };
       const lbl = label || mood || '?';
+      /* Use the inline SVG cloud characters defined in index.html */
+      const svgChar = window.moodCharSVG ? window.moodCharSVG(m) : null;
+      const charSrc = svgChar ? `data:image/svg+xml,${encodeURIComponent(svgChar)}` : null;
       return (
         <div style={{ position:'relative', width:42, height:37, flexShrink:0 }}>
           {/* Folder tab */}
@@ -34,12 +37,16 @@
             border:'1px solid rgba(0,0,0,0.07)',
             boxShadow:'0 2px 5px rgba(0,0,0,0.05)',
           }} />
-          {/* Character emoji */}
-          <div style={{
-            position:'absolute', top:1, left:0, right:0, height:21,
-            display:'flex', alignItems:'center', justifyContent:'center',
-            fontSize:14, lineHeight:1, userSelect:'none',
-          }}>{pal.emoji}</div>
+          {/* SVG cloud character */}
+          {charSrc && (
+            <img
+              alt="" src={charSrc}
+              style={{
+                position:'absolute', top:0, left:'50%', transform:'translateX(-50%)',
+                width:36, height:22, objectFit:'contain', pointerEvents:'none',
+              }}
+            />
+          )}
           {/* Frosted badge */}
           <div style={{
             position:'absolute', left:1, bottom:0, right:1, height:14,

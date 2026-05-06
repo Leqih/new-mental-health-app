@@ -26,7 +26,147 @@
     };
     const LOG_MOOD_OPTIONS = ['Angry','Exhausted','Sad','Anxious','Boring','Good','Happy','Grateful'];
 
-    function LogMoodPage({ onBack, onSave, initialData }) {
+    /* ── Mood-specific CSS gradients — pastel, S≈25% L≈91% ──
+       Mixed ~50% toward white for bright airy feel. A→B→C→B→A loop. */
+    const MOOD_CARD_GRADIENT = {
+      Good:      'linear-gradient(135deg, #C8F0B4, #BDEB9A, #AEE17D, #BDEB9A, #C8F0B4)',
+      Happy:     'linear-gradient(135deg, #FFF1A6, #FFE783, #FFD85A, #FFE783, #FFF1A6)',
+      Grateful:  'linear-gradient(135deg, #F9E0B6, #F7C985, #EEA34E, #F7C985, #F9E0B6)',
+      Sad:       'linear-gradient(135deg, #CFE9FB, #B9DCF7, #9FD0F2, #B9DCF7, #CFE9FB)',
+      Anxious:   'linear-gradient(135deg, #FFD7E7, #FFB7D3, #F58AB3, #FFB7D3, #FFD7E7)',
+      Angry:     'linear-gradient(135deg, #FFD5D0, #FFAAA0, #FF7D6D, #FFAAA0, #FFD5D0)',
+      Exhausted: 'linear-gradient(135deg, #E6D4FA, #D0B7F1, #B391E5, #D0B7F1, #E6D4FA)',
+      Boring:    'linear-gradient(135deg, #CFF3F0, #AEEAE5, #7ED9D0, #AEEAE5, #CFF3F0)',
+    };
+
+    /* ── Inject CSS keyframes once for the animated gradient ── */
+    (() => {
+      if (document.getElementById('_mgAnim')) return;
+      const s = document.createElement('style');
+      s.id = '_mgAnim';
+      s.textContent = `
+        @keyframes mgFlow {
+          0%   { background-position: 0% 50%; }
+          50%  { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+      `;
+      document.head.appendChild(s);
+    })();
+
+    /* ── Animated WebGL shader gradient — warm-to-cool 3D depth ── */
+    // Wide hue spread per mood: vivid warm + soft neutral + vivid cool.
+    // More saturation than before so blobs read as distinct colour zones.
+    const MOOD_GRADIENT_COLORS = {
+      Good:      [[0.78,0.97,0.70], [0.94,0.97,0.80], [0.66,0.87,0.94]],  // lime-sage | cream | seafoam-teal
+      Happy:     [[0.99,0.93,0.52], [0.99,0.83,0.70], [0.78,0.74,0.99]],  // rich gold | peach | lavender
+      Grateful:  [[0.99,0.82,0.60], [0.99,0.76,0.78], [0.86,0.72,0.98]],  // amber | warm rose | mauve
+      Sad:       [[0.70,0.80,0.99], [0.84,0.84,0.99], [0.92,0.82,0.99]],  // vivid blue | periwinkle | lilac
+      Anxious:   [[0.99,0.72,0.80], [0.93,0.70,0.98], [0.72,0.68,0.99]],  // rose-pink | purple-pink | deep lavender
+      Angry:     [[0.99,0.68,0.60], [0.99,0.86,0.70], [0.94,0.70,0.88]],  // coral | peach | magenta-rose
+      Exhausted: [[0.90,0.76,0.99], [0.70,0.70,0.99], [0.70,0.82,0.99]],  // mauve | lavender | periwinkle
+      Boring:    [[0.62,0.97,0.84], [0.78,0.99,0.94], [0.70,0.82,0.99]],  // vivid seafoam | mint | sky
+    };
+
+    function GradientCanvas({ mood, width = 340, height = 180 }) {
+      const canvasRef = useRef(null);
+      const rafRef = useRef(null);
+
+      useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const gl = canvas.getContext('webgl', { antialias: true, preserveDrawingBuffer: true });
+        if (!gl) return;
+
+        const vs = `attribute vec2 a_pos; void main(){gl_Position=vec4(a_pos,0,1);}`;
+        // Shader: two large spatial waves per axis, very slow (×0.11)
+        // The warm-to-cool color span does the 3D work; shader just moves them.
+        const fs = `
+          precision mediump float;
+          uniform float u_time;
+          uniform vec2 u_res;
+          uniform vec3 u_c0, u_c1, u_c2;
+
+          float smooth3(float x){ return x*x*(3.0-2.0*x); }
+
+          void main(){
+            vec2 uv = gl_FragCoord.xy / u_res;
+            float t = u_time * 0.11;
+
+            // Large blobs with diagonal drift
+            float s0 = sin(uv.x*1.4 + uv.y*0.8 + t*0.9)*0.5 + 0.5;
+            float s1 = sin(uv.y*1.7 - uv.x*0.9 - t*0.6)*0.5 + 0.5;
+            float s2 = sin(uv.x*1.1 - uv.y*1.4 + t*0.75)*0.5 + 0.5;
+
+            // Smooth + sharpen contrast between blobs
+            float w0 = smooth3(smooth3(s0));
+            float w1 = smooth3(smooth3(s1));
+            float w2 = smooth3(smooth3(1.0 - s2));
+            float total = w0 + w1 + w2 + 0.001;
+
+            vec3 col = (u_c0*w0 + u_c1*w1 + u_c2*w2) / total;
+
+            // Gentle white mix — just enough to keep it airy, not washed out
+            col = mix(col, vec3(1.0), 0.10);
+
+            // Soft diffuse light from top-left (matches reference photo)
+            float d = length(uv - vec2(0.2, 0.85));
+            col += vec3(0.05) * (1.0 - clamp(d * 1.8, 0.0, 1.0));
+
+            // Brightness floor (lower than before so colour depth shows)
+            col = max(col, vec3(0.68));
+
+            gl_FragColor = vec4(col, 1.0);
+          }
+        `;
+        const compileShader = (src, type) => {
+          const s = gl.createShader(type);
+          gl.shaderSource(s, src);
+          gl.compileShader(s);
+          return s;
+        };
+        const prog = gl.createProgram();
+        gl.attachShader(prog, compileShader(vs, gl.VERTEX_SHADER));
+        gl.attachShader(prog, compileShader(fs, gl.FRAGMENT_SHADER));
+        gl.linkProgram(prog);
+        gl.useProgram(prog);
+
+        const buf = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW);
+        const loc = gl.getAttribLocation(prog, 'a_pos');
+        gl.enableVertexAttribArray(loc);
+        gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+        const colors = MOOD_GRADIENT_COLORS[mood] || MOOD_GRADIENT_COLORS['Good'];
+        gl.uniform3fv(gl.getUniformLocation(prog, 'u_c0'), colors[0]);
+        gl.uniform3fv(gl.getUniformLocation(prog, 'u_c1'), colors[1]);
+        gl.uniform3fv(gl.getUniformLocation(prog, 'u_c2'), colors[2]);
+        gl.uniform2fv(gl.getUniformLocation(prog, 'u_res'), [canvas.width, canvas.height]);
+
+        const start = performance.now();
+        const draw = () => {
+          const t = (performance.now() - start) / 1000;
+          gl.uniform1f(gl.getUniformLocation(prog, 'u_time'), t);
+          gl.viewport(0, 0, canvas.width, canvas.height);
+          gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+          rafRef.current = requestAnimationFrame(draw);
+        };
+        draw();
+        return () => { cancelAnimationFrame(rafRef.current); };
+      }, [mood]);
+
+      return (
+        <canvas
+          ref={canvasRef}
+          width={width * 2}
+          height={height * 2}
+          style={{ width: '100%', height: height, display: 'block' }}
+        />
+      );
+    }
+
+    function LogMoodPage({ onBack, onSave, initialData, onChatWithMood }) {
       const [selected, setSelected] = useState(initialData ? (initialData.mood.charAt(0).toUpperCase() + initialData.mood.slice(1)) : 'Good');
       const [prevMood, setPrevMood]  = useState(null);   // slides out
       const [slideDir, setSlideDir]  = useState(null);   // 'left' | 'right'
@@ -34,6 +174,8 @@
       const dragRef  = useRef({ startX:0, dragging:false });
       const timerRef = useRef(null);
       const [showTellMore, setShowTellMore] = useState(!!initialData);
+      const [showSaved, setShowSaved] = useState(false);
+      const [savedMoodData, setSavedMoodData] = useState(null);
       const [reason, setReason] = useState('');
       const [note, setNote]     = useState(initialData?.note || '');
       const [activities, setActivities]   = useState(initialData?.activities || []);
@@ -59,7 +201,7 @@
       /* ── Per-mood helpers ── */
       const moodBgFilter = (id) =>
         id==='Grateful'  ? 'hue-rotate(-200deg) saturate(1.1) brightness(1.1)'  :
-        id==='Happy'     ? 'hue-rotate(-180deg) saturate(1.1) brightness(1.12)' :
+        id==='Happy'     ? 'hue-rotate(-180deg) saturate(1.12) brightness(0.98)' :
         id==='Good'      ? 'hue-rotate(-120deg) saturate(1.3) brightness(1.15)' :
         id==='Sad'       ? 'hue-rotate(0deg)'   :
         id==='Angry'     ? 'hue-rotate(140deg) saturate(1.4) brightness(1.05)' :
@@ -69,7 +211,7 @@
 
       /* Solid fallback color — always opaque even if images fail to load */
       const moodBgColor = (id) =>
-        id==='Grateful'  ? '#fde4c0' : id==='Happy'    ? '#fef5a0' :
+        id==='Grateful'  ? '#fde4c0' : id==='Happy'    ? '#f2de69' :
         id==='Good'      ? '#aadf6a' : id==='Sad'      ? '#c2e4f5' :
         id==='Angry'     ? '#ffd0d0' : id==='Boring'   ? '#c0ecea' :
         id==='Anxious'   ? '#ffd0e8' : '#d8c8f5';
@@ -79,6 +221,15 @@
               mh = moodId==='Happy', mgr = moodId==='Grateful',
               man = moodId==='Angry', mex = moodId==='Exhausted', mbr = moodId==='Boring',
               max = moodId==='Anxious';
+        const charSrc = mg ? imgGoodChar
+          : ms ? imgLogSadBody
+          : mh ? imgLogHappyBody
+          : mgr ? imgLogGratefulBody
+          : man ? imgLogAngryBody
+          : mex ? imgLogExhaustedBody
+          : max ? imgLogAnxiousBody
+          : mbr ? ''
+          : moodCharSrc(moodId);
         const ci = mh ? imgHappyChar : mgr ? imgGratefulChar : mg ? imgGoodChar :
                    man ? imgAngryChar : mex ? imgExhaustedChar : mbr ? '' : max ? imgAnxiousChar : imgLogCloudChar;
         const cf = mg || mh || mgr || man || mex || mbr || max ? 'none' : !ms ? 'saturate(0.2) brightness(0.85) hue-rotate(250deg)' : 'none';
@@ -89,7 +240,7 @@
                    mex ? 'cloudExhausted 5s ease-in-out infinite' :
                    max ? 'cloudAngry 2.5s ease-in-out infinite' :
                    ms  ? 'cloudSad 3s ease-in-out infinite' : 'cloudSad 3s ease-in-out infinite';
-        const ec = mg ? '#141413' : ms ? '#58c2ff' : (!mh && !mgr && !man && !mex && !mbr && !max) ? '#9090b0' : null;
+        const ec = mg ? '#141413' : (!ms && !mh && !mgr && !man && !mex && !mbr && !max) ? '#9090b0' : null;
         const esy = !ms && !mg && !mh && !mgr && !man && !mex && !mbr && !max ? 0.45 : 1;
         const bi = mg ? imgGoodBubble : imgLogBubble;
         const bws = mgr
@@ -135,7 +286,7 @@
             {/* Character */}
             <div style={{ position:'absolute', left:'50%', marginLeft:-143.5, top: mgr ? 220 : man ? 215 : mh ? 205 : 195, width:287, height:287 }}>
               <div style={{ position:'relative', width:'100%', height:'100%', filter:cf, animation:ca }}>
-                {ci && <img alt="" style={{ position:'absolute', display:'block', inset:0, maxWidth:'none', width:'100%', height:'100%' }} src={ci} onError={e=>e.target.style.display='none'} />}
+                {charSrc && <img alt="" style={{ position:'absolute', display:'block', inset:0, maxWidth:'none', width:'100%', height:'100%' }} src={charSrc} onError={e=>e.target.style.display='none'} />}
                 {mbr && <>
                   <img alt="" style={{ position:'absolute', top:0, bottom:0, left:0, right:'75%', width:'25%', height:'100%', display:'block' }} src={imgBoringChar1} onError={e=>e.target.style.display='none'} />
                   <img alt="" style={{ position:'absolute', top:0, bottom:0, left:'24.99%', right:'50%', width:'25.01%', height:'100%', display:'block' }} src={imgBoringChar2} onError={e=>e.target.style.display='none'} />
@@ -143,118 +294,125 @@
                   <img alt="" style={{ position:'absolute', top:0, bottom:0, left:'75%', right:0, width:'25%', height:'100%', display:'block' }} src={imgBoringChar2} onError={e=>e.target.style.display='none'} />
                 </>}
                 {mg && <>
-                  {/* Mouth layer — static, full height so smile isn't clipped */}
+                  {/* Good face overlay from Figma */}
                   <div style={{ position:'absolute', height:56, left:97, top:131, width:92, clipPath:'inset(43% 0 0 0)' }}>
                     <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgGoodFace} onError={e=>e.target.style.display='none'} />
                   </div>
-                  {/* Eyes layer — blinks, top portion only */}
                   <div style={{ position:'absolute', height:56, left:97, top:131, width:92, clipPath:'inset(0 0 57% 0)',
                     transformOrigin:'center top', animation:'faceBlink 4s ease-in-out 0.5s infinite' }}>
                     <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgGoodFace} onError={e=>e.target.style.display='none'} />
                   </div>
                 </>}
                 {mh && <>
-                  {/* Left eye – outer container % → inner image with negative inset */}
+                  {/* Left eye */}
                   <div style={{ position:'absolute', top:'35.54%', right:'56.79%', bottom:'55.75%', left:'36.24%', overflow:'visible' }}>
                     <div style={{ position:'absolute', top:'-30%', right:'-28.63%', bottom:'-30%', left:'-37.51%' }}>
-                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgHappyFaceL} onError={e=>e.target.style.display='none'} />
+                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgLogHappyEyeL} onError={e=>e.target.style.display='none'} />
                     </div>
                   </div>
                   {/* Right eye – mirrored */}
                   <div style={{ position:'absolute', top:'35.54%', right:'36.24%', bottom:'55.75%', left:'56.79%', overflow:'visible' }}>
                     <div style={{ position:'absolute', top:'-30%', right:'-28.63%', bottom:'-30%', left:'-37.51%', transform:'scaleX(-1)' }}>
-                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgHappyFaceR} onError={e=>e.target.style.display='none'} />
+                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgLogHappyEyeR} onError={e=>e.target.style.display='none'} />
                     </div>
                   </div>
                   {/* Mouth */}
                   <div style={{ position:'absolute', top:'46.34%', right:'43.9%', bottom:'45.47%', left:'44.25%', overflow:'visible' }}>
                     <div style={{ position:'absolute', top:'-25.53%', right:'-13.01%', bottom:'-25.53%', left:'-13.01%' }}>
-                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgHappyFaceM} onError={e=>e.target.style.display='none'} />
+                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgLogHappyMouth} onError={e=>e.target.style.display='none'} />
                     </div>
                   </div>
                 </>}
                 {mgr && <>
                   {/* Open eye (left) */}
                   <div style={{ position:'absolute', top:'35.82%', right:'52.25%', bottom:'52.84%', left:'36.68%' }}>
-                    <img alt="" style={{ position:'absolute', display:'block', inset:0, width:'100%', height:'100%' }} src={imgGratefulFaceB} onError={e=>e.target.style.display='none'} />
+                    <img alt="" style={{ position:'absolute', display:'block', inset:0, width:'100%', height:'100%' }} src={imgLogGratefulEyeL} onError={e=>e.target.style.display='none'} />
                   </div>
                   {/* Winking eye (right, mirrored) */}
                   <div style={{ position:'absolute', top:'37.59%', right:'39.1%', bottom:'53.55%', left:'53.98%', overflow:'visible' }}>
                     <div style={{ position:'absolute', top:'-30%', right:'-28.63%', bottom:'-30%', left:'-37.51%', transform:'scaleX(-1)' }}>
-                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgGratefulFaceC} onError={e=>e.target.style.display='none'} />
+                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgLogGratefulEyeR} onError={e=>e.target.style.display='none'} />
                     </div>
                   </div>
                   {/* Mouth (rotated 180° + mirrored) */}
                   <div style={{ position:'absolute', top:'48.58%', right:'41.18%', bottom:'42.2%', left:'40.83%' }}>
-                    <img alt="" style={{ position:'absolute', display:'block', inset:0, width:'100%', height:'100%', transform:'rotate(180deg) scaleX(-1)' }} src={imgGratefulFaceA} onError={e=>e.target.style.display='none'} />
+                    <img alt="" style={{ position:'absolute', display:'block', inset:0, width:'100%', height:'100%', transform:'rotate(180deg) scaleX(-1)' }} src={imgLogGratefulMouth} onError={e=>e.target.style.display='none'} />
                   </div>
                 </>}
                 {man && <>
                   {/* Angry eyebrows */}
                   <div style={{ position:'absolute', top:'32.18%', right:'35.6%', bottom:'52.35%', left:'35.89%', overflow:'visible' }}>
                     <div style={{ position:'absolute', top:'-7.92%', right:'-12.22%', bottom:'0%', left:'-12.22%' }}>
-                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgAngryFaceA} onError={e=>e.target.style.display='none'} />
+                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgLogAngryFace} onError={e=>e.target.style.display='none'} />
                     </div>
                   </div>
                   {/* Angry nose/mouth */}
-                  <div style={{ position:'absolute', top:'48.1%', right:'45.6%', bottom:'42.2%', left:'46.0%' }}>
-                    <img alt="" style={{ position:'absolute', display:'block', inset:0, width:'100%', height:'100%' }} src={imgAngryFaceB} onError={e=>e.target.style.display='none'} />
+                  <div style={{ position:'absolute', left:132, top:139, width:24, height:28 }}>
+                    <img alt="" style={{ position:'absolute', display:'block', inset:0, width:'100%', height:'100%' }} src={imgLogAngryMouth} onError={e=>e.target.style.display='none'} />
                   </div>
                 </>}
                 {mex && <>
                   {/* Left X-eye – stroke A */}
                   <div style={{ position:'absolute', top:'34.5%', left:'34.5%', right:'55.1%', bottom:'56.3%', overflow:'visible' }}>
                     <div style={{ position:'absolute', inset:'-29.85% -26.67%' }}>
-                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgExhaustedEyeA} onError={e=>e.target.style.display='none'} />
+                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgLogExhaustedEyeA} onError={e=>e.target.style.display='none'} />
                     </div>
                   </div>
                   {/* Left X-eye – stroke B */}
                   <div style={{ position:'absolute', top:'34.5%', left:'34.5%', right:'55.1%', bottom:'56.3%', overflow:'visible' }}>
                     <div style={{ position:'absolute', inset:'-29.85% -26.67%', transform:'rotate(180deg) scaleY(-1)' }}>
-                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgExhaustedEyeB} onError={e=>e.target.style.display='none'} />
+                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgLogExhaustedEyeB} onError={e=>e.target.style.display='none'} />
                     </div>
                   </div>
                   {/* Right X-eye – stroke A */}
                   <div style={{ position:'absolute', top:'34.5%', left:'55.5%', right:'34.1%', bottom:'56.3%', overflow:'visible' }}>
                     <div style={{ position:'absolute', inset:'-29.85% -26.67%' }}>
-                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgExhaustedEyeA} onError={e=>e.target.style.display='none'} />
+                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgLogExhaustedEyeA} onError={e=>e.target.style.display='none'} />
                     </div>
                   </div>
                   {/* Right X-eye – stroke B */}
                   <div style={{ position:'absolute', top:'34.5%', left:'55.5%', right:'34.1%', bottom:'56.3%', overflow:'visible' }}>
                     <div style={{ position:'absolute', inset:'-29.85% -26.67%', transform:'rotate(180deg) scaleY(-1)' }}>
-                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgExhaustedEyeB} onError={e=>e.target.style.display='none'} />
+                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgLogExhaustedEyeB} onError={e=>e.target.style.display='none'} />
                     </div>
                   </div>
                   {/* Wavy mouth – left half */}
                   <div style={{ position:'absolute', top:'50.2%', left:'36.2%', right:'49.8%', bottom:'45.6%', overflow:'visible' }}>
                     <div style={{ position:'absolute', top:'-52.64%', right:'-15.87%', bottom:'-52.64%', left:'-15.88%' }}>
-                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgExhaustedMthA} onError={e=>e.target.style.display='none'} />
+                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgLogExhaustedMthA} onError={e=>e.target.style.display='none'} />
                     </div>
                   </div>
                   {/* Wavy mouth – right half */}
                   <div style={{ position:'absolute', top:'50.2%', left:'50.2%', right:'35.9%', bottom:'45.6%', overflow:'visible' }}>
                     <div style={{ position:'absolute', top:'-52.64%', right:'-15.87%', bottom:'-52.64%', left:'-15.88%', transform:'rotate(180deg) scaleY(-1)' }}>
-                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgExhaustedMthB} onError={e=>e.target.style.display='none'} />
+                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgLogExhaustedMthB} onError={e=>e.target.style.display='none'} />
                     </div>
                   </div>
                 </>}
                 {mbr && <>
-                  {/* Left eye — Vector 21.svg inline, exact Figma coords */}
-                  <svg style={{ position:'absolute', left:108, top:113, width:31, height:20, overflow:'visible' }} viewBox="0 0 32 20" fill="none">
-                    <path d="M7.50195 12.2736L23.8186 7.50196" stroke="black" strokeWidth="15" strokeLinecap="round"/>
-                  </svg>
-                  {/* Right eye — Vector 32.svg inline, exact Figma coords */}
-                  <svg style={{ position:'absolute', left:156, top:113, width:31, height:20, overflow:'visible' }} viewBox="0 0 32 20" fill="none">
-                    <path d="M23.8186 12.2736L7.50199 7.50196" stroke="black" strokeWidth="15" strokeLinecap="round"/>
-                  </svg>
-                  {/* Mouth frown line — exact Figma coords */}
-                  <div style={{ position:'absolute', left:116, top:137, width:51, height:19 }}>
-                    <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgBoringMthA} onError={e=>e.target.style.display='none'} />
+                  {/* Left eye */}
+                  <div style={{ position:'absolute', top:'41.96%', left:'40.07%', right:'54.25%', bottom:'56.37%', overflow:'visible' }}>
+                    <div style={{ position:'absolute', top:-7.5, right:'-44.12%', bottom:-7.5, left:'-44.12%' }}>
+                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgBoringEyeL} onError={e=>e.target.style.display='none'} />
+                    </div>
                   </div>
-                  {/* Mouth accent blob — exact Figma coords */}
-                  <div style={{ position:'absolute', left:159, top:132, width:20, height:34 }}>
-                    <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgBoringMthB} onError={e=>e.target.style.display='none'} />
+                  {/* Right eye */}
+                  <div style={{ position:'absolute', top:'41.96%', left:'56.79%', right:'37.52%', bottom:'56.37%', overflow:'visible' }}>
+                    <div style={{ position:'absolute', top:-7.5, right:'-44.12%', bottom:-7.5, left:'-44.12%' }}>
+                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgBoringEyeR} onError={e=>e.target.style.display='none'} />
+                    </div>
+                  </div>
+                  {/* Mouth line */}
+                  <div style={{ position:'absolute', top:'50.35%', left:'42.86%', right:'44.6%', bottom:'48.25%', overflow:'visible' }}>
+                    <div style={{ position:'absolute', top:'-187.5%', right:'-20.84%', bottom:'-187.55%', left:'-20.84%' }}>
+                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgBoringMthA} onError={e=>e.target.style.display='none'} />
+                    </div>
+                  </div>
+                  {/* Mouth accent */}
+                  <div style={{ position:'absolute', top:'48.6%', left:'57.84%', right:'40.42%', bottom:'44.76%', overflow:'visible' }}>
+                    <div style={{ position:'absolute', top:'-39.48%', right:'-150.04%', bottom:'-39.48%', left:'-150%' }}>
+                      <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgBoringMthB} onError={e=>e.target.style.display='none'} />
+                    </div>
                   </div>
                 </>}
                 {!mg && !mh && !mgr && ec && <>
@@ -262,15 +420,13 @@
                   <div style={{ position:'absolute', background:ec, height:11, left:82,  borderRadius:20, top:133, width:21, transform:`scaleY(${esy})`, transformOrigin:'center', animation:'eyeIdle 4s ease-in-out 0.5s infinite' }} />
                 </>}
                 {ms && <>
-                  <div style={{ position:'absolute', width:5, height:9, borderRadius:'50% 50% 50% 50% / 40% 40% 60% 60%', background:'#58c2ff', left:89,  top:148, animation:'tearFall 2s ease-in 0s   infinite' }} />
-                  <div style={{ position:'absolute', width:5, height:9, borderRadius:'50% 50% 50% 50% / 40% 40% 60% 60%', background:'#58c2ff', left:89,  top:148, animation:'tearFall 2s ease-in 1s   infinite' }} />
-                  <div style={{ position:'absolute', width:5, height:9, borderRadius:'50% 50% 50% 50% / 40% 40% 60% 60%', background:'#58c2ff', left:192, top:148, animation:'tearFall 2s ease-in 0.5s infinite' }} />
-                  <div style={{ position:'absolute', width:5, height:9, borderRadius:'50% 50% 50% 50% / 40% 40% 60% 60%', background:'#58c2ff', left:192, top:148, animation:'tearFall 2s ease-in 1.5s infinite' }} />
+                  <div style={{ position:'absolute', background:'#58c2ff', height:11, left:82, top:133, width:21, borderRadius:20 }} />
+                  <div style={{ position:'absolute', background:'#58c2ff', height:11, left:183, top:133, width:21, borderRadius:20 }} />
                 </>}
                 {max && <>
                   {/* Face overlay (eyes + mouth + sweat drop) from Figma node 52:397 */}
-                  <div style={{ position:'absolute', left:0, top:0, width:'26.1%', height:'32.1%' }}>
-                    <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgAnxiousFace} onError={e=>e.target.style.display='none'} />
+                  <div style={{ position:'absolute', left:0, top:0, width:75, height:92 }}>
+                    <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgLogAnxiousFace} onError={e=>e.target.style.display='none'} />
                   </div>
                 </>}
               </div>
@@ -566,11 +722,80 @@
                 {/* Sticky footer save button */}
                 <div style={{ flexShrink:0, padding:'12px 20px 20px', background:'rgba(250,247,245,0.97)', borderTop:'1px solid rgba(20,20,19,0.06)', backdropFilter:'blur(8px)', WebkitBackdropFilter:'blur(8px)' }}>
                   <div
-                    onClick={() => { onSave(selected, { activities, companions, location, bodyParts, note }); onBack(); }}
+                    onClick={() => {
+                      const ctx = { emotion: selected, contexts: [...activities, ...location].filter(Boolean), note };
+                      onSave(selected, { activities, companions, location, bodyParts, note });
+                      setSavedMoodData(ctx);
+                      setShowSaved(true);
+                    }}
                     style={{ background:accentColor, height:52, borderRadius:26, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:`0 4px 20px ${accentLight}` }}>
                     <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:600, fontSize:16, color:'white', letterSpacing:'-0.2px', margin:0 }}>Complete check-in ✓</p>
                   </div>
                 </div>
+
+                {/* ── Post-save success modal popup ── */}
+                {showSaved && savedMoodData && (() => {
+                  const NEGATIVE = ['Anxious','Sad','Angry','Exhausted','Boring'];
+                  const isNeg = NEGATIVE.includes(savedMoodData.emotion);
+                  const cardGradient = MOOD_CARD_GRADIENT[savedMoodData.emotion] || MOOD_CARD_GRADIENT['Good'];
+                  return (
+                    /* Scrim */
+                    <div style={{ position:'absolute', inset:0, zIndex:500, display:'flex', alignItems:'center', justifyContent:'center', padding:'0 20px', borderRadius:'inherit' }}>
+                      <div style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.30)', backdropFilter:'blur(6px)', WebkitBackdropFilter:'blur(6px)', borderRadius:'inherit' }} />
+
+                      {/* Full-gradient card — animated flowing background */}
+                      <div style={{ position:'relative', width:'100%', borderRadius:32, overflow:'hidden', background: cardGradient, backgroundSize:'400% 400%', animation:'mgFlow 4s ease infinite', boxShadow:'0px 25px 50px -12px rgba(0,0,0,0.35)', padding:'32px 24px 28px', boxSizing:'border-box' }}>
+
+                        {/* Dot grid decoration — top right (3×3) */}
+                        <div style={{ position:'absolute', top:28, right:28, display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:7 }}>
+                          {Array.from({length:9}).map((_,i) => (
+                            <div key={i} style={{ width:5, height:5, borderRadius:'50%', background:'rgba(0,0,0,0.22)' }} />
+                          ))}
+                        </div>
+
+                        {/* Checkmark badge */}
+                        <div style={{ width:52, height:52, borderRadius:26, background:'rgba(255,255,255,0.55)', backdropFilter:'blur(12px)', WebkitBackdropFilter:'blur(12px)', border:'1.5px solid rgba(255,255,255,0.85)', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:20, boxShadow:'0 2px 0 rgba(255,255,255,0.8) inset' }}>
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                            <path d="M5 12L10 17L19 8" stroke="rgba(20,18,40,0.70)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </div>
+
+                        {/* Title */}
+                        <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:700, fontSize:26, color:'#111', letterSpacing:'-0.5px', margin:'0 0 10px', lineHeight:1.2, paddingRight:52 }}>
+                          {isNeg ? 'Want to talk it through?' : 'Nice — keep the momentum!'}
+                        </p>
+
+                        {/* Subtitle */}
+                        <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:400, fontSize:14, color:'rgba(10,8,20,0.60)', margin:'0 0 32px', lineHeight:1.55 }}>
+                          {isNeg
+                            ? "Aiden can help you process what you're feeling right now."
+                            : 'Reflecting on good days helps them stick. Share it with Aiden?'}
+                        </p>
+
+                        {/* White pill CTA — mirrors Figma button style */}
+                        {onChatWithMood && (
+                          <div onClick={() => onChatWithMood(savedMoodData)}
+                            style={{ width:'100%', height:50, borderRadius:999, background:'white', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 18px 0 20px', boxSizing:'border-box', marginBottom:14, boxShadow:'0 4px 20px rgba(0,0,0,0.12)' }}>
+                            <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:600, fontSize:15, color:'#111', letterSpacing:'0.1px', margin:0 }}>
+                              Talk to Aiden about this
+                            </p>
+                            <div style={{ width:30, height:30, borderRadius:15, background:'rgba(0,0,0,0.07)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                <path d="M5 12h14M13 6l6 6-6 6" stroke="#111" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                              </svg>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Back to home */}
+                        <div onClick={onBack} style={{ width:'100%', textAlign:'center', cursor:'pointer', padding:'4px 0' }}>
+                          <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:500, fontSize:14, color:'rgba(10,8,20,0.50)', margin:0 }}>Back to Home</p>
+                        </div>
+
+                      </div>
+                    </div>
+                  );
+                })()}
 
               </div>
             );
@@ -578,4 +803,3 @@
         </div>
       );
     }
-

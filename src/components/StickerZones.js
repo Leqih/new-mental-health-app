@@ -1,164 +1,392 @@
-    /* ── STICKER ZONES — shared between DayCard & CalStickerZone ── */
-    function GoodStickerZone() {
-      return (
-        <div style={{ position:'relative', width:44, height:37, flexShrink:0 }}>
-          {/* Rectangle82 backing: left:2, top:0, w:42, h:37 — image bleeds via negative inset */}
-          <div style={{ position:'absolute', left:2, top:0, width:42, height:37 }}>
-            <img alt="" src={imgW82} onError={e=>e.target.style.display='none'}
-              style={{ position:'absolute', top:0, right:'-9.52%', bottom:'-21.62%', left:'-9.52%', display:'block', width:'119.04%', height:'121.62%' }} />
-          </div>
+/* ── STICKER ZONES — shared between DayCard & CalStickerZone ── */
+function DayFolderShell({ label = '?', accent = '#eef1f6', top = 13, icon = null }) {
+  return (
+    <div style={{ position:'relative', width:44, height:37, flexShrink:0 }}>
+      <div style={{
+        position:'absolute',
+        left:3,
+        top,
+        width:38,
+        height:24,
+        borderRadius:11,
+        background:'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(249,247,244,0.96) 100%)',
+        border:'1px solid rgba(20,20,19,0.08)',
+        boxShadow:'0 10px 20px rgba(20,20,19,0.08), 0 2px 4px rgba(20,20,19,0.04)'
+      }} />
+      <div style={{
+        position:'absolute',
+        left:8,
+        top:top - 3,
+        width:15,
+        height:7,
+        borderRadius:'7px 7px 3px 3px',
+        background:'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(246,242,236,0.95) 100%)',
+        border:'1px solid rgba(20,20,19,0.08)',
+        borderBottom:'none',
+        boxShadow:'0 2px 4px rgba(20,20,19,0.03)'
+      }} />
+      {icon}
+      <div style={{
+        position:'absolute',
+        left:8,
+        top:top + 11,
+        width:28,
+        height:10,
+        borderRadius:5,
+        background:accent,
+        border:'1px solid rgba(20,20,19,0.06)',
+        display:'flex',
+        alignItems:'center',
+        justifyContent:'center',
+        boxShadow:'inset 0 1px 0 rgba(255,255,255,0.5)'
+      }}>
+        <p style={{
+          margin:0,
+          fontFamily:'Sofia Sans,sans-serif',
+          fontWeight:600,
+          fontSize:8,
+          lineHeight:'8px',
+          letterSpacing:'0.32px',
+          textTransform:'uppercase',
+          color:'rgba(20,20,19,0.82)'
+        }}>{label}</p>
+      </div>
+    </div>
+  );
+}
 
-          {/* Main green blob: left:0 top:7, size:28.851, rotate(-13.21deg) */}
-          <div style={{ position:'absolute', left:0, top:7, width:28.851, height:28.851, display:'flex', alignItems:'center', justifyContent:'center' }}>
-            <div style={{ transform:'rotate(-13.21deg)', flexShrink:0 }}>
-              <div style={{ position:'relative', width:24, height:24, flexShrink:0 }}>
-                {/* Base blob body */}
-                <img alt="" src={imgWV} onError={e=>e.target.style.display='none'}
-                  style={{ position:'absolute', inset:0, display:'block', width:'100%', height:'100%' }} />
-                {/* Left eye: inset[35.54%_56.79%_55.75%_36.24%] */}
-                <div style={{ position:'absolute', top:'35.54%', right:'56.79%', bottom:'55.75%', left:'36.24%' }}>
-                  <div style={{ position:'absolute', top:'-30%', right:'-28.63%', bottom:'-30%', left:'-37.51%' }}>
-                    <img alt="" src={imgWV24} onError={e=>e.target.style.display='none'}
-                      style={{ display:'block', width:'100%', height:'100%' }} />
-                  </div>
-                </div>
-                {/* Right eye (mirrored): inset[35.54%_36.24%_55.75%_56.79%] */}
-                <div style={{ position:'absolute', top:'35.54%', right:'36.24%', bottom:'55.75%', left:'56.79%', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                  <div style={{ transform:'scaleX(-1)', flexShrink:0, width:'100%', height:'100%' }}>
-                    <div style={{ position:'relative', width:'100%', height:'100%' }}>
-                      <div style={{ position:'absolute', top:'-30%', right:'-28.63%', bottom:'-30%', left:'-37.51%' }}>
-                        <img alt="" src={imgWV25} onError={e=>e.target.style.display='none'}
-                          style={{ display:'block', width:'100%', height:'100%' }} />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                {/* Smile: inset[46.34%_43.9%_45.47%_44.25%] */}
-                <div style={{ position:'absolute', top:'46.34%', right:'43.9%', bottom:'45.47%', left:'44.25%' }}>
-                  <div style={{ position:'absolute', top:'-25.53%', right:'-13.01%', bottom:'-25.53%', left:'-13.01%' }}>
-                    <img alt="" src={imgWV34} onError={e=>e.target.style.display='none'}
-                      style={{ display:'block', width:'100%', height:'100%' }} />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+function GoodStickerIcon() {
+  return (
+    <div style={{ position:'absolute', left:10, top:8, width:23, height:18 }}>
+      <div style={{
+        position:'absolute',
+        left:2,
+        top:5,
+        width:18,
+        height:11,
+        borderRadius:8,
+        background:'linear-gradient(180deg, #dcfb9e 0%, #98d955 100%)',
+        boxShadow:'0 4px 8px rgba(115,173,51,0.25)'
+      }} />
+      <div style={{
+        position:'absolute',
+        left:0,
+        top:7,
+        width:9,
+        height:9,
+        borderRadius:'50%',
+        background:'linear-gradient(180deg, #ecffba 0%, #8fd55a 100%)'
+      }} />
+      <div style={{
+        position:'absolute',
+        right:0,
+        top:7,
+        width:9,
+        height:9,
+        borderRadius:'50%',
+        background:'linear-gradient(180deg, #ebffba 0%, #8fd55a 100%)'
+      }} />
+      <div style={{
+        position:'absolute',
+        left:6,
+        top:1,
+        width:11,
+        height:11,
+        borderRadius:'50%',
+        background:'linear-gradient(180deg, #f5ffc9 0%, #a7e061 100%)'
+      }} />
+      <div style={{ position:'absolute', left:8, top:8, width:2.4, height:2.4, borderRadius:'50%', background:'#243021' }} />
+      <div style={{ position:'absolute', left:13.6, top:8, width:2.4, height:2.4, borderRadius:'50%', background:'#243021' }} />
+      <div style={{ position:'absolute', left:8.4, top:11.4, width:7.2, height:3.2, borderBottom:'2px solid #243021', borderRadius:'0 0 7px 7px' }} />
+    </div>
+  );
+}
 
-          {/* Secondary face: left:15 top:3, w:28.81 h:25.406, rotate(8deg) */}
-          <div style={{ position:'absolute', left:15, top:3, width:28.81, height:25.406, display:'flex', alignItems:'center', justifyContent:'center' }}>
-            <div style={{ transform:'rotate(8deg)', flexShrink:0 }}>
-              <div style={{ position:'relative', width:26, height:22, flexShrink:0 }}>
-                <div style={{ position:'absolute', left:4.8, top:5.38, width:26, height:22 }}>
-                  {/* Body: inset[-9.09%_9.39%_-3.74%_-6.55%] */}
-                  <div style={{ position:'absolute', top:'-9.09%', right:'9.39%', bottom:'-3.74%', left:'-6.55%' }}>
-                    <img alt="" src={imgWV1} onError={e=>e.target.style.display='none'}
-                      style={{ position:'absolute', inset:0, display:'block', width:'100%', height:'100%' }} />
-                  </div>
-                  {/* Eyes: inset[33.92%_42.23%_46.88%_26.63%] */}
-                  <div style={{ position:'absolute', top:'33.92%', right:'42.23%', bottom:'46.88%', left:'26.63%' }}>
-                    <div style={{ position:'absolute', top:0, right:0, bottom:'-11.63%', left:0 }}>
-                      <img alt="" src={imgWG6} onError={e=>e.target.style.display='none'}
-                        style={{ display:'block', width:'100%', height:'100%' }} />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+function SadStickerIcon() {
+  return (
+    <div style={{ position:'absolute', left:8, top:7, width:25, height:19 }}>
+      <div style={{
+        position:'absolute',
+        left:2,
+        top:6,
+        width:20,
+        height:11,
+        borderRadius:8,
+        background:'linear-gradient(180deg, #d9f3ff 0%, #8fd5ff 100%)',
+        boxShadow:'0 4px 8px rgba(103,167,214,0.25)'
+      }} />
+      <div style={{
+        position:'absolute',
+        left:0,
+        top:8,
+        width:9,
+        height:9,
+        borderRadius:'50%',
+        background:'linear-gradient(180deg, #eff9ff 0%, #8fd4ff 100%)'
+      }} />
+      <div style={{
+        position:'absolute',
+        right:0,
+        top:8,
+        width:9,
+        height:9,
+        borderRadius:'50%',
+        background:'linear-gradient(180deg, #eff9ff 0%, #8fd4ff 100%)'
+      }} />
+      <div style={{
+        position:'absolute',
+        left:7,
+        top:2,
+        width:11,
+        height:11,
+        borderRadius:'50%',
+        background:'linear-gradient(180deg, #f3fbff 0%, #a9deff 100%)'
+      }} />
+      <div style={{
+        position:'absolute',
+        left:3,
+        top:5,
+        width:8,
+        height:6,
+        borderRadius:5,
+        background:'linear-gradient(180deg, rgba(255,172,198,0.95) 0%, rgba(243,104,165,0.9) 100%)',
+        transform:'rotate(-16deg)'
+      }} />
+      <div style={{
+        position:'absolute',
+        right:2,
+        top:4,
+        width:7,
+        height:5,
+        borderRadius:5,
+        background:'linear-gradient(180deg, rgba(255,181,212,0.95) 0%, rgba(245,118,172,0.92) 100%)',
+        transform:'rotate(18deg)'
+      }} />
+      <div style={{ position:'absolute', left:10, top:9, width:2.4, height:2.4, borderRadius:'50%', background:'#273047' }} />
+      <div style={{ position:'absolute', left:15.6, top:9, width:2.4, height:2.4, borderRadius:'50%', background:'#273047' }} />
+      <div style={{ position:'absolute', left:10, top:13.2, width:8, height:2.8, borderTop:'2px solid #273047', borderRadius:'6px 6px 0 0' }} />
+    </div>
+  );
+}
 
-          {/* Third face: left:8.7 top:5, w:26 h:22 */}
-          <div style={{ position:'absolute', left:8.7, top:5, width:26, height:22 }}>
-            {/* Body: inset[-4.55%_-2.15%_-8.28%_4.99%] */}
-            <div style={{ position:'absolute', top:'-4.55%', right:'-2.15%', bottom:'-8.28%', left:'4.99%' }}>
-              <img alt="" src={imgWV1} onError={e=>e.target.style.display='none'}
-                style={{ position:'absolute', inset:0, display:'block', width:'100%', height:'100%' }} />
-            </div>
-            {/* Eyes: inset[38.47%_30.69%_42.33%_38.17%] */}
-            <div style={{ position:'absolute', top:'38.47%', right:'30.69%', bottom:'42.33%', left:'38.17%' }}>
+function stickerMoodSvg(kind = 'good') {
+  const face = kind === 'sad'
+    ? `
+      <circle cx="42" cy="57" r="4.2" fill="#261f3c"/>
+      <circle cx="60" cy="57" r="4.2" fill="#261f3c"/>
+      <path d="M40 69 Q45 64 50 68 Q55 72 60 68 Q63 65 65 69" stroke="#261f3c" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+      <ellipse cx="68" cy="67" rx="3.4" ry="6.2" fill="#87b7ff" opacity="0.9"/>
+    `
+    : `
+      <circle cx="42" cy="57" r="4.1" fill="#1d2c1a"/>
+      <circle cx="60" cy="57" r="4.1" fill="#1d2c1a"/>
+      <path d="M40 67 Q51 75 62 67" stroke="#1d2c1a" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+    `;
+
+  const fillA = kind === 'sad' ? '#ffd6ee' : '#f2ffe4';
+  const fillB = kind === 'sad' ? '#f08abc' : '#8fd86a';
+  return `
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="g" cx="42%" cy="34%" r="70%">
+          <stop offset="0%" stop-color="${fillA}"/>
+          <stop offset="100%" stop-color="${fillB}"/>
+        </radialGradient>
+      </defs>
+      <circle cx="35" cy="56" r="22" fill="url(#g)"/>
+      <circle cx="52" cy="44" r="26" fill="url(#g)"/>
+      <circle cx="68" cy="57" r="20" fill="url(#g)"/>
+      <rect x="18" y="56" width="63" height="19" rx="10" fill="url(#g)"/>
+      <ellipse cx="48" cy="34" rx="10" ry="5" fill="white" opacity="0.36"/>
+      ${face}
+    </svg>
+  `;
+}
+
+function stickerMoodSrc(kind) {
+  return `data:image/svg+xml;utf8,${encodeURIComponent(stickerMoodSvg(kind))}`;
+}
+
+function StickerMoodFallback({ mood = 'good' }) {
+  const src = stickerMoodSrc(mood);
+  return (
+    <>
+      <img alt="" src={src}
+        style={{ position:'absolute', left:1, top:7, width:26, height:26, display:'block', transform:'rotate(-11deg)', filter:'drop-shadow(0 4px 8px rgba(0,0,0,0.08))' }} />
+      <img alt="" src={src}
+        style={{ position:'absolute', left:16, top:4, width:22, height:22, display:'block', transform:'rotate(8deg)', opacity:0.95 }} />
+      <img alt="" src={src}
+        style={{ position:'absolute', left:8, top:4, width:21, height:21, display:'block', transform:'rotate(-4deg)', opacity:0.92 }} />
+    </>
+  );
+}
+
+function StickerFolderBacking({ left = 0, top = 0, width = 42, height = 37 }) {
+  return (
+    <div style={{ position:'absolute', left, top, width, height }}>
+      <div style={{
+        position:'absolute',
+        inset:0,
+        borderRadius:12,
+        background:'linear-gradient(180deg, rgba(255,255,255,0.94) 0%, rgba(255,248,241,0.92) 100%)',
+        border:'1px solid rgba(20,20,19,0.08)',
+        boxShadow:'0 4px 14px rgba(0,0,0,0.04)'
+      }} />
+      <img alt="" src={imgRectangle82} onError={e=>e.target.style.display='none'}
+        style={{ position:'absolute', top:0, right:'-9.52%', bottom:'-21.62%', left:'-9.52%', display:'block', width:'119.04%', height:'121.62%' }} />
+    </div>
+  );
+}
+
+function WeekStripFolderBacking() {
+  return (
+    <img
+      alt=""
+      src={imgWeekStripRectangle82}
+      onError={e => e.target.style.display = 'none'}
+      style={{
+        position:'absolute',
+        top:0,
+        right:'-9.52%',
+        bottom:'-21.62%',
+        left:'-9.52%',
+        display:'block',
+        width:'119.04%',
+        height:'121.62%'
+      }}
+    />
+  );
+}
+
+function WeekStripBadge({ label = '?' }) {
+  return (
+    <>
+      <div style={{
+        position:'absolute',
+        left:2,
+        top:21,
+        width:42,
+        height:16,
+        borderRadius:5,
+        background:'rgba(255,255,255,0.40)',
+        border:'1px solid rgba(0,0,0,0.05)',
+        backdropFilter:'blur(2px)',
+        WebkitBackdropFilter:'blur(2px)'
+      }} />
+      <p style={{
+        position:'absolute',
+        left:23,
+        top:24,
+        transform:'translateX(-50%)',
+        fontFamily:'Sofia Sans,sans-serif',
+        fontWeight:500,
+        fontSize:8,
+        lineHeight:'normal',
+        letterSpacing:'0.3px',
+        textTransform:'uppercase',
+        color:'black',
+        whiteSpace:'nowrap',
+        margin:0
+      }}>{label}</p>
+    </>
+  );
+}
+
+function WeekStripStickerBase({ label = '?', children = null }) {
+  return (
+    <div style={{ position:'relative', width:44, height:37, flexShrink:0 }}>
+      <WeekStripFolderBacking />
+      {children}
+      <WeekStripBadge label={label} />
+    </div>
+  );
+}
+
+function GoodStickerZone() {
+  return (
+    <WeekStripStickerBase label="GOOD">
+      <div style={{ position:'absolute', left:8.7, top:5, width:26, height:22 }}>
+        <img alt="" src={imgWeekStripVector1} onError={e=>e.target.style.display='none'}
+          style={{ position:'absolute', inset:0, display:'block', width:'100%', height:'100%' }} />
+        <div style={{ position:'absolute', top:'38.47%', right:'30.69%', bottom:'42.33%', left:'38.17%' }}>
+          <div style={{ position:'absolute', top:0, right:0, bottom:'-11.63%', left:0 }}>
+            <img alt="" src={imgWeekStripGroup6} onError={e=>e.target.style.display='none'}
+              style={{ display:'block', width:'100%', height:'100%' }} />
+          </div>
+        </div>
+      </div>
+      <div style={{ position:'absolute', left:15, top:3, width:28.81, height:25.406, display:'flex', alignItems:'center', justifyContent:'center' }}>
+        <div style={{ transform:'rotate(8deg)', flexShrink:0 }}>
+          <div style={{ position:'relative', width:22, height:20 }}>
+            <img alt="" src={imgWeekStripVector1} onError={e=>e.target.style.display='none'}
+              style={{ position:'absolute', inset:0, display:'block', width:'100%', height:'100%' }} />
+            <div style={{ position:'absolute', top:'33.92%', right:'42.23%', bottom:'46.88%', left:'26.63%' }}>
               <div style={{ position:'absolute', top:0, right:0, bottom:'-11.63%', left:0 }}>
-                <img alt="" src={imgWG6} onError={e=>e.target.style.display='none'}
+                <img alt="" src={imgWeekStripGroup6} onError={e=>e.target.style.display='none'}
                   style={{ display:'block', width:'100%', height:'100%' }} />
               </div>
             </div>
           </div>
-
-          {/* Frosted badge: left:2 top:21 w:42 h:16 */}
-          <div style={{ position:'absolute', left:2, top:21, width:42, height:16, backdropFilter:'blur(2px)', WebkitBackdropFilter:'blur(2px)', background:'rgba(255,255,255,0.4)', border:'1px solid rgba(0,0,0,0.05)', borderRadius:5 }} />
-          {/* "Good" text: left:23 top:24, centered via translateX(-50%) */}
-          <p style={{ position:'absolute', left:23, top:24, transform:'translateX(-50%)', fontFamily:'Sofia Sans,sans-serif', fontWeight:500, fontSize:8, color:'black', textAlign:'center', letterSpacing:'0.3px', textTransform:'uppercase', whiteSpace:'nowrap', lineHeight:'normal', margin:0 }}>Good</p>
         </div>
-      );
-    }
-
-    /* Sticker zone for TUE (sad) */
-    function SadStickerZone() {
-      return (
-        <div style={{ position:'relative', width:42, height:37, flexShrink:0 }}>
-          {/* Rectangle82: left:0 top:0 */}
-          <div style={{ position:'absolute', left:0, top:0, width:42, height:37 }}>
-            <img alt="" src={imgW82} onError={e=>e.target.style.display='none'}
-              style={{ position:'absolute', top:0, right:'-9.52%', bottom:'-21.62%', left:'-9.52%', display:'block', width:'119.04%', height:'121.62%' }} />
-          </div>
-          {/* Main sad face: left:0.03 top:7, size:28.294×24.765, rotate(-6.41deg) */}
-          <div style={{ position:'absolute', left:0.03, top:7, width:28.294, height:24.765, display:'flex', alignItems:'center', justifyContent:'center' }}>
-            <div style={{ transform:'rotate(-6.41deg)', flexShrink:0 }}>
-              <div style={{ position:'relative', width:26, height:22, flexShrink:0 }}>
-                <img alt="" src={imgWSadM} onError={e=>e.target.style.display='none'}
-                  style={{ position:'absolute', display:'block', left:0.2, top:-1, width:25.26, height:25.26 }} />
+      </div>
+      <div style={{ position:'absolute', left:0, top:7, width:28.851, height:28.851, display:'flex', alignItems:'center', justifyContent:'center' }}>
+        <div style={{ transform:'rotate(-13.21deg)', flexShrink:0 }}>
+          <div style={{ position:'relative', width:24, height:24 }}>
+            <img alt="" src={imgWeekStripVector} onError={e=>e.target.style.display='none'}
+              style={{ position:'absolute', inset:0, display:'block', width:'100%', height:'100%' }} />
+            <div style={{ position:'absolute', top:'35.54%', right:'56.79%', bottom:'55.75%', left:'36.24%' }}>
+              <div style={{ position:'absolute', top:'-30%', right:'-28.63%', bottom:'-30%', left:'-37.51%' }}>
+                <img alt="" src={imgWeekStripVector24} onError={e=>e.target.style.display='none'}
+                  style={{ display:'block', width:'100%', height:'100%' }} />
+              </div>
+            </div>
+            <div style={{ position:'absolute', top:'35.54%', right:'36.24%', bottom:'55.75%', left:'56.79%' }}>
+              <div style={{ position:'absolute', top:'-30%', right:'-28.63%', bottom:'-30%', left:'-37.51%' }}>
+                <img alt="" src={imgWeekStripVector25} onError={e=>e.target.style.display='none'}
+                  style={{ display:'block', width:'100%', height:'100%' }} />
+              </div>
+            </div>
+            <div style={{ position:'absolute', top:'46.34%', right:'43.9%', bottom:'45.47%', left:'44.25%' }}>
+              <div style={{ position:'absolute', top:'-25.53%', right:'-13.01%', bottom:'-25.53%', left:'-13.01%' }}>
+                <img alt="" src={imgWeekStripVector34} onError={e=>e.target.style.display='none'}
+                  style={{ display:'block', width:'100%', height:'100%' }} />
               </div>
             </div>
           </div>
-          {/* Secondary sad face: left:13 top:3, w:28.81 h:25.406, rotate(8deg+3.74deg) */}
-          <div style={{ position:'absolute', left:13, top:3, width:28.81, height:25.406, display:'flex', alignItems:'center', justifyContent:'center' }}>
-            <div style={{ transform:'rotate(8deg)', flexShrink:0 }}>
-              <div style={{ position:'relative', width:26, height:22, flexShrink:0 }}>
-                <div style={{ position:'absolute', left:0.98, top:2.69, width:27.38, height:23.649, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                  <div style={{ transform:'rotate(3.74deg)', flexShrink:0 }}>
-                    <div style={{ position:'relative', width:26, height:22 }}>
-                      <img alt="" src={imgWSadS} onError={e=>e.target.style.display='none'}
-                        style={{ position:'absolute', display:'block', left:0, top:0, width:24.398, height:24.398 }} />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* Third sad face: left:6.7 top:5, w:26 h:22 */}
-          <div style={{ position:'absolute', left:6.7, top:5, width:26, height:22 }}>
-            <img alt="" src={imgWSadT} onError={e=>e.target.style.display='none'}
-              style={{ position:'absolute', display:'block', left:0, top:0, width:24.398, height:24.398 }} />
-          </div>
-          {/* Badge: left:0 top:21 */}
-          <div style={{ position:'absolute', left:0, top:21, width:42, height:16, backdropFilter:'blur(2px)', WebkitBackdropFilter:'blur(2px)', background:'rgba(255,255,255,0.4)', border:'1px solid rgba(0,0,0,0.05)', borderRadius:5 }} />
-          <p style={{ position:'absolute', left:14, top:24, fontFamily:'Sofia Sans,sans-serif', fontWeight:500, fontSize:8, color:'black', letterSpacing:'0.3px', textTransform:'uppercase', whiteSpace:'nowrap', lineHeight:'normal', margin:0 }}>SAD</p>
         </div>
-      );
-    }
+      </div>
+    </WeekStripStickerBase>
+  );
+}
 
-    /* Sticker zone for empty (TODAY/WED/THUR) */
-    function EmptyStickerZone() {
-      return (
-        <div style={{ position:'relative', width:42, height:37, flexShrink:0 }}>
-          <div style={{ position:'absolute', left:0, top:0, width:42, height:37 }}>
-            <img alt="" src={imgW82} onError={e=>e.target.style.display='none'}
-              style={{ position:'absolute', top:0, right:'-9.52%', bottom:'-21.62%', left:'-9.52%', display:'block', width:'119.04%', height:'121.62%' }} />
-          </div>
-          <div style={{ position:'absolute', left:0, top:21, width:42, height:16, backdropFilter:'blur(2px)', WebkitBackdropFilter:'blur(2px)', background:'rgba(255,255,255,0.4)', border:'1px solid rgba(0,0,0,0.05)', borderRadius:5 }} />
-          <p style={{ position:'absolute', left:19, top:24, fontFamily:'Sofia Sans,sans-serif', fontWeight:500, fontSize:8, color:'black', letterSpacing:'0.3px', textTransform:'uppercase', whiteSpace:'nowrap', lineHeight:'normal', margin:0 }}>?</p>
+function SadStickerZone() {
+  return (
+    <WeekStripStickerBase label="SAD">
+      <img alt="" src={imgWeekStripGroup8} onError={e=>e.target.style.display='none'}
+        style={{ position:'absolute', left:8.7, top:5, width:26, height:22, display:'block' }} />
+      <img alt="" src={imgWeekStripGroup7} onError={e=>e.target.style.display='none'}
+        style={{ position:'absolute', left:15, top:3, width:22, height:20, display:'block', transform:'rotate(8deg)' }} />
+      <div style={{ position:'absolute', left:0, top:7, width:28.851, height:28.851, display:'flex', alignItems:'center', justifyContent:'center' }}>
+        <div style={{ transform:'rotate(-13.21deg)', flexShrink:0 }}>
+          <img alt="" src={imgWeekStripGroup14} onError={e=>e.target.style.display='none'}
+            style={{ display:'block', width:24, height:24 }} />
         </div>
-      );
-    }
+      </div>
+    </WeekStripStickerBase>
+  );
+}
+
+function EmptyStickerZone() {
+  return <WeekStripStickerBase label="?" />;
+}
 
     /* ── HAPPY STICKER ZONE — same 3-char structure as GoodStickerZone ── */
     /* Uses imgHappyChar (yellow star body) + face overlay positions from buildIconHTML */
-    function HappyStickerZone() {
-      return (
-        <div style={{ position:'relative', width:44, height:37, flexShrink:0 }}>
-          {/* Rectangle82 backing */}
-          <div style={{ position:'absolute', left:2, top:0, width:42, height:37 }}>
-            <img alt="" src={imgW82} onError={e=>e.target.style.display='none'}
-              style={{ position:'absolute', top:0, right:'-9.52%', bottom:'-21.62%', left:'-9.52%', display:'block', width:'119.04%', height:'121.62%' }} />
-          </div>
+function HappyStickerZone() {
+  return (
+    <div style={{ position:'relative', width:44, height:37, flexShrink:0 }}>
+      {/* Rectangle82 backing */}
+      <StickerFolderBacking left={2} top={0} width={42} height={37} />
 
           {/* Third char (back): left:8.7, top:5, 26×22 */}
           <div style={{ position:'absolute', left:8.7, top:5, width:26, height:22 }}>
@@ -511,4 +739,3 @@
         </div>
       );
     }
-

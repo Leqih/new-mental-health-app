@@ -1,1 +1,4 @@
 .vercel
+src/assets/*.mp4
+src/assets/*.mov
+src/assets/*.webm

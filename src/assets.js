@@ -1,3 +1,6 @@
+    /* ── VIDEO ASSETS ── */
+    const videoBg2        = 'src/assets/bg2.mp4?v=1';
+
     /* ── FIGMA ASSETS ── */
     const imgVideoBg      = 'https://www.figma.com/api/mcp/asset/17ac71f1-3168-4ea4-83ee-465e139cfe00';
     /* Mood Log card (node 30-2074) – fresh URLs */

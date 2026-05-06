@@ -210,7 +210,251 @@
       );
     }
 
-    function ResourceCard({ res, SF, onBook, priorityIndex = 0, horizontal = false }) {
+    /* ── Breathing Guide (4-7-8 technique) ── */
+    function BreathingGuide({ SF }) {
+      const PHASES = [
+        { label:'Inhale', dur:4, scale:1.28 },
+        { label:'Hold',   dur:7, scale:1.28 },
+        { label:'Exhale', dur:8, scale:1.0  },
+      ];
+      const [running, setRunning]   = useState(false);
+      const [phaseIdx, setPhaseIdx] = useState(0);
+      const [tick, setTick]         = useState(0);
+      const [cycles, setCycles]     = useState(0);
+      const intervalRef             = useRef(null);
+      const phase     = PHASES[phaseIdx];
+      const remaining = phase.dur - tick;
+
+      const stop = () => { clearInterval(intervalRef.current); setRunning(false); setPhaseIdx(0); setTick(0); };
+      const start = () => {
+        setPhaseIdx(0); setTick(0); setRunning(true);
+        let pIdx = 0, t = 0;
+        intervalRef.current = setInterval(() => {
+          t++;
+          setTick(t);
+          if (t >= PHASES[pIdx].dur) {
+            t = 0;
+            pIdx = (pIdx + 1) % PHASES.length;
+            if (pIdx === 0) setCycles(c => c + 1);
+            setPhaseIdx(pIdx);
+          }
+        }, 1000);
+      };
+      useEffect(() => () => clearInterval(intervalRef.current), []);
+
+      const progress  = running ? tick / phase.dur : 0;
+      const circleR   = 72;
+      const circum    = 2 * Math.PI * circleR;
+      const dash      = circum * (1 - progress);
+      const orbScale  = running ? phase.scale : 1;
+      const transTime = running
+        ? { Inhale:`${phase.dur}s`, Hold:'0.4s', Exhale:`${phase.dur}s` }[phase.label]
+        : '0.5s';
+
+      return (
+        <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:0, paddingTop:12 }}>
+          {/* Orb + ring */}
+          <div style={{ position:'relative', width:196, height:196, display:'flex', alignItems:'center', justifyContent:'center' }}>
+            {/* Soft outer glow halo */}
+            <div style={{
+              position:'absolute', inset:0, borderRadius:'50%',
+              background:'radial-gradient(circle, rgba(255,255,255,0.28) 0%, transparent 70%)',
+              transform:`scale(${running ? orbScale * 1.16 : 1.06})`,
+              transition:`transform ${transTime} ease-in-out`,
+              filter:'blur(12px)',
+            }} />
+            {/* SVG ring */}
+            <svg width="196" height="196" style={{ position:'absolute', inset:0, transform:'rotate(-90deg)' }}>
+              <circle cx="98" cy="98" r={circleR} fill="none" stroke="rgba(255,255,255,0.22)" strokeWidth="2.5" />
+              {running && (
+                <circle cx="98" cy="98" r={circleR} fill="none"
+                  stroke="rgba(255,255,255,0.82)" strokeWidth="2.5"
+                  strokeDasharray={circum} strokeDashoffset={dash}
+                  strokeLinecap="round"
+                  style={{ transition:`stroke-dashoffset 1s linear` }} />
+              )}
+            </svg>
+            {/* Orb — white glass ball on soft teal bg */}
+            <div style={{
+              width:116, height:116, borderRadius:'50%',
+              background: running
+                ? 'radial-gradient(circle at 36% 30%, rgba(255,255,255,0.98) 0%, rgba(220,238,240,0.82) 38%, rgba(160,210,215,0.38) 70%, rgba(120,185,192,0.12) 100%)'
+                : 'radial-gradient(circle at 36% 30%, rgba(255,255,255,0.88) 0%, rgba(215,235,238,0.62) 42%, rgba(155,205,210,0.18) 100%)',
+              transform:`scale(${orbScale})`,
+              transition:`transform ${transTime} ease-in-out, background 0.5s ease`,
+              boxShadow: running
+                ? '0 0 44px rgba(255,255,255,0.32), 0 8px 28px rgba(100,175,185,0.22)'
+                : '0 4px 20px rgba(100,170,180,0.14)',
+              display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column', gap:1,
+            }}>
+              {running ? (
+                <>
+                  <span style={{ fontSize:28, fontWeight:900, color:'#3a6a72', fontFamily:SF, lineHeight:1 }}>{remaining}</span>
+                  <span style={{ fontSize:10, fontWeight:700, color:'rgba(58,106,114,0.6)', fontFamily:SF, letterSpacing:'0.5px', textTransform:'uppercase' }}>sec</span>
+                </>
+              ) : (
+                <span style={{ fontSize:28, lineHeight:1 }}>🫧</span>
+              )}
+            </div>
+          </div>
+
+          {/* Phase label */}
+          <div style={{ height:40, display:'flex', alignItems:'center', justifyContent:'center', marginTop:4 }}>
+            {running ? (
+              <p style={{ margin:0, fontSize:24, fontWeight:700, color:'rgba(255,255,255,0.9)', fontFamily:SF, letterSpacing:'-0.3px', textShadow:'0 1px 6px rgba(80,150,160,0.3)' }}>{phase.label}</p>
+            ) : (
+              <p style={{ margin:0, fontSize:13, fontWeight:500, color:'rgba(255,255,255,0.55)', fontFamily:SF }}>Tap start when you're ready</p>
+            )}
+          </div>
+
+          {/* Steps */}
+          <div style={{ display:'flex', gap:6, marginTop:8, marginBottom:20 }}>
+            {PHASES.map((p, i) => {
+              const active = running && phaseIdx === i;
+              return (
+                <div key={p.label} style={{ display:'flex', alignItems:'center', gap:5, background: active ? 'rgba(255,255,255,0.32)' : 'rgba(255,255,255,0.14)', borderRadius:20, padding:'5px 12px', transition:'background 0.35s ease', border: active ? '1px solid rgba(255,255,255,0.5)' : '1px solid transparent' }}>
+                  <div style={{ width:5, height:5, borderRadius:'50%', background: active ? '#3a6a72' : 'rgba(255,255,255,0.55)' }} />
+                  <span style={{ fontSize:10.5, fontWeight:active ? 700 : 500, color: active ? '#3a6a72' : 'rgba(255,255,255,0.65)', fontFamily:SF, transition:'all 0.3s' }}>{p.label} {p.dur}s</span>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Cycle badge */}
+          {cycles > 0 && (
+            <div style={{ background:'rgba(255,255,255,0.22)', borderRadius:99, padding:'4px 14px', marginBottom:10 }}>
+              <span style={{ fontSize:11, fontWeight:600, color:'rgba(58,106,114,0.7)', fontFamily:SF }}>{cycles} {cycles === 1 ? 'cycle' : 'cycles'} completed</span>
+            </div>
+          )}
+
+          {/* Start / Stop */}
+          <div onClick={running ? stop : start} style={{
+            background: running ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.88)',
+            borderRadius:99, padding:'14px 52px',
+            cursor:'pointer',
+            border: running ? '1px solid rgba(255,255,255,0.38)' : 'none',
+            transition:'all 0.25s ease',
+            boxShadow: running ? 'none' : '0 4px 20px rgba(80,150,160,0.18)',
+          }}>
+            <span style={{ fontSize:14, fontWeight:800, color: running ? 'rgba(255,255,255,0.8)' : '#3a6a72', fontFamily:SF }}>{running ? 'Stop' : 'Start'}</span>
+          </div>
+        </div>
+      );
+    }
+
+    /* ── Resource Detail Sheet ── */
+    function ResourceDetailSheet({ res, SF, onClose, onBook }) {
+      const canBook = onBook && res._key && BOOKABLE_KEYS.has(res._key);
+      const hasCall = !!res.phone;
+      const isBreathing  = res._key === 'breathing';
+      const isApp = ['welltrack','talkCampus'].includes(res._key);
+
+      const CARD_GRADIENTS = {
+        caps:        'linear-gradient(155deg, #7864fc 0%, #a084ff 42%, #f5b8a0 100%)',
+        letsTalk:    'linear-gradient(155deg, #5b8dff 0%, #90b4ff 48%, #d8edff 100%)',
+        crisis:      'linear-gradient(155deg, #ff6060 0%, #ff9880 52%, #ffd4b0 100%)',
+        text741:     'linear-gradient(155deg, #ff7070 0%, #ffaa88 52%, #ffe0c8 100%)',
+        breathing:   'linear-gradient(155deg, #7890d0 0%, #80c0b0 50%, #c0e0c4 100%)',
+        welltrack:   'linear-gradient(155deg, #e8621a 0%, #f59042 48%, #ffd080 100%)',
+        talkCampus:  'linear-gradient(155deg, #0891b2 0%, #38bdf8 52%, #bae6fd 100%)',
+        mckinley:    'linear-gradient(155deg, #059669 0%, #34d399 52%, #a7f3d0 100%)',
+        resilience:  'linear-gradient(155deg, #d97706 0%, #fbbf24 52%, #fef3c7 100%)',
+        griefSupport:'linear-gradient(155deg, #6b7280 0%, #9ca3af 52%, #f3f4f6 100%)',
+        safeZone:    'linear-gradient(155deg, #8b5cf6 0%, #c084fc 52%, #f3e8ff 100%)',
+        communityAdvocacy: 'linear-gradient(155deg, #f59e0b 0%, #fbbf24 52%, #fef3c7 100%)',
+        financialWellness: 'linear-gradient(155deg, #16a34a 0%, #4ade80 52%, #d1fae5 100%)',
+        odos:        'linear-gradient(155deg, #be185d 0%, #f472b6 52%, #fce7f3 100%)',
+        workshops:   'linear-gradient(155deg, #7c3aed 0%, #a78bfa 52%, #ede9fe 100%)',
+        rosecrance:  'linear-gradient(155deg, #dc2626 0%, #f87171 52%, #fee2e2 100%)',
+        reach:       'linear-gradient(155deg, #374151 0%, #6b7280 52%, #f3f4f6 100%)',
+      };
+      const cardGrad = CARD_GRADIENTS[res._key] || 'linear-gradient(155deg, #8c6eff 0%, #b8a0ff 50%, #f0d0ff 100%)';
+      const heroLabel = res._key === 'caps' ? 'Illinois Counseling Center' : res.title;
+
+      const handleCTA = () => {
+        if (canBook) { onClose(); onBook(); return; }
+        if (hasCall) window.location.href = `tel:${res.phone}`;
+      };
+
+      const ctaLabel = canBook ? 'Start therapist matching ↗'
+        : hasCall ? `Call ${res.phone} ↗`
+        : isApp ? 'Get the app ↗'
+        : null;
+
+      return (
+        <div style={{ position:'absolute', inset:0, zIndex:600, display:'flex', flexDirection:'column', justifyContent:'flex-end' }}
+          onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+          <div style={{ position:'absolute', inset:0, background:'rgba(20,20,19,0.32)', backdropFilter:'blur(6px)', WebkitBackdropFilter:'blur(6px)' }} onClick={onClose} />
+          <div style={{ position:'relative', zIndex:1, borderRadius:'28px 28px 0 0', overflow:'hidden', animation:'slideUp 0.32s cubic-bezier(.22,.8,.24,1)' }}>
+            {/* Gradient header */}
+            <div style={{ background:cardGrad, padding: isBreathing ? '28px 24px 32px' : '28px 24px 36px', position:'relative', overflow:'hidden' }}>
+              <div style={{ position:'absolute', inset:0, background:'linear-gradient(180deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 50%)', pointerEvents:'none' }} />
+              {/* Drag handle */}
+              <div style={{ width:36, height:4, borderRadius:2, background:'rgba(255,255,255,0.35)', margin:'0 auto 24px' }} />
+              {/* Close */}
+              <div onClick={onClose} style={{ position:'absolute', right:20, top:20, width:30, height:30, borderRadius:15, background:'rgba(255,255,255,0.18)', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}>
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="white" strokeWidth="1.8" strokeLinecap="round"/></svg>
+              </div>
+
+              {!isBreathing ? (
+                <div style={{ display:'flex', alignItems:'flex-start', gap:16 }}>
+                  <div style={{ width:58, height:58, borderRadius:18, background:'rgba(255,255,255,0.22)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, backdropFilter:'blur(4px)', WebkitBackdropFilter:'blur(4px)' }}>
+                    <span style={{ fontSize:27, lineHeight:1 }}>{res.icon}</span>
+                  </div>
+                  <div style={{ flex:1, minWidth:0, paddingTop:4 }}>
+                    <p style={{ margin:'0 0 4px', fontSize:19, fontWeight:800, color:'white', fontFamily:SF, letterSpacing:'-0.36px', lineHeight:1.18 }}>{heroLabel}</p>
+                    <p style={{ margin:0, fontSize:12, fontWeight:500, color:'rgba(255,255,255,0.68)', fontFamily:SF, lineHeight:1.4 }}>{res.sub}</p>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div style={{ textAlign:'center', marginBottom:0 }}>
+                    <p style={{ margin:'0 0 4px', fontSize:20, fontWeight:800, color:'rgba(255,255,255,0.95)', fontFamily:SF, letterSpacing:'-0.36px', textShadow:'0 1px 8px rgba(80,150,160,0.25)' }}>Breathing Exercise</p>
+                    <p style={{ margin:0, fontSize:12, fontWeight:500, color:'rgba(255,255,255,0.62)', fontFamily:SF }}>4-7-8 technique · activates calm response</p>
+                  </div>
+                  <BreathingGuide SF={SF} />
+                </>
+              )}
+            </div>
+
+            {/* White content area */}
+            {!isBreathing && (
+              <div style={{ background:'#faf9f8', padding:'22px 24px', display:'flex', flexDirection:'column', gap:16 }}>
+                {/* Tags */}
+                {res.tags && res.tags.length > 0 && (
+                  <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
+                    {res.tags.map(tag => (
+                      <span key={tag} style={{ fontSize:10.5, fontWeight:700, color:'#5a4a7a', background:'rgba(138,108,255,0.09)', borderRadius:99, padding:'5px 11px', letterSpacing:'0.18px', fontFamily:SF }}>{tag}</span>
+                    ))}
+                  </div>
+                )}
+                {/* Tagline */}
+                <p style={{ margin:0, fontSize:13.5, fontWeight:400, color:'rgba(20,20,19,0.72)', fontFamily:SF, lineHeight:1.58 }}>{res.tagline}</p>
+                {/* Detail info */}
+                {res.detail && (
+                  <div style={{ display:'flex', alignItems:'center', gap:8, background:'rgba(20,20,19,0.04)', borderRadius:14, padding:'11px 14px' }}>
+                    <span style={{ fontSize:15 }}>📍</span>
+                    <span style={{ fontSize:12, fontWeight:600, color:'rgba(20,20,19,0.6)', fontFamily:SF, lineHeight:1.4 }}>{res.detail}</span>
+                  </div>
+                )}
+                {/* CTA */}
+                {ctaLabel && (
+                  <div onClick={handleCTA} style={{ background:'#141413', borderRadius:99, padding:'14px 24px', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', gap:8, marginTop:2 }}>
+                    <span style={{ fontSize:13.5, fontWeight:800, color:'white', fontFamily:SF }}>{ctaLabel}</span>
+                  </div>
+                )}
+                {/* Bottom safe area */}
+                <div style={{ height:8 }} />
+              </div>
+            )}
+            {/* Safe area for breathing */}
+            {isBreathing && <div style={{ background:'#b8d8d4', height:28 }} />}
+          </div>
+        </div>
+      );
+    }
+
+    function ResourceCard({ res, SF, onBook, onExpand, priorityIndex = 0, horizontal = false }) {
       const canBook = onBook && res._key && BOOKABLE_KEYS.has(res._key);
       const hasCall = !!res.phone;
       const primaryLabel = canBook ? 'Start matching' : (hasCall ? 'Call now' : (RESOURCE_ACTION_COPY[res._key] || 'Explore'));
@@ -218,17 +462,30 @@
       const CARD_GRADIENTS = {
         caps:        'linear-gradient(155deg, #7864fc 0%, #a084ff 42%, #f5b8a0 100%)',
         letsTalk:    'linear-gradient(155deg, #5b8dff 0%, #90b4ff 48%, #d8edff 100%)',
-        crisis988:   'linear-gradient(155deg, #ff6060 0%, #ff9880 52%, #ffd4b0 100%)',
-        crisisText:  'linear-gradient(155deg, #ff7070 0%, #ffaa88 52%, #ffe0c8 100%)',
-        breathe:     'linear-gradient(155deg, #22c77a 0%, #70e0b4 52%, #cdf5e4 100%)',
+        crisis:      'linear-gradient(155deg, #ff6060 0%, #ff9880 52%, #ffd4b0 100%)',
+        text741:     'linear-gradient(155deg, #ff7070 0%, #ffaa88 52%, #ffe0c8 100%)',
+        breathing:   'linear-gradient(155deg, #7890d0 0%, #80c0b0 50%, #c0e0c4 100%)',
+        welltrack:   'linear-gradient(155deg, #e8621a 0%, #f59042 48%, #ffd080 100%)',
+        talkCampus:  'linear-gradient(155deg, #0891b2 0%, #38bdf8 52%, #bae6fd 100%)',
+        mckinley:    'linear-gradient(155deg, #059669 0%, #34d399 52%, #a7f3d0 100%)',
+        resilience:  'linear-gradient(155deg, #d97706 0%, #fbbf24 52%, #fef3c7 100%)',
+        griefSupport:'linear-gradient(155deg, #6b7280 0%, #9ca3af 52%, #f3f4f6 100%)',
+        safeZone:    'linear-gradient(155deg, #8b5cf6 0%, #c084fc 52%, #f3e8ff 100%)',
+        communityAdvocacy: 'linear-gradient(155deg, #f59e0b 0%, #fbbf24 52%, #fef3c7 100%)',
+        financialWellness: 'linear-gradient(155deg, #16a34a 0%, #4ade80 52%, #d1fae5 100%)',
+        odos:        'linear-gradient(155deg, #be185d 0%, #f472b6 52%, #fce7f3 100%)',
+        workshops:   'linear-gradient(155deg, #7c3aed 0%, #a78bfa 52%, #ede9fe 100%)',
+        rosecrance:  'linear-gradient(155deg, #dc2626 0%, #f87171 52%, #fee2e2 100%)',
+        reach:       'linear-gradient(155deg, #374151 0%, #6b7280 52%, #f3f4f6 100%)',
       };
       const cardGrad = CARD_GRADIENTS[res._key] || 'linear-gradient(155deg, #8c6eff 0%, #b8a0ff 50%, #f0d0ff 100%)';
-      const handleAction = () => {
+      const handleAction = (e) => {
+        e.stopPropagation();
         if (canBook) { onBook(); return; }
         if (hasCall) window.location.href = `tel:${res.phone}`;
       };
       return (
-        <div style={{ marginLeft:horizontal ? 0 : 36, width:horizontal ? 220 : undefined, minWidth:horizontal ? 220 : undefined, maxWidth:horizontal ? 220 : '86%', minHeight:horizontal ? 270 : undefined, background:cardGrad, borderRadius:22, display:'flex', flexDirection:'column', flexShrink:0, scrollSnapAlign:'start', position:'relative', overflow:'hidden', padding:'22px 20px 20px' }}>
+        <div onClick={() => onExpand && onExpand(res)} style={{ marginLeft:horizontal ? 0 : 36, width:horizontal ? 220 : undefined, minWidth:horizontal ? 220 : undefined, maxWidth:horizontal ? 220 : '86%', minHeight:horizontal ? 270 : undefined, background:cardGrad, borderRadius:22, display:'flex', flexDirection:'column', flexShrink:0, scrollSnapAlign:'start', position:'relative', overflow:'hidden', padding:'22px 20px 20px', cursor:'pointer' }}>
           <div style={{ position:'absolute', inset:0, background:'linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0) 42%)', pointerEvents:'none' }} />
           <span style={{ position:'absolute', right:14, top:12, fontSize:20, opacity:0.5, lineHeight:1 }}>✦</span>
           <div style={{ width:50, height:50, borderRadius:15, background:'rgba(255,255,255,0.22)', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:14, flexShrink:0, backdropFilter:'blur(4px)', WebkitBackdropFilter:'blur(4px)' }}>
@@ -236,17 +493,21 @@
           </div>
           <p style={{ margin:'0 0 6px', fontSize:15, fontWeight:800, color:'white', fontFamily:SF, lineHeight:1.2, letterSpacing:'-0.25px' }}>{heroLabel}</p>
           <p style={{ margin:0, fontSize:11, fontWeight:400, color:'rgba(255,255,255,0.72)', fontFamily:SF, lineHeight:1.5, flex:1, display:'-webkit-box', WebkitLineClamp:3, WebkitBoxOrient:'vertical', overflow:'hidden' }}>{res.sub}</p>
-          {(canBook || hasCall) && (
+          {(canBook || hasCall) ? (
             <div onClick={handleAction} style={{ marginTop:16, display:'flex', alignItems:'center', gap:5, cursor:'pointer' }}>
               <span style={{ fontSize:12, fontWeight:700, color:'white', fontFamily:SF, textDecoration:'underline', textUnderlineOffset:3 }}>{primaryLabel}</span>
               <span style={{ fontSize:12, color:'rgba(255,255,255,0.70)', lineHeight:1 }}>↗</span>
+            </div>
+          ) : (
+            <div style={{ marginTop:16, display:'flex', alignItems:'center', gap:5 }}>
+              <span style={{ fontSize:11, fontWeight:600, color:'rgba(255,255,255,0.55)', fontFamily:SF }}>Tap to learn more</span>
             </div>
           )}
         </div>
       );
     }
 
-    function ResourceRail({ resources, SF, onBook }) {
+    function ResourceRail({ resources, SF, onBook, onExpand }) {
       return (
         <div style={{ marginLeft:36, width:'calc(100% - 36px)', display:'flex', flexDirection:'column', gap:8, animation:'msgIn 0.28s ease-out' }}>
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:10 }}>
@@ -255,7 +516,7 @@
           </div>
           <div style={{ display:'flex', gap:12, overflowX:'auto', paddingRight:18, paddingBottom:6, scrollSnapType:'x mandatory', scrollPaddingLeft:0, scrollbarWidth:'none', msOverflowStyle:'none' }}>
             {resources.map((item, idx) => (
-              <ResourceCard key={`${item.res._key || item.res.title}-${idx}`} res={item.res} SF={SF} onBook={BOOKABLE_KEYS.has(item.res?._key) ? onBook : null} priorityIndex={item.priorityIndex || idx} horizontal />
+              <ResourceCard key={`${item.res._key || item.res.title}-${idx}`} res={item.res} SF={SF} onBook={BOOKABLE_KEYS.has(item.res?._key) ? onBook : null} onExpand={onExpand} priorityIndex={item.priorityIndex || idx} horizontal />
             ))}
           </div>
         </div>
@@ -541,7 +802,7 @@
       return (
         <div
           ref={deckRootRef}
-          style={{ marginLeft:36, marginTop:page === 1 ? -16 : -14, width:'calc(100% - 36px)', maxWidth:342, overflow:'hidden', touchAction:'pan-y', animation:'msgIn 0.28s ease-out', userSelect:'none', transition:'margin-top 0.24s cubic-bezier(.22,.8,.24,1)' }}
+          style={{ marginLeft:36, marginTop:10, width:'calc(100% - 36px)', maxWidth:342, overflow:'hidden', touchAction:'pan-y', animation:'msgIn 0.28s ease-out', userSelect:'none', transition:'margin-top 0.24s cubic-bezier(.22,.8,.24,1)' }}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
@@ -937,53 +1198,42 @@
             })}
           </div>
           {requestModal && ReactDOM.createPortal(
-            <div onClick={() => setRequestModal(null)} style={{ position:'fixed', inset:0, zIndex:9999, background:'rgba(13,16,26,0.16)', backdropFilter:'blur(12px)', WebkitBackdropFilter:'blur(12px)', display:'flex', alignItems:'center', justifyContent:'center', padding:'28px 18px', pointerEvents:'auto' }}>
-              <div onClick={(e) => e.stopPropagation()} style={{ width:'min(314px, calc(100vw - 36px))', maxWidth:'100%', background:'linear-gradient(180deg, rgba(255,255,255,0.96), rgba(245,248,255,0.92))', borderRadius:28, border:'1px solid rgba(255,255,255,0.86)', boxShadow:'0 38px 90px rgba(24,31,70,0.26), 0 18px 44px rgba(255,167,135,0.18)', overflow:'hidden', position:'relative', transform:'translateY(-10px)' }}>
-                <div style={{ position:'absolute', inset:0, background:'radial-gradient(circle at 50% 24%, rgba(255,214,192,0.58), rgba(136,180,255,0.22) 48%, rgba(255,255,255,0) 82%)', pointerEvents:'none' }} />
-                <div style={{ position:'absolute', inset:'auto 0 0 0', height:88, background:'linear-gradient(180deg, rgba(255,255,255,0), rgba(120,145,255,0.10) 55%, rgba(255,167,135,0.12))', pointerEvents:'none' }} />
-                <div style={{ position:'relative', zIndex:1, padding:'20px 18px 18px', display:'flex', flexDirection:'column', gap:12 }}>
-                  <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:12 }}>
-                    <div style={{ display:'flex', flexDirection:'column', gap:5 }}>
-                      <span style={{ fontSize:10, fontWeight:800, color:'rgba(111,94,255,0.78)', fontFamily:SF, letterSpacing:'0.52px', textTransform:'uppercase' }}>Request sent</span>
-                      <p style={{ margin:0, fontSize:18, fontWeight:800, color:'#141413', fontFamily:SF, lineHeight:1.06 }}>Session request received</p>
-                      <p style={{ margin:0, fontSize:12.25, color:'rgba(58,51,84,0.74)', fontFamily:SF, lineHeight:1.34 }}>We saved the therapist details and next-step note in chat.</p>
+            <div onClick={() => setRequestModal(null)} style={{ position:'fixed', inset:0, zIndex:9999, background:'rgba(13,16,26,0.22)', backdropFilter:'blur(14px)', WebkitBackdropFilter:'blur(14px)', display:'flex', alignItems:'center', justifyContent:'center', padding:'28px 18px', pointerEvents:'auto' }}>
+              <div onClick={(e) => e.stopPropagation()} style={{ width:'min(300px, calc(100vw - 36px))', maxWidth:'100%', background:'rgba(255,255,255,0.97)', borderRadius:30, boxShadow:'0 32px 80px rgba(20,20,19,0.20)', overflow:'hidden', position:'relative' }}>
+                {/* Top accent band */}
+                <div style={{ height:5, background:'linear-gradient(90deg, #39d89a, #6bb8ff)' }} />
+                <div style={{ padding:'26px 22px 22px', display:'flex', flexDirection:'column', alignItems:'center', gap:16 }}>
+                  {/* Checkmark */}
+                  <div style={{ width:52, height:52, borderRadius:'50%', background:'linear-gradient(145deg, #39d89a, #20c777)', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 12px 28px rgba(34,197,94,0.26)' }}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                      <path d="M5 12.5l5 5 9-9" stroke="white" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                  {/* Title */}
+                  <div style={{ textAlign:'center', display:'flex', flexDirection:'column', gap:4 }}>
+                    <p style={{ margin:0, fontSize:19, fontWeight:800, color:'#141413', fontFamily:SF, lineHeight:1.08 }}>Request sent!</p>
+                    <p style={{ margin:0, fontSize:12.5, color:'rgba(58,51,84,0.62)', fontFamily:SF, lineHeight:1.38 }}>We'll notify you when {requestModal.therapist.name.split(' ')[0]} responds</p>
+                  </div>
+                  {/* Therapist row */}
+                  <div style={{ width:'100%', background:'rgba(20,20,19,0.04)', borderRadius:18, padding:'13px 14px', display:'flex', alignItems:'center', gap:11 }}>
+                    <div style={{ width:40, height:40, borderRadius:'50%', background:'linear-gradient(145deg, rgba(52,79,171,0.88), rgba(32,48,109,0.98))', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                      <span style={{ fontSize:15, fontWeight:800, color:'white', fontFamily:SF }}>{requestModal.therapist.initials}</span>
                     </div>
-                    <div style={{ width:36, height:36, borderRadius:'50%', background:'linear-gradient(180deg, #39d89a, #20c777)', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 10px 24px rgba(34,197,94,0.24)' }}>
-                      <span style={{ fontSize:18, color:'white', lineHeight:1 }}>✓</span>
+                    <div style={{ minWidth:0, flex:1 }}>
+                      <p style={{ margin:0, fontSize:14, fontWeight:800, color:'#141413', fontFamily:SF, lineHeight:1.15 }}>{requestModal.therapist.name}</p>
+                      <p style={{ margin:0, fontSize:11, color:'rgba(58,51,84,0.62)', fontFamily:SF, lineHeight:1.3 }}>{requestModal.therapist.title}</p>
+                    </div>
+                    <div style={{ background:'rgba(57,216,154,0.14)', borderRadius:10, padding:'5px 10px', flexShrink:0 }}>
+                      <span style={{ fontSize:10.5, fontWeight:700, color:'#18a06a', fontFamily:SF }}>{requestModal.therapist.availability}</span>
                     </div>
                   </div>
-                  <div style={{ background:'linear-gradient(180deg, rgba(255,255,255,0.58), rgba(255,255,255,0.34))', border:'1px solid rgba(20,20,19,0.07)', borderRadius:22, padding:'14px 14px 12px', display:'flex', flexDirection:'column', gap:10, boxShadow:'inset 0 1px 0 rgba(255,255,255,0.42)' }}>
-                    <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-                      <div style={{ width:42, height:42, borderRadius:'50%', background:'linear-gradient(180deg, rgba(52,79,171,0.84), rgba(32,48,109,0.96))', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 10px 22px rgba(10,14,33,0.14)' }}>
-                        <span style={{ fontSize:17, fontWeight:800, color:'white', fontFamily:SF }}>{requestModal.therapist.initials}</span>
-                      </div>
-                      <div style={{ minWidth:0, display:'flex', flexDirection:'column', gap:2 }}>
-                        <p style={{ margin:0, fontSize:14.5, fontWeight:800, color:'#141413', fontFamily:SF, lineHeight:1.12 }}>{requestModal.therapist.name}</p>
-                        <p style={{ margin:0, fontSize:11.25, color:'rgba(58,51,84,0.74)', fontFamily:SF, lineHeight:1.28 }}>{requestModal.therapist.title}</p>
-                      </div>
+                  {/* Buttons */}
+                  <div style={{ display:'flex', gap:9, width:'100%' }}>
+                    <div onClick={() => setRequestModal(null)} style={{ flex:1, background:'#141413', borderRadius:16, padding:'13px', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}>
+                      <span style={{ fontSize:13.5, fontWeight:700, color:'white', fontFamily:SF }}>Done</span>
                     </div>
-                    <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
-                      <div style={{ ...RAIL_WHITE_PILL_STYLE, padding:'7px 12px', minWidth:0 }}>
-                        <span style={{ fontSize:10.25, fontWeight:700, color:'#3c3c3c', fontFamily:SF }}>{requestModal.when}</span>
-                      </div>
-                      <div style={{ ...RAIL_WHITE_PILL_STYLE, padding:'7px 12px', minWidth:0 }}>
-                        <span style={{ fontSize:10.25, fontWeight:700, color:'#3c3c3c', fontFamily:SF }}>{requestModal.therapist.availability}</span>
-                      </div>
-                      <div style={{ ...RAIL_WHITE_PILL_STYLE, padding:'7px 12px', minWidth:0 }}>
-                        <span style={{ fontSize:10.25, fontWeight:700, color:'#3c3c3c', fontFamily:SF }}>Wait {requestModal.therapist.wait}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div style={{ background:'rgba(20,20,19,0.045)', border:'1px solid rgba(20,20,19,0.07)', borderRadius:18, padding:'13px 14px 12px', display:'flex', flexDirection:'column', gap:6 }}>
-                    <span style={{ fontSize:10.5, fontWeight:800, color:'rgba(111,94,255,0.88)', fontFamily:SF, letterSpacing:'0.42px', textTransform:'uppercase' }}>Saved note</span>
-                    <span style={{ fontSize:12.5, fontWeight:600, color:'#141413', fontFamily:SF, lineHeight:1.34 }}>Your request was saved in this chat. Come back anytime to review the therapist, availability, and next step without losing context.</span>
-                  </div>
-                  <div style={{ display:'flex', gap:10, paddingTop:2 }}>
-                    <div onClick={() => setRequestModal(null)} style={{ flex:1, background:'#141413', borderRadius:18, padding:'12px 14px', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', boxShadow:'0 12px 22px rgba(20,20,19,0.12)' }}>
-                      <span style={{ fontSize:13, fontWeight:700, color:'white', fontFamily:SF }}>Done</span>
-                    </div>
-                    <div onClick={() => setRequestModal(null)} style={{ flexShrink:0, background:'rgba(255,255,255,0.76)', border:'1px solid rgba(20,20,19,0.08)', borderRadius:18, padding:'12px 14px', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}>
-                      <span style={{ fontSize:13, fontWeight:700, color:'#141413', fontFamily:SF }}>Keep browsing</span>
+                    <div onClick={() => setRequestModal(null)} style={{ flex:1, background:'rgba(20,20,19,0.06)', borderRadius:16, padding:'13px', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}>
+                      <span style={{ fontSize:13.5, fontWeight:700, color:'#141413', fontFamily:SF }}>Keep browsing</span>
                     </div>
                   </div>
                 </div>
@@ -995,10 +1245,11 @@
       );
     }
 
-    function TypeChatPage({ onBack, userName, initialTopic, moodContext, bookingMode, preService, peerChat }) {
+    function TypeChatPage({ onBack, onBook, userName, initialTopic, moodContext, bookingMode, preService, peerChat }) {
       const SF = 'Sofia Sans,sans-serif';
       const R = UIUC_RESOURCES;
       const [input, setInput] = useState('');
+      const [expandedRes, setExpandedRes] = useState(null);
       const isPeerChat = !!peerChat;
 
       const getPeerOpening = () => `${peerChat.name.split(' ')[0]} is here now. You can start simple — one honest sentence is enough.`;
@@ -1084,14 +1335,14 @@
           const displayVal = value.split(' · ').join(', ');
           setMessages(m => [...m,
             { from:'user', text: displayVal },
-            { from:'ai', text:`Thank you for sharing that 💜 How long has this been affecting your daily life?` },
+            { from:'ai', text:`Thank you for sharing that — it takes something to name these things out loud 💜 How long has this been affecting your daily life?` },
             { type:'widget', _wt:'intake-duration-severity', id:'intake-duration-severity' },
           ]);
           setChips([]);
         } else if (field === 'severity') {
           setMessages(m => [...m,
             { from:'user', text:`${SCALE_EMOJI[value] || ''} ${value}` },
-            { from:'ai', text:`Got it. Have you worked with a therapist or counselor before?` },
+            { from:'ai', text:`I hear you — that gives me a clearer picture. Have you worked with a therapist or counselor before?` },
             { type:'widget', _wt:'intake-choice', id:'intake-therapyHistory', intakeField:'therapyHistory',
               label:'Therapy history',
               helper:'Choose the closest fit.',
@@ -1103,7 +1354,7 @@
           if (hadTherapy) {
             setMessages(m => [...m,
               { from:'user', text: value },
-              { from:'ai', text:`That's helpful to know. What felt most useful in those sessions?` },
+              { from:'ai', text:`That's useful context 💜 Looking back on those sessions — what do you remember as being most helpful?` },
               { type:'widget', _wt:'intake-tags', id:'intake-pastHelpful', intakeField:'pastHelpful',
                 label:'What helped most?',
                 options:["Just being heard","Practical coping tools","Understanding my patterns","Processing specific events","Homework & exercises","Nothing really clicked"] },
@@ -1111,7 +1362,7 @@
           } else {
             setMessages(m => [...m,
               { from:'user', text: value },
-              { from:'ai', text:`That's totally fine — everyone starts somewhere 💙 What are you hoping to get from therapy?` },
+              { from:'ai', text:`That's completely fine — there's no wrong starting point 💙 What are you hoping therapy might give you?` },
               { type:'widget', _wt:'intake-tags', id:'intake-goals', intakeField:'goals',
                 label:"What are you hoping for?",
                 options:["Learn practical coping tools","Process feelings in depth","Work on specific goals","Understand myself better","Improve my relationships","Just consistent support","Not sure yet"] },
@@ -1121,7 +1372,7 @@
         } else if (field === 'pastHelpful') {
           setMessages(m => [...m,
             { from:'user', text: value.split(' · ').join(', ') },
-            { from:'ai', text:`That's really helpful. What are you hoping to get from therapy this time?` },
+            { from:'ai', text:`That's really helpful — I'll factor that into your match. What are you hoping therapy gives you this time around?` },
             { type:'widget', _wt:'intake-tags', id:'intake-goals', intakeField:'goals',
               label:"What are you hoping for?",
               options:["Learn practical coping tools","Process feelings in depth","Work on specific goals","Understand myself better","Improve my relationships","Just consistent support","Not sure yet"] },
@@ -1130,7 +1381,7 @@
         } else if (field === 'goals') {
           setMessages(m => [...m,
             { from:'user', text: value.split(' · ').join(', ') },
-            { from:'ai', text:`Almost there — just a couple of quick preferences. Do you have a gender preference for your therapist?` },
+            { from:'ai', text:`Almost done — just two quick preferences. Do you have a preference for your therapist's gender?` },
             { type:'widget', _wt:'intake-choice', id:'intake-genderPref', intakeField:'genderPref',
               label:'Therapist preference',
               helper:'Optional, but helpful for matching.',
@@ -1140,7 +1391,7 @@
         } else if (field === 'genderPref') {
           setMessages(m => [...m,
             { from:'user', text: value },
-            { from:'ai', text:`And what kind of therapy style feels right for you?` },
+            { from:'ai', text:`And last one — what kind of therapy style tends to feel most comfortable to you?` },
             { type:'widget', _wt:'intake-choice', id:'intake-approachPref', intakeField:'approachPref',
               label:'Therapy style',
               helper:'Pick the one that feels most natural.',
@@ -1151,7 +1402,7 @@
           const matches = matchTherapists({ ...updated });
           setMessages(m => [...m,
             { from:'user', text: value },
-            { from:'ai', text:`Based on everything you've shared, here are your top matches 💜 Each has been selected for how well they fit what you're looking for.` },
+            { from:'ai', text:`Based on everything you've shared, here are your top three matches 💜 Each one has been selected specifically for what you're going through — not just a general list.` },
             { type:'widget', _wt:'intake-match', id:'intake-match', matches },
           ]);
           setChips(["Tell me more about one of them","I have more questions","Thanks, I'll reach out directly"]);
@@ -1187,64 +1438,142 @@
 
       /* Phase 1 — listen, empathise, ask a follow-up (no resources yet) */
       const LISTEN = {
-        crisis:      { text: `I'm really glad you said something, ${userName} — that took courage 💙 Can you tell me a little more about where you're at right now? Even just a few words.`, chips: ["I'm having really dark thoughts","I'm not in immediate danger","I just needed to tell someone","I honestly don't know how to explain it"] },
-        anxiety:     { text: `Anxiety is relentless like that — it basically turns up the volume on everything 😮‍💨 How long has this been showing up for you, ${userName}?`, widget:{ type:'anxiety-swipe' }, chips: ["It's been building for a while","Something specific happened","It just hit me out of nowhere","Honestly, I don't know"] },
-        overwhelmed: { text: `Ugh, that "everything at once" feeling is so real 😩 You're not falling apart, ${userName} — you're just carrying a lot. What's taking up the most headspace right now?`, widget:{ type:'tags', label:"What's weighing on you most?", options:["Exams & deadlines","Coursework load","Friendship issues","Romantic stress","Family pressure","Finances","Identity & belonging","Everything at once","Can't even pinpoint it"] }, chips: ["School and deadlines","Literally everything at once","My social life is a mess","I just can't sleep"] },
-        lonely:      { text: `Feeling lonely in a place full of people is honestly one of the hardest things 💙 How does it show up for you, ${userName}?`, widget:{ type:'tags', label:"How does it show up?", options:["Missing real connection","No one truly gets me","Drifted from friends","New here, know no one","Left out of things","Surrounded by people but alone","Just numb inside","Cultural or identity disconnect"] }, chips: ["I miss feeling close to people","No one really gets me","I've drifted from my friends","I just moved here and know no one"] },
-        sleep:       { text: `Sleep deprivation makes literally everything harder — your brain, your mood, your whole outlook 😴 What's been getting in the way, ${userName}?`, widget:{ type:'tags', label:"What gets in the way?", options:["Mind racing at night","Anxiety before bed","Doom-scrolling too late","Irregular schedule","Waking up in the night","Nightmares","Just can't wind down","Stress about finances or family"] }, chips: ["My mind won't shut off","I'm stressed about too many things","My sleep schedule is just broken","I feel anxious before bed"] },
-        academic:    { text: `Academic pressure has this way of piling up fast and getting heavy 📚 Are you feeling behind, ${userName}, or is it more about dreading something specific ahead?`, widget:{ type:'tags', label:"What's the pressure about?", options:["Behind on coursework","Scared of failing","A specific exam","A difficult professor","Can't focus at all","Lost motivation","Imposter syndrome","Financial pressure too","Juggling too much"] }, chips: ["I'm so far behind","I'm scared of failing","I can't focus at all","I just don't care about anything anymore"] },
-        grief:       { text: `I'm so sorry, ${userName} 🕊️ Loss is one of the hardest things to carry — and it shows up in so many different ways. How has it been hitting you lately?`, widget:{ type:'tags', label:"How has it been showing up?", options:["Waves of sadness","Hard to concentrate","Feeling numb or empty","Withdrawing from people","Guilt or regret","Physical exhaustion","Random moments of grief","Anger mixed in"] }, chips: ["It hits me at random moments","I feel numb most of the time","I've been withdrawing from people","I don't know how to process it"] },
-        relationship:{ text: `Relationship stress hits differently — it's personal and it follows you everywhere 💙 What's been weighing on you most in this, ${userName}?`, widget:{ type:'tags', label:"What's at the core?", options:["Conflict with someone close","A breakup or distance","Trust was broken","I feel unseen or unheard","Loneliness in the relationship","Family tension","Friendship falling apart","Not sure how to repair it"] }, chips: ["There's been a lot of conflict","Someone hurt me","I feel really disconnected","I don't know how to fix it"] },
-        financial:   { text: `Financial stress is incredibly real and incredibly draining — it touches everything 💙 What's been weighing on you most, ${userName}?`, widget:{ type:'tags', label:"What's the biggest pressure?", options:["Tuition & fees","Rent or housing","Food insecurity","Running out of aid","Can't focus on school","Shame or embarrassment","Supporting family too","Not sure what help exists"] }, chips: ["I'm running low on funds","I'm not sure what help is available","It's affecting my ability to focus","I'm stressed about next semester"] },
-        identity:    { text: `Navigating identity and belonging — especially at a big university — can feel really isolating 💙 What's been on your mind, ${userName}?`, widget:{ type:'tags', label:"What's at the heart of it?", options:["Feeling like I don't belong","Cultural or racial identity","LGBTQ+ identity","First-gen college experience","Religious or values conflict","Pressure from family","Feeling unseen on campus","Imposter syndrome"] }, chips: ["I feel like I don't fit in here","My identity feels invisible","Family and campus feel worlds apart","I'm figuring out who I am"] },
-        resources:   { text: `Of course — happy to share what UIUC has 💙 Before I do, ${userName}, can I ask what's going on? Even just a word or two helps me point you to the right place.`, widget:{ type:'tags', label:"What's going on?", options:["Anxiety or stress","Feeling overwhelmed","Loneliness","Sleep issues","Academic pressure","Financial stress","A crisis","Identity & belonging","Not sure"] }, chips: ["I'm feeling anxious","I'm overwhelmed","I might need to talk to someone","It's a crisis"] },
-        caps:        { text: `CAPS is really worth knowing about 💜 Before I share the details — what kind of support are you hoping to find, ${userName}?`, widget:{ type:'tags', label:"What are you hoping for?", options:["Someone to talk to","Ongoing therapy","A one-time check-in","Medication support","Not sure yet","Something urgent"] }, chips: ["I want to book an appointment","I'm not sure if I need therapy","I want to talk to someone first","It feels urgent"] },
-        better:      { text: `That genuinely makes me happy to hear 💜 What shifted for you, ${userName} — even just a little?`, chips: ["I talked to someone","Things just got a bit lighter","I needed to vent and it helped","I'm not sure, but thanks"] },
-        default:     { text: `I hear you, ${userName} — thank you for trusting me with that 💙 How intense does this get for you on a day-to-day basis?`, widget:{ type:'scale' }, chips: ["It affects my sleep","It's hard to focus on anything","I isolate myself","I just feel really numb"] },
+        crisis:      { text: `I'm really glad you said something — that wasn't easy to type, and it matters 💙 I'm right here with you. Can you tell me a little more about where you're at right now? Even just a few words — whatever feels safe.`, chips: ["I'm having really dark thoughts","I'm not in immediate danger","I just needed to tell someone","I honestly don't know how to explain it"] },
+        anxiety:     { text: `That sounds genuinely exhausting — anxiety has a way of making everything feel louder and closer than it actually is. How long has it been showing up like this for you, ${userName}?`, widget:{ type:'anxiety-swipe' }, chips: ["It's been building for a while","Something specific happened","It just hit me out of nowhere","Honestly, I don't know"] },
+        overwhelmed: { text: `Ugh — carrying that much at once is exhausting. It doesn't mean you're falling apart, ${userName}, it means there's genuinely a lot pressing on you right now. What's the thing that feels most heavy?`, widget:{ type:'tags', label:"What's weighing on you most?", options:["Exams & deadlines","Coursework load","Friendship issues","Romantic stress","Family pressure","Finances","Identity & belonging","Everything at once","Can't even pinpoint it"] }, chips: ["School and deadlines","Literally everything at once","My social life is a mess","I just can't sleep"] },
+        lonely:      { text: `Loneliness in a place full of people is honestly one of the more disorienting feelings there is — you're surrounded, and still feel completely alone. How has it been showing up for you lately, ${userName}?`, widget:{ type:'tags', label:"How does it show up?", options:["Missing real connection","No one truly gets me","Drifted from friends","New here, know no one","Left out of things","Surrounded by people but alone","Just numb inside","Cultural or identity disconnect"] }, chips: ["I miss feeling close to people","No one really gets me","I've drifted from my friends","I just moved here and know no one"] },
+        sleep:       { text: `When sleep goes, everything gets harder — your focus, your mood, how you feel about yourself. I'm glad you mentioned it. What's been getting in the way most, ${userName}?`, widget:{ type:'tags', label:"What gets in the way?", options:["Mind racing at night","Anxiety before bed","Doom-scrolling too late","Irregular schedule","Waking up in the night","Nightmares","Just can't wind down","Stress about finances or family"] }, chips: ["My mind won't shut off","I'm stressed about too many things","My sleep schedule is just broken","I feel anxious before bed"] },
+        academic:    { text: `That kind of academic pressure has a way of quietly turning into something much heavier. Are you feeling behind on things, ${userName}, or is it more of a dread about what's coming up?`, widget:{ type:'tags', label:"What's the pressure about?", options:["Behind on coursework","Scared of failing","A specific exam","A difficult professor","Can't focus at all","Lost motivation","Imposter syndrome","Financial pressure too","Juggling too much"] }, chips: ["I'm so far behind","I'm scared of failing","I can't focus at all","I just don't care about anything anymore"] },
+        grief:       { text: `I'm really sorry, ${userName}. Loss is one of those things that doesn't follow a script — it shows up when you don't expect it and looks different every time. How has it been landing for you lately?`, widget:{ type:'tags', label:"How has it been showing up?", options:["Waves of sadness","Hard to concentrate","Feeling numb or empty","Withdrawing from people","Guilt or regret","Physical exhaustion","Random moments of grief","Anger mixed in"] }, chips: ["It hits me at random moments","I feel numb most of the time","I've been withdrawing from people","I don't know how to process it"] },
+        relationship:{ text: `Relationship stuff is hard in a particular way — it's personal, and it follows you into every other part of your day. What's been sitting heaviest in this for you, ${userName}?`, widget:{ type:'tags', label:"What's at the core?", options:["Conflict with someone close","A breakup or distance","Trust was broken","I feel unseen or unheard","Loneliness in the relationship","Family tension","Friendship falling apart","Not sure how to repair it"] }, chips: ["There's been a lot of conflict","Someone hurt me","I feel really disconnected","I don't know how to fix it"] },
+        financial:   { text: `Financial stress is one of those things that creeps into absolutely everything — focus, sleep, how you feel walking into class. You don't have to manage it alone. What's the part that's weighing on you most, ${userName}?`, widget:{ type:'tags', label:"What's the biggest pressure?", options:["Tuition & fees","Rent or housing","Food insecurity","Running out of aid","Can't focus on school","Shame or embarrassment","Supporting family too","Not sure what help exists"] }, chips: ["I'm running low on funds","I'm not sure what help is available","It's affecting my ability to focus","I'm stressed about next semester"] },
+        identity:    { text: `Figuring out who you are — while also being at a huge university with all its pressures — is genuinely a lot. You're not alone in feeling that way. What's been on your mind most, ${userName}?`, widget:{ type:'tags', label:"What's at the heart of it?", options:["Feeling like I don't belong","Cultural or racial identity","LGBTQ+ identity","First-gen college experience","Religious or values conflict","Pressure from family","Feeling unseen on campus","Imposter syndrome"] }, chips: ["I feel like I don't fit in here","My identity feels invisible","Family and campus feel worlds apart","I'm figuring out who I am"] },
+        resources:   { text: `Of course — I know UIUC has a lot of options and it can be hard to know where to start. Before I point you somewhere, ${userName}, can you give me a word or two about what's going on? Even vague is fine.`, widget:{ type:'tags', label:"What's going on?", options:["Anxiety or stress","Feeling overwhelmed","Loneliness","Sleep issues","Academic pressure","Financial stress","A crisis","Identity & belonging","Not sure"] }, chips: ["I'm feeling anxious","I'm overwhelmed","I might need to talk to someone","It's a crisis"] },
+        caps:        { text: `CAPS is a really solid option — I'm glad you're thinking about it 💜 What kind of support are you hoping for, ${userName}? That'll help me give you a clearer picture of what to expect.`, widget:{ type:'tags', label:"What are you hoping for?", options:["Someone to talk to","Ongoing therapy","A one-time check-in","Medication support","Not sure yet","Something urgent"] }, chips: ["I want to book an appointment","I'm not sure if I need therapy","I want to talk to someone first","It feels urgent"] },
+        better:      { text: `That's genuinely good to hear — I mean it 💜 What shifted for you, even a little? I'm curious.`, chips: ["I talked to someone","Things just got a bit lighter","I needed to vent and it helped","I'm not sure, but thanks"] },
+        draft:       { text: `Of course — happy to help you find the right words 💙 Quick question before I write anything: is this someone close to you, or more of an acquaintance you want to reconnect with? And do they know you've been going through something, or would this be news to them?`, chips: ["Close friend, they don't know yet","Close friend, they already know a bit","More of an acquaintance","Family member"] },
+        default:     { text: `I hear you, and I appreciate you trusting me with this 💙 Just so I understand a bit better — how intense does it usually get on a day-to-day basis?`, widget:{ type:'scale' }, chips: ["It affects my sleep","It's hard to focus on anything","I isolate myself","I just feel really numb"] },
       };
 
       /* Phase 2 — dig deeper, one specific follow-up before resources */
       const DEEPEN = {
-        crisis:      { text: `I hear you — and I'm not going anywhere 💙 You don't need perfect words, ${userName}. Right now in this moment — are you somewhere safe?`, chips: ["Yes, I'm safe right now","I'm home but struggling","I'm not sure how I feel","I need help right now"] },
-        anxiety:     { text: `I'm curious 🤔 — when it hits, ${userName}, does it tend to live more in your head (thoughts spiraling, imagining worst-case), or does it get physical too, like tightness in your chest or that restless can't-sit-still feeling?`, widget:{ type:'tags', label:'Where does it show up?', options:["Racing, looping thoughts","Tight chest or shallow breath","Restless — can't sit still","Hard to focus on anything","Sudden dread for no reason","Trouble sleeping too","All of the above, honestly"] }, chips: ["Mostly in my head — thoughts spiral","Physical — chest, stomach, restless","Both at the same time","It's hard to put into words"] },
-        overwhelmed: { text: `Makes sense 😔 When everything piles up — do you tend to shut down and go quiet, ${userName}, or does it come out more as anxious restlessness, where you can't stop thinking but also can't start anything?`, chips: ["I shut down and go numb","I get anxious and can't settle","Both, depending on the day","I honestly don't know anymore"] },
-        lonely:      { text: `I hear you, ${userName} 💙 Is there someone specific you wish you felt closer to, or is it more of a general ache — like something important is just... missing?`, chips: ["There is someone specific","More of a general feeling","I've kind of stopped trying","I'm not sure what I even need"] },
-        sleep:       { text: `When you're lying there and can't sleep, ${userName} — what tends to take over? 😔 A specific worry going in circles, or more like your brain just refuses to switch off?`, chips: ["A specific worry I can't shake","Replaying things from the day","Nothing specific — mind just races","More physical — body just can't relax"] },
-        academic:    { text: `That weight is real 📚 When you imagine things not going well, ${userName} — what's the part that scares you most?`, chips: ["Failing a class or exam","Disappointing my family","Losing a scholarship or opportunity","I just can't see a way forward"] },
-        grief:       { text: `Grief doesn't follow a schedule — it shows up when you least expect it 🕊️ Has it been feeling more heavy and numb lately, ${userName}, or more like sharp waves that catch you off guard?`, chips: ["More like a constant weight","It hits me in waves","Some days are fine, then it floods back","I've been trying not to feel it"] },
-        relationship:{ text: `That kind of stress is so hard to carry 💙 When you think about this relationship, ${userName} — is there a part of you that still hopes things can shift, or does it feel more like you're trying to figure out how to let go?`, chips: ["I still hope things can change","I think I need to let go","I'm somewhere in the middle","I just need to process it"] },
-        financial:   { text: `That's a heavy thing to be managing on top of everything else 💙 Has it been affecting your focus or your sleep, ${userName}, or is it more of a low-level background anxiety that doesn't fully go away?`, chips: ["It's affecting my focus a lot","More of a background stress","It wakes me up at night","All of the above, honestly"] },
-        identity:    { text: `That kind of disconnect is really real 💙 Is it something that's been building for a while, ${userName}, or did something specific happen recently that brought it to the surface?`, chips: ["It's been building for a long time","Something specific happened recently","It comes and goes","I'm not sure when it started"] },
-        resources:   { text: `Of course 💙 Before I share — is there something specific going on, ${userName}, or are you more just exploring what's out there?`, chips: ["Something specific is going on","I just want to know my options","It's for a friend actually","I think I might need therapy"] },
-        caps:        { text: `That's a good step to be thinking about 💜 What's drawing you toward CAPS, ${userName} — has something been happening, or is it more of a 'just in case' feeling?`, chips: ["Something has been going on","I've been struggling for a while","More of a 'just in case'","I'd rather start with Let's Talk"] },
-        better:      { text: `That genuinely makes me happy to hear 💜 Do you feel like you have enough support around you to keep feeling that way, ${userName} — or is it still a bit fragile?`, chips: ["I think I do have support","It feels a bit fragile","Not sure — it could shift","I just needed to get it out"] },
-        default:     { text: `I want to make sure I really understand, ${userName} 💙 When you're in the middle of it — does it feel more like a heavy weight (numb, sad, withdrawn), or more like anxious restlessness you can't shake?`, widget:{ type:'tags', label:'How does it tend to feel?', options:["Heavy, numb, withdrawn","Anxious and restless","Sad, like something is missing","Angry or frustrated","Empty — like nothing matters","It shifts all the time"] }, chips: ["Heavy and numb","Anxious and on edge","Sad and withdrawn","It shifts constantly"] },
+        crisis:      { text: `I'm right here, ${userName} — you don't need to have the right words for this. I just want to understand where you're at. Are you somewhere safe right now?`, chips: ["Yes, I'm safe right now","I'm home but struggling","I'm not sure how I feel","I need help right now"] },
+        anxiety:     { text: `When it hits — does the anxiety tend to stay in your head, like thoughts spiraling and looping? Or does it go physical too, like your chest gets tight or you feel like you can't sit still?`, widget:{ type:'tags', label:'Where does it show up?', options:["Racing, looping thoughts","Tight chest or shallow breath","Restless — can't sit still","Hard to focus on anything","Sudden dread for no reason","Trouble sleeping too","All of the above, honestly"] }, chips: ["Mostly in my head — thoughts spiral","Physical — chest, stomach, restless","Both at the same time","It's hard to put into words"] },
+        overwhelmed: { text: `When everything piles up like this — do you tend to shut down and go quiet, or does it come out more as that restless "can't think straight, can't start anything" kind of stuck feeling?`, chips: ["I shut down and go numb","I get anxious and can't settle","Both, depending on the day","I honestly don't know anymore"] },
+        lonely:      { text: `Is there someone specific you're wishing you felt closer to — or is it more of a general ache, like something meaningful is just missing from your days?`, chips: ["There is someone specific","More of a general feeling","I've kind of stopped trying","I'm not sure what I even need"] },
+        sleep:       { text: `When you're lying there and it's not working — what tends to take over? A specific worry that won't leave, or more like your brain just refuses to settle even when nothing in particular is wrong?`, chips: ["A specific worry I can't shake","Replaying things from the day","Nothing specific — mind just races","More physical — body just can't relax"] },
+        academic:    { text: `When you imagine things going badly — what's the piece that scares you most, ${userName}? The grade itself, or something that comes with it?`, chips: ["Failing a class or exam","Disappointing my family","Losing a scholarship or opportunity","I just can't see a way forward"] },
+        grief:       { text: `Has it been landing more as a kind of constant heaviness — like a weight that doesn't fully lift? Or more like it comes in waves, when you're not expecting it?`, chips: ["More like a constant weight","It hits me in waves","Some days are fine, then it floods back","I've been trying not to feel it"] },
+        relationship:{ text: `When you sit with it — is there still a part of you hoping things can shift? Or does it feel more like you're trying to find a way through or past it?`, chips: ["I still hope things can change","I think I need to let go","I'm somewhere in the middle","I just need to process it"] },
+        financial:   { text: `Has the financial stress been getting into your daily focus and sleep — or is it more of a low hum in the background that's always kind of there?`, chips: ["It's affecting my focus a lot","More of a background stress","It wakes me up at night","All of the above, honestly"] },
+        identity:    { text: `Has this been building slowly over time — or did something happen recently that kind of brought it all to the surface for you?`, chips: ["It's been building for a long time","Something specific happened recently","It comes and goes","I'm not sure when it started"] },
+        resources:   { text: `Before I share what's out there — is there something specific going on, or are you more just getting familiar with your options?`, chips: ["Something specific is going on","I just want to know my options","It's for a friend actually","I think I might need therapy"] },
+        caps:        { text: `What's pulling you toward CAPS, ${userName} — has something been going on, or is it more of a "just in case I ever need it" kind of feeling?`, chips: ["Something has been going on","I've been struggling for a while","More of a 'just in case'","I'd rather start with Let's Talk"] },
+        better:      { text: `Really glad to hear that 💜 Do you feel like you have enough support around you to hold onto that — or does it still feel a bit fragile?`, chips: ["I think I do have support","It feels a bit fragile","Not sure — it could shift","I just needed to get it out"] },
+        draft:       { text: `Got it — here's a draft you can use as-is or tweak however feels right:\n\n"Hey, I've been wanting to reach out. I've been dealing with some anxiety and overthinking lately, and honestly, talking to someone I trust would mean a lot. No pressure at all — just wanted you to know what's been going on. 💙"\n\nWant me to make it shorter, more casual, or add something specific?`, chips: ["Make it shorter","More casual / less heavy","Add that I'd love to meet up","Write a different version"] },
+        default:     { text: `When you're right in the middle of it — does it feel more like a heavy weight you're carrying (numb, withdrawn, hard to care), or more like anxious restlessness that you can't shake?`, widget:{ type:'tags', label:'How does it tend to feel?', options:["Heavy, numb, withdrawn","Anxious and restless","Sad, like something is missing","Angry or frustrated","Empty — like nothing matters","It shifts all the time"] }, chips: ["Heavy and numb","Anxious and on edge","Sad and withdrawn","It shifts constantly"] },
       };
 
-      /* Phase 3 — gentle resource suggestion, personalized based on intensity */
+      /* ── Smart resource picker: uses intent + intensity + duration + collected tags ── */
+      const pickResources = (intent, intensity, wAnswers) => {
+        const isHigh    = ['Intense','Overwhelming'].includes(intensity);
+        const isMid     = ['Moderate','Noticeable'].includes(intensity);
+        const allVals   = Object.values(wAnswers || {}).join(' ').toLowerCase();
+        const duration  = Object.values(wAnswers || {}).find(v =>
+          ['Just today','A few days','About a week','2–3 weeks','Over a month','A long time'].includes(v));
+        const isLong    = ['Over a month','A long time','2–3 weeks'].includes(duration);
+        const isShort   = ['Just today','A few days'].includes(duration);
+        const hasSleep  = /sleep|insomnia/.test(allVals);
+        const hasLGBTQ  = /lgbtq|queer|trans/.test(allVals);
+        const hasIntl   = /international|cultural|new (here|country)/.test(allVals);
+        const hasFinance= /financ|money|rent|tuition|food|housing/.test(allVals);
+        const hasSocial = /alone|lonely|friend|connection|disconnect/.test(allVals);
+        const hasSomatic= /chest|breath|restless|physical/.test(allVals);
+
+        switch (intent) {
+          case 'crisis':
+            return [R.crisis, R.text741, R.rosecrance, R.reach];
+          case 'anxiety':
+            if (isHigh || isLong) return [R.caps, R.letsTalk, R.breathing, hasSomatic ? R.mckinley : R.workshops, R.welltrack];
+            if (isShort && !isMid) return [R.breathing, R.welltrack, R.letsTalk, R.caps];
+            return [R.caps, R.letsTalk, R.breathing, R.welltrack];
+          case 'overwhelmed': {
+            const base = isHigh ? [R.caps, R.letsTalk, R.embeddedCounseling] : [R.caps, R.letsTalk];
+            if (hasFinance) base.push(R.financialWellness); else base.push(R.odos);
+            if (hasSleep)   base.push(R.mckinley); else base.push(R.welltrack);
+            return base.slice(0, 5);
+          }
+          case 'lonely':
+            return hasSocial ? [R.resilience, R.groupCounseling, R.talkCampus, R.caps]
+                              : [R.resilience, R.talkCampus, R.groupCounseling, R.caps];
+          case 'sleep':
+            return [R.mckinley, R.caps, R.breathing, R.welltrack];
+          case 'academic': {
+            const aRes = [R.odos, R.workshops, R.caps];
+            if (hasFinance) aRes.push(R.financialWellness); else aRes.push(R.letsTalk);
+            return aRes;
+          }
+          case 'grief':
+            return [R.griefSupport, R.groupCounseling, R.caps, R.welltrack];
+          case 'relationship':
+            return [R.caps, R.letsTalk, R.groupCounseling, R.resilience];
+          case 'financial':
+            return [R.financialWellness, R.odos, R.caps, R.letsTalk];
+          case 'identity': {
+            const iRes = [];
+            if (hasLGBTQ) iRes.push(R.safeZone);
+            iRes.push(R.communityAdvocacy);
+            if (hasIntl) iRes.push(R.intlStudent);
+            iRes.push(R.caps);
+            return iRes.slice(0, 4);
+          }
+          case 'resources':
+            return [R.caps, R.letsTalk, R.mckinley, R.resilience, R.welltrack, R.talkCampus];
+          case 'caps':
+            return [R.caps, R.letsTalk, R.embeddedCounseling, R.mckinley];
+          case 'better':
+            return [R.welltrack, R.talkCampus];
+          default:
+            return isHigh ? [R.caps, R.letsTalk, R.crisis, R.welltrack]
+                          : [R.caps, R.letsTalk, R.resilience, R.welltrack];
+        }
+      };
+
+      /* Phase 3 — gentle resource suggestion, personalized based on intensity + context */
       const buildSupport = (intensity) => {
         const isHigh = ['Intense','Overwhelming'].includes(intensity);
+        const isLong = ['Over a month','A long time','2–3 weeks'].includes(
+          Object.values(widgetAnswers).find(v =>
+            ['Just today','A few days','About a week','2–3 weeks','Over a month','A long time'].includes(v)));
         return {
-          crisis:      { text: `Thank you for telling me that, ${userName} 💙 Right now, this very second, there are real people ready to talk — no wait, no judgment, completely confidential. Please reach out — you deserve that support.`, resources:[R.crisis, R.text741, R.rosecrance, R.reach], chips:["How do I call 988?","Tell me about CAPS","I'm not sure I'm ready yet"] },
-          anxiety:     { text: `What you're describing is real — and exhausting 😮‍💨 ${isHigh ? `At this level, ${userName}, you deserve real support — ` : `${userName}, `}CAPS offers free therapy and urgent same-day appointments. The breathing exercise can also help right now while you decide what feels right.`, resources: isHigh ? [R.caps, R.letsTalk, R.breathing, R.welltrack, R.workshops] : [R.caps, R.letsTalk, R.breathing, R.welltrack], chips:["How do I book CAPS?","What is Let's Talk?","Show me the breathing exercise"] },
-          overwhelmed: { text: `That's a lot to be carrying alone, ${userName} 😔 ${isHigh ? `When it gets this heavy, real support makes a real difference — ` : ``}CAPS counselors specialize in exactly this. Let's Talk is a no-appointment option if you just need to talk to someone soon. And if any of this is hitting your coursework, the Dean of Students can help too.`, resources: isHigh ? [R.caps, R.letsTalk, R.embeddedCounseling, R.odos, R.welltrack] : [R.caps, R.letsTalk, R.odos, R.welltrack], chips:["What is Let's Talk?","I need an academic extension","How do I reach CAPS?"] },
-          lonely:      { text: `Connection is a real need, not a luxury, ${userName} 💙 Resilience pairs you with a peer coach who's been through similar things — it's free and student-led. TalkCampus lets you connect anonymously any time. And CAPS group counseling can be powerful for exactly this feeling.`, resources:[R.resilience, R.talkCampus, R.groupCounseling, R.caps], chips:["Tell me more about Resilience","What is TalkCampus?","I'd rather talk to a counselor"] },
-          sleep:       { text: `Sleep and mental health are so deeply connected, ${userName} 😴 McKinley's mental health clinic can help with the clinical side — psychiatry, medication if needed. CAPS can work with the anxiety or stress underneath. And the breathing exercise is worth trying tonight.`, resources:[R.mckinley, R.caps, R.breathing, R.welltrack], chips:["How do I reach McKinley?","I think it's anxiety underneath","Show me the breathing exercise"] },
-          academic:    { text: `That weight is valid — and you don't have to push through it alone, ${userName} 📚 The Dean of Students can buy you time with extensions and accommodations. CAPS workshops on test anxiety and perfectionism are free and no-commitment. And if finances are part of the pressure, there's help for that too.`, resources:[R.odos, R.workshops, R.caps, R.financialWellness], chips:["I need an accommodation","Tell me about CAPS workshops","What is financial wellness counseling?"] },
-          grief:       { text: `Grief deserves real support, ${userName} 🕊️ CAPS has counselors who specialize in loss — individual sessions and group support. There's no timeline for this. The WellTrack app also has self-paced modules specifically for grief and loss.`, resources:[R.griefSupport, R.groupCounseling, R.caps, R.welltrack], chips:["Tell me about grief support at CAPS","What is group counseling like?","Where do I start?"] },
-          relationship:{ text: `Relationship pain is real and it deserves real support, ${userName} 💙 CAPS counselors are trained in exactly this — and sometimes talking it through with someone neutral helps you see things clearly. Group counseling is another powerful option for relationship patterns.`, resources:[R.caps, R.letsTalk, R.groupCounseling, R.resilience], chips:["How do I book CAPS?","What is Let's Talk?","Tell me about group counseling"] },
-          financial:   { text: `Financial stress is one of the most common — and least talked about — reasons students struggle, ${userName} 💙 There are emergency funds and aid options you might not know exist. And the Dean of Students can help with academic flexibility while you stabilize.`, resources:[R.financialWellness, R.odos, R.caps, R.letsTalk], chips:["Tell me about emergency funds","I need an academic extension","I want to talk to someone about this"] },
-          identity:    { text: `You belong here, ${userName} 💙 There are people at UIUC who understand exactly what it's like to navigate identity in this environment — Multicultural Affairs, SafeZone for LGBTQ+ students, and International Student Support. CAPS is also LGBTQ+ affirming.`, resources:[R.communityAdvocacy, R.safeZone, R.intlStudent, R.caps], chips:["Tell me about Multicultural Affairs","What is SafeZone?","I'd like to talk to a counselor"] },
-          resources:   { text: `Here are the main options at UIUC, ${userName} 💙 All free, all confidential — no insurance, no paperwork required to get started.`, resources:[R.caps, R.letsTalk, R.mckinley, R.resilience, R.welltrack, R.talkCampus], chips:["I need crisis support now","Tell me about Let's Talk","How do I book CAPS?"] },
-          caps:        { text: `CAPS is free for all UIUC students — no insurance needed, ${userName} 💜 You can call or schedule online. Let's Talk is even easier: schedule a free 15-minute consultation with a counselor embedded in your college. McKinley is another option if you need psychiatric support or medication.`, resources:[R.caps, R.letsTalk, R.embeddedCounseling, R.mckinley], chips:["What's the difference between CAPS and McKinley?","I need crisis support","Thanks, I feel better"] },
-          better:      { text: `I'm really glad to hear that, ${userName} 💜 Checking in with yourself like this matters more than people realise. Come back any time — even just to talk. The WellTrack app is also great for keeping tabs on how you're doing day to day.`, resources:[R.welltrack, R.talkCampus], chips:["Show me UIUC resources","One more thing…","Take care, bye!"] },
-          default:     { text: `I hear you, ${userName} 💙 You've been holding a lot. There are people at UIUC trained for exactly this — free, confidential, no insurance needed. You don't have to figure it out alone.`, resources: isHigh ? [R.caps, R.letsTalk, R.crisis, R.rosecrance, R.welltrack] : [R.caps, R.letsTalk, R.resilience, R.welltrack], chips:["Show me all UIUC resources","I'd like to talk to someone","I just needed to vent, thanks"] },
+          crisis:      { text: `Thank you for trusting me with this, ${userName} — it means something 💙 Right now, there are real people ready to pick up — trained, non-judgmental, completely confidential. You don't need to be "in danger enough." Struggling is enough.`, resources: pickResources('crisis', intensity, widgetAnswers), chips:["How do I call 988?","Tell me about CAPS","I'm not sure I'm ready yet"] },
+          anxiety:     { text: isHigh || isLong
+            ? `What you're carrying sounds genuinely heavy, ${userName} — this has been going on a while and it deserves real support, not just coping tips. CAPS offers free therapy and urgent same-day appointments. The breathing exercise is also worth trying right now.`
+            : `What you're describing is real — anxiety at this level is draining even when it doesn't look like much from the outside. CAPS has counselors who specialize in this, and there are a few self-help tools worth trying today too.`, resources: pickResources('anxiety', intensity, widgetAnswers), chips:["How do I book CAPS?","What is Let's Talk?","Show me the breathing exercise"] },
+          overwhelmed: { text: isHigh
+            ? `You've been holding too much for too long, ${userName}. When it gets this heavy, the best thing you can do is get some real support — not push through alone. CAPS and Let's Talk are both free, no insurance, no paperwork.`
+            : `That "everything at once" weight is real, and carrying it alone makes it so much heavier. There are people at UIUC whose whole job is exactly this — and it's free to start.`, resources: pickResources('overwhelmed', intensity, widgetAnswers), chips:["What is Let's Talk?","I need an academic extension","How do I reach CAPS?"] },
+          lonely:      { text: `Connection is a real need — not a luxury, not a weakness 💙 Resilience pairs you with a peer coach who's actually been through similar things. TalkCampus lets you reach someone any time of night. And CAPS group counseling can be surprisingly powerful for exactly this feeling.`, resources: pickResources('lonely', intensity, widgetAnswers), chips:["Tell me more about Resilience","What is TalkCampus?","I'd rather talk to a counselor"] },
+          sleep:       { text: `Sleep and mental health are genuinely inseparable — when one suffers, so does the other. McKinley's clinical team can address the physical side. CAPS can work on whatever's underneath. And the breathing exercise is worth trying before bed tonight.`, resources: pickResources('sleep', intensity, widgetAnswers), chips:["How do I reach McKinley?","I think it's anxiety underneath","Show me the breathing exercise"] },
+          academic:    { text: `You don't have to keep pushing through this on your own, ${userName} 💙 The Dean of Students can give you real breathing room with extensions and accommodations. CAPS workshops on test anxiety and perfectionism are free and low-commitment. And if finances are part of the pressure, there's help for that too.`, resources: pickResources('academic', intensity, widgetAnswers), chips:["I need an accommodation","Tell me about CAPS workshops","What is financial wellness counseling?"] },
+          grief:       { text: `Grief doesn't have a schedule, and it doesn't need to make sense right now 🕊️ CAPS has counselors who specifically work with loss — individual sessions and group support. There's no timeline you need to follow. WellTrack also has self-paced grief modules if you want something quiet and on your own terms.`, resources: pickResources('grief', intensity, widgetAnswers), chips:["Tell me about grief support at CAPS","What is group counseling like?","Where do I start?"] },
+          relationship:{ text: `Relationship pain follows you everywhere — into class, into sleep, into everything. It's worth getting support for, ${userName} 💙 Sometimes just talking it through with someone neutral helps you see things differently. CAPS counselors work with this every day.`, resources: pickResources('relationship', intensity, widgetAnswers), chips:["How do I book CAPS?","What is Let's Talk?","Tell me about group counseling"] },
+          financial:   { text: `Financial stress is one of the most common reasons students quietly fall apart — and one of the least talked about 💙 There are emergency funds and aid options you might not know exist at UIUC. And the Dean of Students can help create some academic breathing room while things stabilize.`, resources: pickResources('financial', intensity, widgetAnswers), chips:["Tell me about emergency funds","I need an academic extension","I want to talk to someone about this"] },
+          identity:    { text: `You're not alone in feeling this, and you belong here — even when it doesn't feel that way 💙 There are people at UIUC who genuinely understand what it's like to navigate identity in this environment. CAPS is LGBTQ+ affirming and culturally sensitive.`, resources: pickResources('identity', intensity, widgetAnswers), chips:["Tell me about Multicultural Affairs","What is SafeZone?","I'd like to talk to a counselor"] },
+          resources:   { text: `Here's what UIUC has, ${userName} 💙 Everything here is free and confidential — no insurance, no paperwork required to get started. Let me know if you want more detail on any of them.`, resources: pickResources('resources', intensity, widgetAnswers), chips:["I need crisis support now","Tell me about Let's Talk","How do I book CAPS?"] },
+          caps:        { text: `CAPS is free for all UIUC students — no insurance, no referral needed 💜 You can call or book online. Let's Talk is even lower commitment: a free 15-minute chat with a counselor embedded right in your college. McKinley handles the psychiatric side if that's more what you need.`, resources: pickResources('caps', intensity, widgetAnswers), chips:["What's the difference between CAPS and McKinley?","I need crisis support","Thanks, I feel better"] },
+          better:      { text: `That's genuinely wonderful to hear 💜 Checking in with yourself like this matters more than most people realize. Come back any time — even just to talk. WellTrack is also a good way to keep an eye on how you're doing day to day.`, resources: pickResources('better', intensity, widgetAnswers), chips:["Show me UIUC resources","One more thing…","Take care, bye!"] },
+          draft:       { text: `Here are a couple of versions — pick whichever feels most like you:\n\n**Short & simple:**\n"Hey, been meaning to reach out. I've been going through some anxiety stuff and I'd really love to talk if you're open to it. 💙"\n\n**A bit more open:**\n"Hey — I've been dealing with a lot of anxiety and overthinking lately, and I think talking to you would genuinely help. No pressure, just wanted to be honest about what's been going on."\n\nWant me to tweak the tone, length, or add anything specific?`, chips:["Make it even shorter","More casual — less intense","Add a specific ask (call/coffee)","Write something totally different"] },
+          default:     { text: isHigh
+            ? `I hear you, ${userName}, and what you've shared sounds genuinely heavy 💙 You don't have to carry this alone — there are people at UIUC trained for exactly this, free and confidential, no paperwork needed.`
+            : `Thank you for sharing this with me, ${userName} 💙 What you're feeling is real, and there's support available whenever you're ready. You don't have to figure it out on your own.`, resources: pickResources('default', intensity, widgetAnswers), chips:["Show me all UIUC resources","I'd like to talk to someone","I just needed to vent, thanks"] },
         };
       };
 
       const detectIntent = (text) => {
         const t = text.toLowerCase();
         if (/crisis|suicid|hurt.{0,6}self|end (my|it all)|can't (go on|take it)|emergency|dark thought|not (want|safe|okay)/.test(t)) return 'crisis';
+        if (/draft|write.{0,10}(message|text|note)|what.{0,10}(say|tell|text)|how.{0,10}reach out|first.{0,10}message|message.{0,10}to (him|her|them|my|a )|reach out to|help me (text|tell|say)|start.{0,10}conversation/.test(t)) return 'draft';
         if (/anx(ious|iety)|panic|nervous|worried|fear|dread|can't (calm|breathe|switch off)/.test(t)) return 'anxiety';
         if (/overwhelm|burnout|burnt.?out|too much|can't cope|breaking down|white.?knuckl|everything at once/.test(t)) return 'overwhelmed';
         if (/lone(ly|liness)|alone|isolated|no.{0,5}friend|disconnect|no one gets|don't belong/.test(t)) return 'lonely';
@@ -1266,16 +1595,21 @@
       };
 
       const completeAnxietySwipe = (durationValue, symptomValue, widgetId) => {
-        setWidgetAnswers(prev => ({ ...prev, [widgetId]: `${durationValue} · ${symptomValue}` }));
+        const updatedAnswers = { ...widgetAnswers, [widgetId]: `${durationValue} · ${symptomValue}`, _duration: durationValue, _symptoms: symptomValue };
+        setWidgetAnswers(updatedAnswers);
         setTurn((prev) => Math.max(prev, 3));
         setLastIntent('anxiety');
-        const anxietySupport = buildSupport(null).anxiety;
+        // Pass duration/symptoms into resource picker for smarter matching
+        const intensity = Object.values(widgetAnswers).find(v =>
+          ['Mild','Noticeable','Moderate','Intense','Overwhelming'].includes(v));
+        const anxietySupport = buildSupport(intensity).anxiety;
+        const smartResources = pickResources('anxiety', intensity, updatedAnswers);
         setMessages(m => [
           ...m,
           { from:'user', text: durationValue },
           { from:'user', text: symptomValue.split(' · ')[0] },
           { from:'ai', text: anxietySupport.text },
-          ...anxietySupport.resources.map((res, idx) => {
+          ...smartResources.map((res, idx) => {
             const resKey = Object.entries(R).find(([,v]) => v === res)?.[0];
             return { type:'resource', res, resKey, priorityIndex: idx };
           }),
@@ -1516,7 +1850,7 @@
                       </div>
                     </div>
                   )}
-            {msg.type === 'resource' && <ResourceRail resources={railItems} SF={SF} onBook={startIntakeInline} />}
+            {msg.type === 'resource' && <ResourceRail resources={railItems} SF={SF} onBook={startIntakeInline} onExpand={setExpandedRes} />}
                   {msg.type === 'widget' && (
                     msg._wt === 'intake-tags'              ? <TagWidget     options={msg.options} label={msg.label} answered={widgetAnswers[msg.id]} onAnswer={v => advanceIntake(msg.intakeField, v)} SF={SF} /> :
                     msg._wt === 'intake-choice'            ? <ChoiceWidget  options={msg.options} label={msg.label} helper={msg.helper} answered={widgetAnswers[msg.id]} onAnswer={v => advanceIntake(msg.intakeField, v)} SF={SF} /> :
@@ -1597,6 +1931,16 @@
               </div>
             </div>
           </div>
+
+          {/* Resource detail sheet */}
+          {expandedRes && (
+            <ResourceDetailSheet
+              res={expandedRes}
+              SF={SF}
+              onClose={() => setExpandedRes(null)}
+              onBook={startIntakeInline}
+            />
+          )}
 
           <style>{`
             @keyframes typingDot {

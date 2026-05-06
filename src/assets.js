@@ -41,9 +41,9 @@
     const imgLogGratefulMouth  = 'https://www.figma.com/api/mcp/asset/4665c6d3-a643-4fa5-922e-e62b4b71cfae';
     const imgLogGratefulEyeL   = 'https://www.figma.com/api/mcp/asset/20fbb3cb-45d7-4117-ab49-aed967cc758e';
     const imgLogGratefulEyeR   = 'https://www.figma.com/api/mcp/asset/52989d6f-61bf-4f2b-954a-49f4fc49a2a6';
-    /* Good mood (node 52-340) – refreshed 2026-05-01 */
-    const imgGoodChar     = 'https://www.figma.com/api/mcp/asset/22680cba-6ca8-4ee6-adfe-ee9eac16e64b';
-    const imgGoodFace     = 'https://www.figma.com/api/mcp/asset/fbb42262-19c1-445e-84a3-d170d9441f0c';
+    /* Good mood (node 52-340) – clean export, no grain 2026-05-05 */
+    const imgGoodChar     = 'https://www.figma.com/api/mcp/asset/8778c249-cee2-4b0c-a975-79951c5c97dc';
+    const imgGoodFace     = 'https://www.figma.com/api/mcp/asset/b7fa8981-eb96-4fe3-a3b9-2edef5cbacd9';
     const imgGoodBubble   = 'https://www.figma.com/api/mcp/asset/a8904e24-0184-4c00-8d82-46c76d23b296';
     /* Sad mood (node 52-238) – refreshed 2026-05-01 */
     const imgSadChar      = 'https://www.figma.com/api/mcp/asset/1759fe8a-29c7-4118-96d9-6175f135a3ad';

@@ -2,6 +2,7 @@
 
     /* ── STATUS BAR ── */
     function StatusBar() {
+      return null;
       const [time, setTime] = useState(() => {
         const n = new Date(); return `${n.getHours()}:${String(n.getMinutes()).padStart(2,'0')}`;
       });

@@ -223,6 +223,15 @@
       const [activePeer, setActivePeer] = useState(null);
       const [chatPeer, setChatPeer] = useState(null);
       const [activeResourceFilter, setActiveResourceFilter] = useState('all');
+      const [quadTab, setQuadTab] = useState('feed');
+      const [relatedPosts, setRelatedPosts] = useState({});
+      const [showCompose, setShowCompose] = useState(false);
+      const [expandedReplies, setExpandedReplies] = useState({});
+      const [replyInputs, setReplyInputs] = useState({});
+      const [postReplies, setPostReplies] = useState({
+        1: [{ id:'r1', text:"Same. The 2am replay is the worst version of this.", time:'3h ago' }],
+        3: [{ id:'r2', text:"You're not selfish for needing support. They'd want that for you.", time:'14h ago' }, { id:'r3', text:"First-gen here too — this hit.", time:'9h ago' }],
+      });
       const moodOpenedRef = useRef(false);
 
       const openBooking = (serviceKey) => {
@@ -250,10 +259,13 @@
       const closePeerProfile = () => setActivePeer(null);
 
       const draftPeerIntro = (peer) => {
+        setSidebarOpen(false);
         setActivePeer(null);
         setChatMoodCtx(null);
-        setChatPeer(null);
-        setChatTopic(peer.introPrompt);
+        setChatTopic(null);
+        setBookingService(null);
+        setIsChatBookingMode(false);
+        setChatPeer(peer);
         setTypeChat(true);
       };
 
@@ -365,6 +377,15 @@
           matchNote:'Best when you need a low-demand conversation that feels safe even if you only have a few words.',
           introPrompt:"Help me draft a first message to Riley about depression and low energy. Keep it simple and low-pressure.",
         },
+      ];
+
+      /* ── Quad: Social Sandbox posts ── */
+      const SANDBOX_POSTS = [
+        { id:1, tag:'Anxiety', tagBg:'rgba(244,167,167,0.18)', tagColor:'#b84040', text:"Can't stop overthinking every conversation after it happens. My brain replays everything I said for hours and I can't shut it off.", hoursLeft:41, relates:12 },
+        { id:2, tag:'Engineering Stress', tagBg:'rgba(167,196,244,0.18)', tagColor:'#2c5eac', text:"3 prelabs and a lab report due by Thursday. I know I'm not alone in this but at 2am it really does feel that way.", hoursLeft:18, relates:8 },
+        { id:3, tag:'First-gen', tagBg:'rgba(244,214,167,0.18)', tagColor:'#996010', text:"Don't know how to ask my parents for emotional support when they gave up so much for me to be here. It feels selfish.", hoursLeft:6, relates:24 },
+        { id:4, tag:'International', tagBg:'rgba(167,244,196,0.18)', tagColor:'#1a7a46', text:"Missed my family's lunar new year for the second year in a row. The academic calendar doesn't care about any of that.", hoursLeft:33, relates:17 },
+        { id:5, tag:'Identity', tagBg:'rgba(196,167,244,0.18)', tagColor:'#6435b4', text:"Sometimes I feel like I'm performing two completely different versions of myself — one for campus, one for home. It's exhausting.", hoursLeft:22, relates:31 },
       ];
 
       /* ── resources ── */
@@ -630,89 +651,211 @@
 
             </div>
 
-            {/* ══ SECTION 1 — PEER SUPPORT ══ */}
-            <div style={{ position:'relative', width:390, height:844, overflow:'hidden', background:'#ffffff' }}>
+            {/* ══ SECTION 1 — THE QUAD ══ */}
+            <div style={{ position:'relative', width:390, height:844, overflow:'hidden', background:'#f7f7f5' }}>
 
-              {/* Header — same pill style as AI Chat */}
-              <div style={{ position:'absolute', top:52, left:0, right:0, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 20px', zIndex:15 }}>
-                <div onClick={onBack} style={{ background:'rgba(255,255,255,0.88)', border:'1px solid rgba(20,20,19,0.07)', borderRadius:99, width:34, height:34, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', boxShadow:'0 2px 4px rgba(3,7,18,0.04)', flexShrink:0 }}>
-                  <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M7 1L1 7L7 13" stroke="#141413" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
+              {/* Background blush */}
+              <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse 80% 44% at 50% 0%, rgba(220,210,255,0.22) 0%, transparent 72%)', pointerEvents:'none' }} />
+
+              {/* Header */}
+              <div style={{ position:'absolute', top:52, left:0, right:0, display:'flex', alignItems:'center', justifyContent:'center', padding:'0 20px', zIndex:15 }}>
+                <div style={{ background:'rgba(255,255,255,0.88)', border:'1px solid rgba(20,20,19,0.07)', padding:'9px 20px', borderRadius:22, boxShadow:'0 2px 4px rgba(3,7,18,0.04)', display:'flex', alignItems:'center', gap:6 }}>
+                  <span style={{ color:'#141413', fontSize:13, fontWeight:700, fontFamily:'Sofia Sans,sans-serif' }}>The Quad</span>
+                  <span style={{ background:'rgba(34,182,111,0.12)', color:'#18a06a', fontSize:9.5, fontWeight:800, fontFamily:'Sofia Sans,sans-serif', letterSpacing:'0.4px', padding:'3px 7px', borderRadius:99 }}>UIUC</span>
                 </div>
-                <div style={{ background:'rgba(255,255,255,0.88)', border:'1px solid rgba(20,20,19,0.07)', padding:'9px 20px', borderRadius:22, boxShadow:'0 2px 4px rgba(3,7,18,0.04)' }}>
-                  <span style={{ color:'#141413', fontSize:13, fontWeight:700, fontFamily:'Sofia Sans,sans-serif' }}>Peer Support</span>
-                </div>
-                <div style={{ width:34 }} />
               </div>
 
-              {/* Mini orb — smaller version of AI Chat orb, purple tint */}
-              <div style={{ position:'absolute', top:108, left:0, right:0, display:'flex', justifyContent:'center', zIndex:2, pointerEvents:'none' }}>
-                <div style={{ width:92, height:92, borderRadius:46, background:'rgba(255,255,255,0.72)', border:'1.5px solid rgba(255,255,255,0.55)', boxShadow:'0 28px 90px 0 rgba(124,92,252,0.34), 0 8px 28px 0 rgba(255,255,255,0.10), 0 2px 60px 0 #ccebff', overflow:'hidden', position:'relative' }}>
-                  <div style={{ position:'absolute', inset:0, background:'rgba(255,255,255,0.28)' }} />
-                  <div style={{ position:'absolute', top:'28%', left:'10%', width:'80%', height:'65%', overflow:'visible' }}>
-                    <img alt="" src={imgAiMaskGroup} style={{ position:'absolute', top:'-30%', left:'-22%', width:'144%', height:'160%', display:'block', maxWidth:'none' }} />
+              {/* Title block */}
+              <div style={{ position:'absolute', top:104, left:24, right:24, zIndex:2 }}>
+                <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:6 }}>
+                  <div style={{ width:6, height:6, borderRadius:99, background:'#fde047', boxShadow:'0 0 0 5px rgba(253,224,71,0.12)' }} />
+                  <span style={{ color:'rgba(20,20,19,0.5)', fontSize:10.5, fontWeight:700, fontFamily:'Sofia Sans,sans-serif', letterSpacing:'1.1px', textTransform:'uppercase' }}>Community · Anonymous · Verified</span>
+                </div>
+                <p style={{ color:'#141413', fontSize:26, fontWeight:800, fontFamily:'Sofia Sans,sans-serif', margin:'0 0 2px', lineHeight:1.06, letterSpacing:'-0.6px' }}>A place to be honest</p>
+                <p style={{ color:'rgba(20,20,19,0.46)', fontSize:13, fontWeight:500, fontFamily:'Sofia Sans,sans-serif', margin:0, lineHeight:1.4 }}>Posts disappear in 48h. No names, no history.</p>
+              </div>
+
+              {/* Tab bar */}
+              <div style={{ position:'absolute', top:196, left:24, right:24, zIndex:3, display:'flex', background:'rgba(20,20,19,0.05)', borderRadius:16, padding:3, gap:3 }}>
+                {[['feed','The Feed'],['listeners','Peer Listeners']].map(([key, label]) => (
+                  <div key={key} onClick={() => setQuadTab(key)} style={{ flex:1, textAlign:'center', padding:'9px 0', borderRadius:13, background: quadTab===key ? 'white' : 'transparent', boxShadow: quadTab===key ? '0 2px 8px rgba(20,20,19,0.10)' : 'none', cursor:'pointer', transition:'all 0.2s' }}>
+                    <span style={{ fontSize:12.5, fontWeight:700, color: quadTab===key ? '#141413' : 'rgba(20,20,19,0.44)', fontFamily:'Sofia Sans,sans-serif' }}>{label}</span>
                   </div>
-                  <div style={{ position:'absolute', top:'5%', left:'8%', width:'45%', height:'40%', filter:'blur(3px)', background:'radial-gradient(circle at center, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.5) 45%, transparent 100%)' }} />
-                  <div style={{ position:'absolute', inset:0, borderRadius:40, background:'linear-gradient(145deg, rgba(255,255,255,0.22) 6%, rgba(255,255,255,0) 46%)' }} />
-                </div>
+                ))}
               </div>
 
-              {/* Section title */}
-              <div style={{ position:'absolute', top:196, left:28, right:28, zIndex:2, display:'flex', flexDirection:'column', gap:8 }}>
-                <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                  <div style={{ width:7, height:7, borderRadius:99, background:'#fde047', boxShadow:'0 0 0 6px rgba(253,224,71,0.10)' }} />
-                  <p style={{ color:'rgba(20,20,19,0.58)', fontSize:11, fontWeight:700, margin:0, fontFamily:'Sofia Sans,sans-serif', letterSpacing:'1.12px', textTransform:'uppercase' }}>Community</p>
-                </div>
-                <div style={{ maxWidth:252 }}>
-                  <p style={{ color:'#141413', fontSize:27, fontWeight:800, fontFamily:'Sofia Sans,sans-serif', margin:0, lineHeight:1.04, letterSpacing:'-0.7px' }}>Connect with peers</p>
-                  <p style={{ color:'#141413', fontSize:27, fontWeight:800, fontFamily:'Sofia Sans,sans-serif', margin:0, lineHeight:1.04, letterSpacing:'-0.7px' }}>who truly get it</p>
-                </div>
-              </div>
+              {/* ── THE FEED (Social Sandbox) ── */}
+              {quadTab === 'feed' && (
+                <div className="hide-scrollbar" style={{ position:'absolute', top:244, left:0, right:0, bottom:100, overflowY:'auto', padding:'0 20px', display:'flex', flexDirection:'column', gap:10 }}>
+                  {SANDBOX_POSTS.map(post => {
+                    const related = relatedPosts[post.id];
+                    const h = post.hoursLeft;
+                    const timerColor = h <= 6 ? '#e05555' : h <= 18 ? '#e09820' : 'rgba(20,20,19,0.36)';
+                    const timerBg = h <= 6 ? 'rgba(224,85,85,0.10)' : h <= 18 ? 'rgba(224,152,32,0.10)' : 'rgba(20,20,19,0.05)';
+                    const pct = Math.round((post.hoursLeft / 48) * 100);
+                    return (
+                      <div key={post.id} style={{ background:'white', borderRadius:20, padding:'15px 16px 13px', boxShadow:'0 2px 12px rgba(20,20,19,0.05)', border:'1px solid rgba(20,20,19,0.05)' }}>
+                        {/* Tag + timer */}
+                        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
+                          <span style={{ background:post.tagBg, color:post.tagColor, fontSize:10.5, fontWeight:800, fontFamily:'Sofia Sans,sans-serif', padding:'4px 10px', borderRadius:99, letterSpacing:'0.2px' }}>{post.tag}</span>
+                          <div style={{ display:'flex', alignItems:'center', gap:5, background:timerBg, padding:'4px 9px', borderRadius:99 }}>
+                            <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><circle cx="4.5" cy="4.5" r="3.5" stroke={timerColor} strokeWidth="1.3"/><path d="M4.5 2.5V4.5L5.8 5.5" stroke={timerColor} strokeWidth="1.3" strokeLinecap="round"/></svg>
+                            <span style={{ fontSize:10.5, fontWeight:700, color:timerColor, fontFamily:'Sofia Sans,sans-serif' }}>{h}h left</span>
+                          </div>
+                        </div>
+                        {/* Post text */}
+                        <p style={{ margin:'0 0 12px', fontSize:13, lineHeight:1.48, color:'#141413', fontFamily:'Sofia Sans,sans-serif', fontWeight:400 }}>{post.text}</p>
+                        {/* Timer bar */}
+                        <div style={{ height:2, background:'rgba(20,20,19,0.06)', borderRadius:99, marginBottom:12, overflow:'hidden' }}>
+                          <div style={{ height:'100%', width:`${pct}%`, background: h<=6 ? '#e05555' : h<=18 ? '#e09820' : '#7c5cfc', borderRadius:99 }} />
+                        </div>
+                        {/* Actions */}
+                        <div style={{ display:'flex', alignItems:'center', gap:7 }}>
+                          <div onClick={() => setRelatedPosts(p => ({ ...p, [post.id]: !p[post.id] }))} style={{ display:'flex', alignItems:'center', gap:5, cursor:'pointer', padding:'6px 12px', borderRadius:99, background: related ? 'rgba(124,92,252,0.10)' : 'rgba(20,20,19,0.05)' }}>
+                            <svg width="13" height="12" viewBox="0 0 14 13" fill="none"><path d="M7 11.5C7 11.5 1.5 8 1.5 4.5C1.5 2.84 2.84 1.5 4.5 1.5C5.5 1.5 6.38 2.02 7 2.8C7.62 2.02 8.5 1.5 9.5 1.5C11.16 1.5 12.5 2.84 12.5 4.5C12.5 8 7 11.5 7 11.5Z" fill={related ? '#7c5cfc' : 'none'} stroke={related ? '#7c5cfc' : 'rgba(20,20,19,0.38)'} strokeWidth="1.3" strokeLinejoin="round"/></svg>
+                            <span style={{ fontSize:12, fontWeight:700, color: related ? '#7c5cfc' : 'rgba(20,20,19,0.46)', fontFamily:'Sofia Sans,sans-serif' }}>{post.relates + (related ? 1 : 0)} relate</span>
+                          </div>
+                          <div onClick={() => setExpandedReplies(e => ({ ...e, [post.id]: !e[post.id] }))} style={{ display:'flex', alignItems:'center', gap:5, cursor:'pointer', padding:'6px 12px', borderRadius:99, background: expandedReplies[post.id] ? 'rgba(20,20,19,0.08)' : 'rgba(20,20,19,0.05)' }}>
+                            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1.5 2.5C1.5 1.95 1.95 1.5 2.5 1.5H10.5C11.05 1.5 11.5 1.95 11.5 2.5V8C11.5 8.55 11.05 9 10.5 9H4.5L2 11.5V9H2.5C1.95 9 1.5 8.55 1.5 8V2.5Z" stroke={expandedReplies[post.id] ? '#141413' : 'rgba(20,20,19,0.38)'} strokeWidth="1.2" strokeLinejoin="round"/></svg>
+                            <span style={{ fontSize:12, fontWeight:700, color: expandedReplies[post.id] ? '#141413' : 'rgba(20,20,19,0.46)', fontFamily:'Sofia Sans,sans-serif' }}>
+                              {(postReplies[post.id]||[]).length > 0 ? `${(postReplies[post.id]||[]).length} repl${(postReplies[post.id]||[]).length===1?'y':'ies'}` : 'Reply'}
+                            </span>
+                          </div>
+                          <div style={{ flex:1 }} />
+                          <span style={{ fontSize:12, fontWeight:500, color:'rgba(20,20,19,0.28)', fontFamily:'Sofia Sans,sans-serif' }}>Anonymous</span>
+                        </div>
 
-              {/* Peer cards */}
-              <div style={{ position:'absolute', top:286, left:22, right:22, display:'flex', flexDirection:'column', gap:12, zIndex:2 }}>
-                {PEERS.map((peer) => {
-                  const { name, tag, status, color, initial } = peer;
-                  const isOnline = status === 'Online now';
-                  return (
-                    <div key={name} onClick={() => openPeerProfile(peer)} style={{ background:'rgba(255,255,255,0.84)', backdropFilter:'blur(18px)', WebkitBackdropFilter:'blur(18px)', borderRadius:22, padding:'14px 16px', display:'flex', alignItems:'center', gap:14, border:'1px solid rgba(255,255,255,0.46)', boxShadow:'0 14px 32px rgba(20,20,19,0.06), inset 0 1px 0 rgba(255,255,255,0.38)', cursor:'pointer' }}>
-                      {/* Avatar with online dot */}
-                      <div style={{ position:'relative', flexShrink:0 }}>
-                        <div style={{ width:48, height:48, borderRadius:24, background:color, display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'inset 0 1px 0 rgba(255,255,255,0.38)' }}>
-                          <span style={{ fontSize:18, fontWeight:800, color:'rgba(20,20,19,0.48)', fontFamily:'Sofia Sans,sans-serif' }}>{initial}</span>
+                        {/* Inline reply thread */}
+                        {expandedReplies[post.id] && (
+                          <div style={{ marginTop:12, borderTop:'1px solid rgba(20,20,19,0.06)', paddingTop:12, display:'flex', flexDirection:'column', gap:8 }}>
+                            {(postReplies[post.id]||[]).map(r => (
+                              <div key={r.id} style={{ display:'flex', gap:8, alignItems:'flex-start' }}>
+                                <div style={{ width:22, height:22, borderRadius:11, background:'rgba(20,20,19,0.06)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:1 }}>
+                                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="3.5" r="2" fill="rgba(20,20,19,0.28)"/><path d="M1.5 9C1.5 7.07 3.07 5.5 5 5.5C6.93 5.5 8.5 7.07 8.5 9" stroke="rgba(20,20,19,0.28)" strokeWidth="1.2" strokeLinecap="round"/></svg>
+                                </div>
+                                <div style={{ flex:1, background:'rgba(20,20,19,0.03)', borderRadius:12, padding:'8px 12px' }}>
+                                  <p style={{ margin:'0 0 3px', fontSize:13, color:'#141413', fontFamily:'Sofia Sans,sans-serif', lineHeight:1.44 }}>{r.text}</p>
+                                  <span style={{ fontSize:12, color:'rgba(20,20,19,0.34)', fontFamily:'Sofia Sans,sans-serif' }}>{r.time} · Anonymous</span>
+                                </div>
+                              </div>
+                            ))}
+                            {/* Reply input */}
+                            <div style={{ display:'flex', gap:8, alignItems:'center', marginTop:2 }}>
+                              <div style={{ width:22, height:22, borderRadius:11, background:'rgba(124,92,252,0.10)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                                <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="3.5" r="2" fill="#7c5cfc" fillOpacity="0.55"/><path d="M1.5 9C1.5 7.07 3.07 5.5 5 5.5C6.93 5.5 8.5 7.07 8.5 9" stroke="#7c5cfc" strokeWidth="1.2" strokeLinecap="round"/></svg>
+                              </div>
+                              <input
+                                value={replyInputs[post.id] || ''}
+                                onChange={e => setReplyInputs(r => ({ ...r, [post.id]: e.target.value }))}
+                                placeholder="Reply anonymously…"
+                                style={{ flex:1, background:'rgba(20,20,19,0.05)', border:'1px solid rgba(20,20,19,0.08)', borderRadius:99, padding:'7px 14px', fontSize:13, fontFamily:'Sofia Sans,sans-serif', color:'#141413', outline:'none' }}
+                              />
+                              <div
+                                onClick={() => {
+                                  const txt = (replyInputs[post.id]||'').trim();
+                                  if (!txt) return;
+                                  const newReply = { id:`r${Date.now()}`, text: txt, time:'just now' };
+                                  setPostReplies(p => ({ ...p, [post.id]: [...(p[post.id]||[]), newReply] }));
+                                  setReplyInputs(r => ({ ...r, [post.id]: '' }));
+                                }}
+                                style={{ width:30, height:30, borderRadius:15, background:'#141413', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', flexShrink:0 }}
+                              >
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 10V2M2 6L6 2L10 6" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                  <div style={{ height:12 }} />
+                </div>
+              )}
+
+              {/* ── PEER LISTENERS ── */}
+              {quadTab === 'listeners' && (
+                <div className="hide-scrollbar" style={{ position:'absolute', top:244, left:0, right:0, bottom:100, overflowY:'auto', padding:'0 20px', display:'flex', flexDirection:'column', gap:10 }}>
+                  <p style={{ margin:'4px 0 8px', fontSize:13, color:'rgba(20,20,19,0.46)', fontFamily:'Sofia Sans,sans-serif', fontWeight:500, lineHeight:1.45 }}>Trained volunteers, verified by the UIUC Counseling Center. Enter a Listening Room to connect 1-on-1.</p>
+                  {PEERS.map((peer) => {
+                    const { name, tag, status, color, initial } = peer;
+                    const isOnline = status === 'Online now';
+                    return (
+                      <div key={name} onClick={() => openPeerProfile(peer)} style={{ background:'white', borderRadius:20, padding:'14px 16px', display:'flex', alignItems:'center', gap:14, border:'1px solid rgba(20,20,19,0.05)', boxShadow:'0 2px 12px rgba(20,20,19,0.05)', cursor:'pointer' }}>
+                        <div style={{ position:'relative', flexShrink:0 }}>
+                          <div style={{ width:46, height:46, borderRadius:23, background:color, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                            <span style={{ fontSize:17, fontWeight:800, color:'rgba(20,20,19,0.52)', fontFamily:'Sofia Sans,sans-serif' }}>{initial}</span>
+                          </div>
+                          {isOnline && <div style={{ position:'absolute', bottom:1, right:0, width:10, height:10, borderRadius:5, background:'#2ecc71', border:'2px solid white' }} />}
                         </div>
-                        {isOnline && <div style={{ position:'absolute', bottom:2, right:1, width:11, height:11, borderRadius:6, background:'#2ecc71', border:'2px solid white' }} />}
-                      </div>
-                      {/* Info */}
-                      <div style={{ flex:1, minWidth:0 }}>
-                        <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:4 }}>
-                          <span style={{ fontSize:15, fontWeight:800, color:'#141413', fontFamily:'Sofia Sans,sans-serif', letterSpacing:'-0.24px' }}>{name}</span>
-                          <span style={{ background:'rgba(124,92,252,0.11)', padding:'4px 10px', borderRadius:99, fontSize:10.5, fontWeight:700, color:'#7C5CFC', fontFamily:'Sofia Sans,sans-serif', lineHeight:1 }}>{tag}</span>
+                        <div style={{ flex:1, minWidth:0 }}>
+                          <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:4 }}>
+                            <span style={{ fontSize:14.5, fontWeight:800, color:'#141413', fontFamily:'Sofia Sans,sans-serif', letterSpacing:'-0.2px' }}>{name}</span>
+                            <span style={{ background:'rgba(34,182,111,0.11)', color:'#18a06a', fontSize:10.5, fontWeight:700, fontFamily:'Sofia Sans,sans-serif', letterSpacing:'0.2px', padding:'2px 8px', borderRadius:99 }}>✓ Verified</span>
+                          </div>
+                          <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+                            <span style={{ background:'rgba(124,92,252,0.09)', color:'#7c5cfc', fontSize:10.5, fontWeight:700, fontFamily:'Sofia Sans,sans-serif', padding:'3px 9px', borderRadius:99 }}>{tag}</span>
+                            <span style={{ fontSize:12, color: isOnline ? '#2ecc71' : 'rgba(20,20,19,0.36)', fontFamily:'Sofia Sans,sans-serif', fontWeight: isOnline ? 700 : 500 }}>{status}</span>
+                          </div>
                         </div>
-                        <span style={{ fontSize:12.5, color: isOnline ? '#2ecc71' : 'rgba(20,20,19,0.38)', fontFamily:'Sofia Sans,sans-serif', fontWeight: isOnline ? 700 : 500, letterSpacing:'-0.08px' }}>{status}</span>
+                        {/* Enter Room button */}
+                        <div onClick={(e) => { e.stopPropagation(); openPeerChat(peer); }} style={{ background:'rgba(20,20,19,0.05)', borderRadius:99, padding:'7px 14px', cursor:'pointer', flexShrink:0 }}>
+                          <span style={{ fontSize:12, fontWeight:700, color:'#141413', fontFamily:'Sofia Sans,sans-serif', whiteSpace:'nowrap' }}>Enter Room</span>
+                        </div>
                       </div>
-                      {/* Chat button */}
-                      <div onClick={(e) => { e.stopPropagation(); openPeerChat(peer); }} style={{ width:38, height:38, borderRadius:19, background:'rgba(124,92,252,0.08)', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', flexShrink:0, boxShadow:'inset 0 1px 0 rgba(255,255,255,0.24)' }}>
-                        <img alt="" src={imgPeerChatBtn} onClick={(e) => { e.stopPropagation(); openPeerChat(peer); }} style={{ width:17, height:17, display:'block', cursor:'pointer' }} />
-                      </div>
+                    );
+                  })}
+                  <div style={{ height:12 }} />
+                </div>
+              )}
+
+              {/* Compose / Share button */}
+              <div style={{ position:'absolute', bottom:112, left:24, right:24, zIndex:5 }}>
+                {quadTab === 'feed' ? (
+                  <div onClick={() => setShowCompose(true)} style={{ background:'#141413', borderRadius:20, padding:'15px 20px', display:'flex', alignItems:'center', justifyContent:'space-between', cursor:'pointer', boxShadow:'0 16px 36px rgba(20,20,19,0.18)' }}>
+                    <div>
+                      <p style={{ color:'white', fontWeight:800, fontSize:15, margin:'0 0 2px', fontFamily:'Sofia Sans,sans-serif', letterSpacing:'-0.2px' }}>Share anonymously</p>
+                      <p style={{ color:'rgba(255,255,255,0.46)', fontSize:12, margin:0, fontFamily:'Sofia Sans,sans-serif' }}>Disappears in 48 hours</p>
                     </div>
-                  );
-                })}
+                    <div style={{ width:34, height:34, borderRadius:17, background:'rgba(255,255,255,0.10)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                      <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M7 2V12M2 7H12" stroke="white" strokeWidth="1.8" strokeLinecap="round"/></svg>
+                    </div>
+                  </div>
+                ) : (
+                  <div onClick={() => openPeerChat(PEERS.find(p => p.status === 'Online now') || PEERS[0])} style={{ background:'#141413', borderRadius:20, padding:'15px 20px', display:'flex', alignItems:'center', justifyContent:'space-between', cursor:'pointer', boxShadow:'0 16px 36px rgba(20,20,19,0.18)' }}>
+                    <div>
+                      <p style={{ color:'white', fontWeight:800, fontSize:15, margin:'0 0 2px', fontFamily:'Sofia Sans,sans-serif', letterSpacing:'-0.2px' }}>Find a Listening Room</p>
+                      <p style={{ color:'rgba(255,255,255,0.46)', fontSize:12, margin:0, fontFamily:'Sofia Sans,sans-serif' }}>3 listeners available now</p>
+                    </div>
+                    <div style={{ width:34, height:34, borderRadius:17, background:'rgba(255,255,255,0.10)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5H11M7.5 2.5L11 6.5L7.5 10.5" stroke="white" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* CTA — dark button with arrow inline SVG */}
-              <div style={{ position:'absolute', bottom:122, left:28, right:28, zIndex:3 }}>
-                <div style={{ background:'linear-gradient(180deg, rgba(25,37,58,0.96) 0%, rgba(20,20,19,0.98) 100%)', borderRadius:24, padding:'18px 22px', display:'flex', alignItems:'center', justifyContent:'space-between', cursor:'pointer', boxShadow:'0 22px 48px rgba(20,20,19,0.20), 0 0 0 1px rgba(255,255,255,0.05) inset' }}>
-                  <div>
-                    <p style={{ color:'white', fontWeight:800, fontSize:17, margin:'0 0 4px', fontFamily:'Sofia Sans,sans-serif', letterSpacing:'-0.26px' }}>Find a Match</p>
-                    <p style={{ color:'rgba(255,255,255,0.52)', fontSize:12.5, margin:0, fontFamily:'Sofia Sans,sans-serif', fontWeight:500, letterSpacing:'-0.08px' }}>3 peers available now</p>
-                  </div>
-                  <div style={{ width:42, height:42, borderRadius:21, background:'rgba(255,255,255,0.10)', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'inset 0 1px 0 rgba(255,255,255,0.14)' }}>
-                    <img alt="" src={imgPeerArrow} style={{ width:18, height:18, display:'block' }} />
+              {/* Compose sheet */}
+              {showCompose && (
+                <div onClick={() => setShowCompose(false)} style={{ position:'absolute', inset:0, zIndex:50, background:'rgba(0,0,0,0.32)', backdropFilter:'blur(8px)' }}>
+                  <div onClick={e => e.stopPropagation()} style={{ position:'absolute', bottom:0, left:0, right:0, background:'white', borderRadius:'28px 28px 0 0', padding:'20px 22px 40px', display:'flex', flexDirection:'column', gap:14 }}>
+                    <div style={{ width:36, height:4, borderRadius:99, background:'rgba(20,20,19,0.12)', margin:'0 auto 4px' }} />
+                    <div>
+                      <p style={{ margin:'0 0 4px', fontSize:16, fontWeight:800, color:'#141413', fontFamily:'Sofia Sans,sans-serif' }}>Share something</p>
+                      <p style={{ margin:0, fontSize:13, color:'rgba(20,20,19,0.46)', fontFamily:'Sofia Sans,sans-serif' }}>Completely anonymous · Disappears in 48h</p>
+                    </div>
+                    <div style={{ background:'rgba(20,20,19,0.05)', borderRadius:16, padding:'14px 16px', minHeight:100, border:'1px solid rgba(20,20,19,0.07)' }}>
+                      <p style={{ margin:0, fontSize:13, color:'rgba(20,20,19,0.34)', fontFamily:'Sofia Sans,sans-serif' }}>What's on your mind?</p>
+                    </div>
+                    <div style={{ display:'flex', gap:8, overflowX:'auto' }} className="hide-scrollbar">
+                      {['Anxiety','Stress','First-gen','International','Identity','Depression','Grief'].map(t => (
+                        <span key={t} style={{ background:'rgba(20,20,19,0.05)', color:'rgba(20,20,19,0.6)', fontSize:12, fontWeight:700, fontFamily:'Sofia Sans,sans-serif', padding:'7px 14px', borderRadius:99, whiteSpace:'nowrap', cursor:'pointer', flexShrink:0 }}>{t}</span>
+                      ))}
+                    </div>
+                    <div onClick={() => setShowCompose(false)} style={{ background:'#141413', borderRadius:16, padding:'14px', textAlign:'center', cursor:'pointer' }}>
+                      <span style={{ color:'white', fontSize:13, fontWeight:700, fontFamily:'Sofia Sans,sans-serif' }}>Post anonymously</span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* ══ SECTION 2 — RESOURCE CENTER ══ */}

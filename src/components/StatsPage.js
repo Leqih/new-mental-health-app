@@ -71,7 +71,7 @@
       ];
 
       return (
-        <div style={{ position:'absolute', inset:0, background:'#f5f2ef', zIndex:200, borderRadius:'inherit', overflow:'hidden' }}>
+        <div style={{ position:'absolute', inset:0, background:'#faf7f5', zIndex:200, borderRadius:'inherit', overflow:'hidden' }}>
           <StatusBar />
 
           {/* Header */}

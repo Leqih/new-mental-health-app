@@ -1,4 +1,4 @@
-    const { useEffect, useState } = React;
+    const { useEffect, useRef, useState } = React;
 
     /* ── Inject gradient keyframes once (shared with LogMoodPage) ── */
     (() => {
@@ -134,6 +134,29 @@
       const moodBanner = !bannerDismissed ? computeMoodBanner(allMoodLogs) : null;
 
       /* Week strip mood states */
+      /* ── Swipe navigation (left/right only, axis-locked) ── */
+      const NAV_PAGES = ['home', 'stats', 'peers', 'profile'];
+      const swipeRef = useRef({ x: 0, y: 0, axis: null });
+      const handleTouchStart = (e) => {
+        swipeRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY, axis: null };
+      };
+      const handleTouchMove = (e) => {
+        if (swipeRef.current.axis) return; // already locked
+        const dx = Math.abs(e.touches[0].clientX - swipeRef.current.x);
+        const dy = Math.abs(e.touches[0].clientY - swipeRef.current.y);
+        if (dx < 6 && dy < 6) return; // too small to decide
+        swipeRef.current.axis = dx > dy * 1.5 ? 'h' : 'v'; // lock axis early (stricter horiz threshold)
+      };
+      const handleTouchEnd = (e) => {
+        if (swipeRef.current.axis !== 'h') return; // only act on horizontal
+        const dx = e.changedTouches[0].clientX - swipeRef.current.x;
+        if (Math.abs(dx) < 80) return; // minimum distance
+        const idx = NAV_PAGES.indexOf(page);
+        if (idx === -1 || page === 'peers') return;
+        if (dx < 0 && idx < NAV_PAGES.length - 1) setPage(NAV_PAGES[idx + 1]);
+        if (dx > 0 && idx > 0) setPage(NAV_PAGES[idx - 1]);
+      };
+
       const isDesktopPreview = viewport.width > 430;
       const horizontalInset = isDesktopPreview ? 32 : 0;
       const verticalInset = isDesktopPreview ? 32 : 0;
@@ -143,7 +166,7 @@
             (viewport.width - horizontalInset * 2) / FRAME_W,
             (viewport.height - verticalInset * 2) / FRAME_H
           )
-        : viewport.width / FRAME_W;
+        : Math.min(viewport.width / FRAME_W, viewport.height / FRAME_H);
 
       return (
         <>
@@ -154,7 +177,7 @@
             alignItems: isDesktopPreview ? 'center' : 'flex-start',
             justifyContent: 'center',
             overflow: 'hidden',
-            background: '#ddd7ce',
+            background: '#faf7f5',
             padding: `${verticalInset}px ${horizontalInset}px`,
           }}>
             <div style={{
@@ -163,13 +186,17 @@
               position: 'relative',
               flexShrink: 0,
             }}>
-              <div style={{
-                width: FRAME_W, height: FRAME_H,
-                position: 'absolute', left: 0, top: 0, overflow: 'hidden',
-                flexShrink: 0,
-                transform: `scale(${frameScale})`,
-                transformOrigin: 'top left',
-              }}>
+              <div
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+                style={{
+                  width: FRAME_W, height: FRAME_H,
+                  position: 'absolute', left: 0, top: 0, overflow: 'hidden',
+                  flexShrink: 0,
+                  transform: `scale(${frameScale})`,
+                  transformOrigin: 'top left',
+                }}>
                 {/* ── BACKGROUND ── */}
                 <div style={{
                   position:'absolute',

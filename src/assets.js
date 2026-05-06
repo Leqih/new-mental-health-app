@@ -47,7 +47,7 @@
     const imgGoodFace     = 'https://www.figma.com/api/mcp/asset/c341e8ee-d61b-4bcd-92a5-f44818541500'; // node 52:342 eyes group (92×48 top-left)
     const imgGoodBubble   = 'https://www.figma.com/api/mcp/asset/a8904e24-0184-4c00-8d82-46c76d23b296';
     /* Sad mood (node 52-238) – refreshed 2026-05-06 */
-    const imgSadChar      = 'https://www.figma.com/api/mcp/asset/83bc17a1-8dc1-4e3e-a0d9-91dcd45630b2'; // node 52:249 sad cloud body (refreshed)
+    const imgSadChar      = 'https://www.figma.com/api/mcp/asset/557bc801-d027-46ea-8d85-c887803ac596'; // node 52:239 sad cloud body ONLY (no face)
     /* Happy mood (node 60-232) – fresh URLs */
     const imgHappyChar    = 'https://www.figma.com/api/mcp/asset/b7f17f3f-398b-408b-8c56-d5c6ecec2c4d';
     const imgHappyFaceL   = 'https://www.figma.com/api/mcp/asset/50e40067-7a72-4ec9-8b66-eaedbe4942cf';
@@ -63,7 +63,7 @@
     const imgAngryFaceA   = 'https://www.figma.com/api/mcp/asset/b9656d0c-0bed-49a9-aa32-87892eefc5de'; // node 56:30 eyebrows group
     const imgAngryFaceB   = 'https://www.figma.com/api/mcp/asset/88e140ed-422d-4d45-b09c-95a24c5f578f'; // node 56:51 mouth circle (24×28)
     /* Anxious mood (node 60-210) */
-    const imgAnxiousChar  = 'https://www.figma.com/api/mcp/asset/c39f226c-34c3-40a4-8a80-2045d077ac69'; // pink spiky blob body (node 55:3, refreshed)
+    const imgAnxiousChar  = 'https://www.figma.com/api/mcp/asset/e653a93c-043f-4ce9-8bee-43301858dab2'; // node 55:4 anxious spiky body ONLY (no face)
     const imgAnxiousSweat = 'https://www.figma.com/api/mcp/asset/a56492de-2c40-40a3-a3c3-3ebb3eafc46b'; // sweat drop (node 52:397, 75×92)
     const imgAnxiousFace  = 'https://www.figma.com/api/mcp/asset/f1c3f497-facd-4273-97d7-6cf8d8c6da62'; // face overlay (eyes+mouth+sweat drop)
     const imgWeeklyAnxiousFigma = 'src/assets/anxious-weekly-figma.svg?v=1';

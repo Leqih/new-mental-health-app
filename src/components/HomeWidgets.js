@@ -1,5 +1,5 @@
     /* ── MOOD LOG CARD ── */
-    function MoodLogCard({ count }) {
+    function MoodLogCard({ count, onClick }) {
       const E = { w:17, h:17, br:8.5 };
       const emptyBox = (key, extra={}) => (
         <div key={key} style={{ background:'white', border:'1px solid rgba(20,20,19,0.12)', borderRadius:E.br, flexShrink:0, width:E.w, height:E.h, ...extra }} />
@@ -9,7 +9,7 @@
       );
 
       return (
-        <div style={{ position:'absolute', background:'rgba(252,251,250,0.92)', border:'1px solid rgba(20,20,19,0.07)', height:165, left:0, overflow:'hidden', borderRadius:20, boxShadow:'0 4px 24px rgba(0,0,0,0.04), 0 24px 48px rgba(0,0,0,0.08)', top:0, width:168 }}>
+        <div onClick={onClick} style={{ position:'absolute', background:'rgba(252,251,250,0.92)', border:'1px solid rgba(20,20,19,0.07)', height:165, left:0, overflow:'hidden', borderRadius:20, boxShadow:'0 4px 24px rgba(0,0,0,0.04), 0 24px 48px rgba(0,0,0,0.08)', top:0, width:168, cursor: onClick ? 'pointer' : 'default' }}>
           {/* Original gradient halo */}
           <div style={{ position:'absolute', height:298.667, left:-1, top:-122, width:168 }}>
             <img alt="" style={{ position:'absolute', display:'block', inset:0, maxWidth:'none', width:'100%', height:'100%' }} src={imgGradientHalo} onError={e => e.target.style.display='none'} />

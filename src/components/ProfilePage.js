@@ -6,7 +6,6 @@
       const SF = 'Sofia Sans,sans-serif';
       return (
         <div style={{ position:'absolute', inset:0, zIndex:200, background:'#faf7f5', display:'flex', flexDirection:'column', overflowY:'auto' }}>
-          <StatusBar />
           <div style={{ display:'flex', alignItems:'center', gap:12, padding:'64px 22px 20px' }}>
             <button onClick={onBack} style={{ background:'rgba(20,20,19,0.07)', border:'none', borderRadius:20, width:40, height:40, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
               <svg width="10" height="16" viewBox="0 0 10 16" fill="none"><path d="M9 1L1 8l8 7" stroke="#141413" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>

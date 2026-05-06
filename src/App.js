@@ -382,8 +382,6 @@
                 </p>
               </div>
 
-              {/* Status bar on top */}
-              <StatusBar />
             </div>
                 {/* Today moods list sheet */}
                 {showTodaySheet && <TodayMoodsSheet entries={todayEntries} onClose={() => setShowTodaySheet(false)} onViewEntry={e => { setShowTodaySheet(false); setViewEntry(e); }} onLogMood={() => { setShowTodaySheet(false); setPage('logMood'); }} />}

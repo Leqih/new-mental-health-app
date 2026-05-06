@@ -11,8 +11,6 @@
         ? { peak:'#b4a0e8', c1:'#ccc0ef', c2:'#d8cef5', c3:'#e4dcfa', c4:'#f0ecfd' }
         : mood==='Angry'
         ? { peak:'#ff7070', c1:'#ffaaaa', c2:'#ffc0c0', c3:'#ffd5d5', c4:'#ffe8e8' }
-        : mood==='Boring'
-        ? { peak:'#40c8c0', c1:'#80d8d4', c2:'#a8e6e2', c3:'#c0efec', c4:'#d8f5f4' }
         : mood==='Anxious'
         ? { peak:'#ff82aa', c1:'#ffaac2', c2:'#ffbfd0', c3:'#ffd5e0', c4:'#ffe8f0' }
         : { peak:'#91e4fb', c1:'#c7ecf7', c2:'#daf6ff', c3:'#e4f9ff', c4:'#eafaff' };
@@ -24,7 +22,7 @@
         return { h: hs[src], c: cs[src] };
       });
     };
-    const LOG_MOOD_OPTIONS = ['Angry','Exhausted','Sad','Anxious','Boring','Good','Happy','Grateful'];
+    const LOG_MOOD_OPTIONS = ['Angry','Exhausted','Sad','Anxious','Good','Happy','Grateful'];
 
     function LogMoodPage({ onBack, onSave, initialData }) {
       const [selected, setSelected] = useState(initialData ? (initialData.mood.charAt(0).toUpperCase() + initialData.mood.slice(1)) : 'Good');
@@ -63,7 +61,6 @@
         id==='Good'      ? 'hue-rotate(-120deg) saturate(1.3) brightness(1.15)' :
         id==='Sad'       ? 'hue-rotate(0deg)'   :
         id==='Angry'     ? 'hue-rotate(140deg) saturate(1.4) brightness(1.05)' :
-        id==='Boring'    ? 'hue-rotate(-50deg) saturate(1.2) brightness(1.12)' :
         id==='Anxious'   ? 'hue-rotate(320deg) saturate(0.9) brightness(1.08)' :
         'hue-rotate(30deg) saturate(0.55) brightness(1.05)';
 
@@ -71,26 +68,25 @@
       const moodBgColor = (id) =>
         id==='Grateful'  ? '#fde4c0' : id==='Happy'    ? '#fef5a0' :
         id==='Good'      ? '#aadf6a' : id==='Sad'      ? '#c2e4f5' :
-        id==='Angry'     ? '#ffd0d0' : id==='Boring'   ? '#c0ecea' :
+        id==='Angry'     ? '#ffd0d0' :
         id==='Anxious'   ? '#ffd0e8' : '#d8c8f5';
 
       const renderSlot = (moodId) => {
         const mg = moodId==='Good', ms = moodId==='Sad',
               mh = moodId==='Happy', mgr = moodId==='Grateful',
-              man = moodId==='Angry', mex = moodId==='Exhausted', mbr = moodId==='Boring',
+              man = moodId==='Angry', mex = moodId==='Exhausted',
               max = moodId==='Anxious';
         const ci = mh ? imgHappyChar : mgr ? imgGratefulChar : mg ? imgGoodChar :
-                   man ? imgAngryChar : mex ? imgExhaustedChar : mbr ? '' : max ? imgAnxiousChar : imgLogCloudChar;
-        const cf = mg || mh || mgr || man || mex || mbr || max ? 'none' : !ms ? 'saturate(0.2) brightness(0.85) hue-rotate(250deg)' : 'none';
+                   man ? imgAngryChar : mex ? imgExhaustedChar : max ? imgAnxiousChar : imgLogCloudChar;
+        const cf = mg || mh || mgr || man || mex || max ? 'none' : !ms ? 'saturate(0.2) brightness(0.85) hue-rotate(250deg)' : 'none';
         const ca = mh  ? 'cloudHappy 2s ease-in-out infinite' :
                    mgr ? 'cloudGrateful 5s ease-in-out infinite' :
                    man ? 'cloudAngry 1.5s ease-in-out infinite' :
-                   mbr ? 'cloudBoring 7s ease-in-out infinite' :
                    mex ? 'cloudExhausted 5s ease-in-out infinite' :
                    max ? 'cloudAngry 2.5s ease-in-out infinite' :
                    ms  ? 'cloudSad 3s ease-in-out infinite' : 'cloudSad 3s ease-in-out infinite';
-        const ec = mg ? '#141413' : ms ? '#58c2ff' : (!mh && !mgr && !man && !mex && !mbr && !max) ? '#9090b0' : null;
-        const esy = !ms && !mg && !mh && !mgr && !man && !mex && !mbr && !max ? 0.45 : 1;
+        const ec = mg ? '#141413' : ms ? '#58c2ff' : (!mh && !mgr && !man && !mex && !max) ? '#9090b0' : null;
+        const esy = !ms && !mg && !mh && !mgr && !man && !mex && !max ? 0.45 : 1;
         const bi = mg ? imgGoodBubble : imgLogBubble;
         const bws = mgr
           ? { background:'linear-gradient(-1.89deg,rgb(240,180,100) 30%,rgb(220,120,40) 110%)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' }
@@ -102,8 +98,6 @@
           ? { background:'linear-gradient(-1.89deg,rgb(255,90,70) 30%,rgb(210,30,10) 110%)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' }
           : mex
           ? { background:'linear-gradient(-1.89deg,rgb(180,120,255) 30%,rgb(120,50,210) 110%)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' }
-          : mbr
-          ? { background:'linear-gradient(-1.89deg,rgb(30,185,175) 30%,rgb(10,145,135) 110%)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' }
           : max
           ? { background:'linear-gradient(-1.89deg,rgb(255,130,170) 30%,rgb(210,60,110) 110%)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' }
           : ms ? { color:'#47d9ff' } : { color:'#a090d0' };
@@ -136,12 +130,6 @@
             <div style={{ position:'absolute', left:'50%', marginLeft:-143.5, top: mgr ? 220 : man ? 215 : mh ? 205 : 195, width:287, height:287 }}>
               <div style={{ position:'relative', width:'100%', height:'100%', filter:cf, animation:ca }}>
                 {ci && <img alt="" style={{ position:'absolute', display:'block', inset:0, maxWidth:'none', width:'100%', height:'100%' }} src={ci} onError={e=>e.target.style.display='none'} />}
-                {mbr && <>
-                  <img alt="" style={{ position:'absolute', top:0, bottom:0, left:0, right:'75%', width:'25%', height:'100%', display:'block' }} src={imgBoringChar1} onError={e=>e.target.style.display='none'} />
-                  <img alt="" style={{ position:'absolute', top:0, bottom:0, left:'24.99%', right:'50%', width:'25.01%', height:'100%', display:'block' }} src={imgBoringChar2} onError={e=>e.target.style.display='none'} />
-                  <img alt="" style={{ position:'absolute', top:0, bottom:0, left:'50%', right:'24.99%', width:'25.01%', height:'100%', display:'block' }} src={imgBoringChar1} onError={e=>e.target.style.display='none'} />
-                  <img alt="" style={{ position:'absolute', top:0, bottom:0, left:'75%', right:0, width:'25%', height:'100%', display:'block' }} src={imgBoringChar2} onError={e=>e.target.style.display='none'} />
-                </>}
                 {mg && <>
                   {/* Mouth layer — static, full height so smile isn't clipped */}
                   <div style={{ position:'absolute', height:56, left:97, top:131, width:92, clipPath:'inset(43% 0 0 0)' }}>
@@ -239,24 +227,6 @@
                     </div>
                   </div>
                 </>}
-                {mbr && <>
-                  {/* Left eye — Vector 21.svg inline, exact Figma coords */}
-                  <svg style={{ position:'absolute', left:108, top:113, width:31, height:20, overflow:'visible' }} viewBox="0 0 32 20" fill="none">
-                    <path d="M7.50195 12.2736L23.8186 7.50196" stroke="black" strokeWidth="15" strokeLinecap="round"/>
-                  </svg>
-                  {/* Right eye — Vector 32.svg inline, exact Figma coords */}
-                  <svg style={{ position:'absolute', left:156, top:113, width:31, height:20, overflow:'visible' }} viewBox="0 0 32 20" fill="none">
-                    <path d="M23.8186 12.2736L7.50199 7.50196" stroke="black" strokeWidth="15" strokeLinecap="round"/>
-                  </svg>
-                  {/* Mouth frown line — exact Figma coords */}
-                  <div style={{ position:'absolute', left:116, top:137, width:51, height:19 }}>
-                    <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgBoringMthA} onError={e=>e.target.style.display='none'} />
-                  </div>
-                  {/* Mouth accent blob — exact Figma coords */}
-                  <div style={{ position:'absolute', left:159, top:132, width:20, height:34 }}>
-                    <img alt="" style={{ display:'block', width:'100%', height:'100%' }} src={imgBoringMthB} onError={e=>e.target.style.display='none'} />
-                  </div>
-                </>}
                 {!mg && !mh && !mgr && ec && <>
                   <div style={{ position:'absolute', background:ec, height:11, left:183, borderRadius:20, top:133, width:21, transform:`scaleY(${esy})`, transformOrigin:'center', animation:'eyeIdle 4s ease-in-out 0.3s infinite' }} />
                   <div style={{ position:'absolute', background:ec, height:11, left:82,  borderRadius:20, top:133, width:21, transform:`scaleY(${esy})`, transformOrigin:'center', animation:'eyeIdle 4s ease-in-out 0.5s infinite' }} />
@@ -310,14 +280,14 @@
       const isGood = selected==='Good', isSad = selected==='Sad',
             isHappy = selected==='Happy', isGrateful = selected==='Grateful',
             isAngry = selected==='Angry', isExhausted = selected==='Exhausted',
-            isBoring = selected==='Boring', isAnxious = selected==='Anxious';
+            isAnxious = selected==='Anxious';
       const pillShadow = isGrateful ? '#f0a040' : isHappy ? '#e8c010' :
                          isGood ? '#90d870' : isSad ? '#91e4fb' :
-                         isAngry ? '#ff7070' : isBoring ? '#40c8c0' :
+                         isAngry ? '#ff7070' :
                          isExhausted ? '#b4a0e8' : isAnxious ? '#ff82aa' : '#b090e8';
       const sheetBg = isGrateful ? '#fff8f0' : isHappy ? '#fffdf0' :
                       isGood ? '#f4fbee' : isSad ? '#eef8ff' :
-                      isAngry ? '#fff4f4' : isBoring ? '#edfaf9' :
+                      isAngry ? '#fff4f4' :
                       isExhausted ? '#f5f0ff' : isAnxious ? '#fff0f5' : '#faf7f5';
       const inAnim  = slideDir==='left'  ? 'slideFromRight 0.4s cubic-bezier(0.25,0.46,0.45,0.94) both' :
                       slideDir==='right' ? 'slideFromLeft  0.4s cubic-bezier(0.25,0.46,0.45,0.94) both' : 'none';
@@ -397,7 +367,7 @@
                     const tint = isSel ? (
                       mood==='Grateful'  ? '#fdecd8' : mood==='Happy'    ? '#fef9d0' :
                       mood==='Good'      ? '#e8f8df' : mood==='Sad'      ? '#daf4fd' :
-                      mood==='Angry'     ? '#ffe8e8' : mood==='Boring'   ? '#d5f5f4' :
+                      mood==='Angry'     ? '#ffe8e8' :
                       mood==='Exhausted' ? '#eedeff' : mood==='Anxious' ? '#ffe4ef' : '#ede8fa') : 'white';
                     return (
                     <div key={mood} onClick={() => switchMood(mood)}
@@ -416,7 +386,7 @@
               </div>
             {/* Submit */}
             <div onClick={() => { setShowTellMore(true); }}
-              style={{ position:'absolute', background: isGrateful?'#d87830':isHappy?'#c8a000':isGood?'#5cb85c':isSad?'#3ab4dc':isAngry?'#e04040':isBoring?'#30b8b0':isExhausted?'#8050c8':isAnxious?'#d84080':'#9070cc', height:45, left:19, borderRadius:20, top:328, width:352, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', transition:'background 0.3s ease' }}>
+              style={{ position:'absolute', background: isGrateful?'#d87830':isHappy?'#c8a000':isGood?'#5cb85c':isSad?'#3ab4dc':isAngry?'#e04040':isExhausted?'#8050c8':isAnxious?'#d84080':'#9070cc', height:45, left:19, borderRadius:20, top:328, width:352, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', transition:'background 0.3s ease' }}>
               <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:500, fontSize:16, color:'white', letterSpacing:'-0.2px' }}>Log Mood</p>
             </div>
           </div>
@@ -431,12 +401,11 @@
             <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:500, fontSize:13, color:'#141413', letterSpacing:'-0.1px' }}>← Back</p>
           </div>
 
-          <StatusBar />
           <div style={{ position:'absolute', inset:0, pointerEvents:'none', borderRadius:'inherit', boxShadow:'inset 0px 1px 0px 0px rgba(255,255,255,0.12)' }} />
 
           {showTellMore && (() => {
-            const accentColor = isGrateful?'#d87830':isHappy?'#c8a000':isGood?'#5cb85c':isSad?'#3ab4dc':isAngry?'#e04040':isBoring?'#30b8b0':isExhausted?'#8050c8':isAnxious?'#d84080':'#9070cc';
-            const accentLight = isGrateful?'rgba(216,120,48,0.12)':isHappy?'rgba(200,160,0,0.12)':isGood?'rgba(92,184,92,0.12)':isSad?'rgba(58,180,220,0.12)':isAngry?'rgba(224,64,64,0.12)':isBoring?'rgba(48,184,176,0.12)':isExhausted?'rgba(128,80,200,0.12)':isAnxious?'rgba(216,64,128,0.12)':'rgba(144,112,204,0.12)';
+            const accentColor = isGrateful?'#d87830':isHappy?'#c8a000':isGood?'#5cb85c':isSad?'#3ab4dc':isAngry?'#e04040':isExhausted?'#8050c8':isAnxious?'#d84080':'#9070cc';
+            const accentLight = isGrateful?'rgba(216,120,48,0.12)':isHappy?'rgba(200,160,0,0.12)':isGood?'rgba(92,184,92,0.12)':isSad?'rgba(58,180,220,0.12)':isAngry?'rgba(224,64,64,0.12)':isExhausted?'rgba(128,80,200,0.12)':isAnxious?'rgba(216,64,128,0.12)':'rgba(144,112,204,0.12)';
 
             const TagChip = ({ label, selected, onToggle }) => (
               <div onClick={onToggle} style={{ display:'inline-flex', alignItems:'center', gap:6, background: selected ? accentColor : 'white', border: `1px solid ${selected ? accentColor : 'rgba(20,20,19,0.10)'}`, borderRadius:999, padding:'5px 13px', cursor:'pointer', flexShrink:0, transition:'all 0.15s' }}>
@@ -467,7 +436,6 @@
               isGood     ? 'linear-gradient(160deg,#c8f0c0 0%,#e8f8e0 100%)' :
               isSad      ? 'linear-gradient(160deg,#b8dff8 0%,#d8f0ff 100%)' :
               isAngry    ? 'linear-gradient(160deg,#f8b0b0 0%,#fee8e8 100%)' :
-              isBoring   ? 'linear-gradient(160deg,#80e0d8 0%,#c0f0ec 100%)' :
               isExhausted? 'linear-gradient(160deg,#d0c0f0 0%,#ece0ff 100%)' :
                            'linear-gradient(160deg,#b8e8f8 0%,#d8f0ff 100%)';
 
@@ -476,7 +444,6 @@
 
                 {/* Mood-gradient header */}
                 <div style={{ flexShrink:0, position:'relative', background: tellGradient, paddingBottom:22 }}>
-                  <StatusBar />
                   {/* Back button */}
                   <div onClick={() => setShowTellMore(false)}
                     style={{ position:'absolute', left:20, top:56, zIndex:10, background:'rgba(255,255,255,0.72)', backdropFilter:'blur(10px)', WebkitBackdropFilter:'blur(10px)', borderRadius:20, padding:'7px 14px', cursor:'pointer', border:'1px solid rgba(255,255,255,0.55)', boxShadow:'0 2px 8px rgba(0,0,0,0.07)' }}>

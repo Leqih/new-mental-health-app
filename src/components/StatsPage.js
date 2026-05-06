@@ -72,8 +72,6 @@
 
       return (
         <div style={{ position:'absolute', inset:0, background:'#f5f2ef', zIndex:200, borderRadius:'inherit', overflow:'hidden' }}>
-          <StatusBar />
-
           {/* Header */}
           <div style={{ position:'absolute', top:44, left:0, width:390, height:56, display:'flex', alignItems:'center', justifyContent:'center', padding:'0 20px', boxSizing:'border-box' }}>
             <p style={{ fontFamily:SF, fontWeight:700, fontSize:18, color:'#141413', margin:0, letterSpacing:'-0.3px' }}>Your Stats</p>
@@ -334,7 +332,6 @@
 
           </div>
 
-          <StatusBar />
         </div>
       );
     }

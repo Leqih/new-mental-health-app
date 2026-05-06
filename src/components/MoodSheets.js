@@ -1,6 +1,6 @@
     const { useState } = React;
     /* ── TODAY MOODS SHEET (lists all today entries) ── */
-    function TodayMoodsSheet({ entries, onClose, onViewEntry, onLogMood }) {
+    function TodayMoodsSheet({ entries, onClose, onViewEntry, onLogMood, title = "Today's Moods", showLogMood = true, showDayLabel = false }) {
       const moodGrad = {
         good:      ['#b8f070','#60d888','#a0f0c8'],
         sad:       ['#90c8f8','#6098f0','#a0d0ff'],
@@ -12,12 +12,13 @@
         anxious:   ['#ff90b8','#f04878','#ffb0d0'],
       };
       return (
-        <div style={{ position:'absolute', inset:0, zIndex:50, display:'flex', flexDirection:'column', justifyContent:'flex-end' }}
+        <div style={{ position:'absolute', inset:0, zIndex:400, display:'flex', flexDirection:'column', justifyContent:'flex-end' }}
           onClick={onClose}>
           <div onClick={e => e.stopPropagation()}
-            style={{ background:'#faf7f5', borderRadius:'20px 20px 0 0', padding:'0 0 40px',
+            style={{ background:'#faf7f5', borderRadius:'20px 20px 0 0',
               boxShadow:'0 -8px 32px rgba(0,0,0,0.12)',
-              animation:'slideUp 0.3s cubic-bezier(0.32,0.72,0,1)' }}>
+              animation:'slideUp 0.3s cubic-bezier(0.32,0.72,0,1)',
+              maxHeight:'88%', display:'flex', flexDirection:'column' }}>
             {/* drag pill */}
             <div style={{ display:'flex', justifyContent:'center', padding:'12px 0 8px' }}>
               <div style={{ width:36, height:4, borderRadius:2, background:'rgba(20,20,19,0.2)' }} />
@@ -27,10 +28,18 @@
               @keyframes blob2 { 0%,100%{transform:translate(0%,0%) scale(1)} 33%{transform:translate(-25%,15%) scale(0.88)} 66%{transform:translate(20%,-18%) scale(1.12)} }
               @keyframes blob3 { 0%,100%{transform:translate(0%,0%) scale(1)} 33%{transform:translate(15%,22%) scale(1.1)} 66%{transform:translate(-20%,-10%) scale(0.92)} }
             `}</style>
-            <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:700, fontSize:17, color:'#141413', margin:'4px 22px 14px', letterSpacing:'-0.3px' }}>
-              Today's Moods
-            </p>
-            {/* Entry cards — same fluid blob style as MoodDetailSheet */}
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', margin:'4px 22px 14px' }}>
+              <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:700, fontSize:17, color:'#141413', margin:0, letterSpacing:'-0.3px' }}>
+                {title}
+              </p>
+              <button onClick={onClose} style={{ background:'rgba(20,20,19,0.08)', border:'none', borderRadius:999, width:28, height:28, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', flexShrink:0 }}>
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                  <path d="M1 1L10 10M10 1L1 10" stroke="#141413" strokeWidth="1.8" strokeLinecap="round"/>
+                </svg>
+              </button>
+            </div>
+            {/* Entry cards — scrollable */}
+            <div style={{ flex:1, overflowY:'auto', WebkitOverflowScrolling:'touch' }}>
             <div style={{ display:'flex', flexDirection:'column', gap:10, padding:'0 22px' }}>
               {entries.map((entry, i) => {
                 const m = entry.mood.toLowerCase();
@@ -53,7 +62,7 @@
                       </div>
                       <div style={{ flex:1 }}>
                         <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:800, fontSize:18, color:'#141413', margin:0, lineHeight:1, letterSpacing:'-0.3px' }}>{entry.mood}</p>
-                        <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:500, fontSize:12, color:'rgba(20,20,19,0.5)', margin:'4px 0 0' }}>{entry.time}</p>
+                        <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:500, fontSize:12, color:'rgba(20,20,19,0.5)', margin:'4px 0 0' }}>{showDayLabel && entry.dayLabel ? `${entry.dayLabel} · ${entry.time}` : entry.time}</p>
                       </div>
                       {(entry.activities?.length > 0 || entry.note) && (
                         <p style={{ fontFamily:'Sofia Sans,sans-serif', fontSize:16, color:'rgba(20,20,19,0.35)', margin:0, flexShrink:0 }}>›</p>
@@ -63,14 +72,16 @@
                 );
               })}
             </div>
-            <div style={{ padding:'16px 22px 0', display:'flex', flexDirection:'column', gap:10 }}>
-              <button onClick={onLogMood} style={{ width:'100%', fontFamily:'Sofia Sans,sans-serif', fontWeight:600, fontSize:15, color:'white', background:'#141413', border:'none', borderRadius:999, padding:'13px 0', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>
-                <span style={{ fontSize:17, lineHeight:1 }}>＋</span> Log Mood
-              </button>
-              <button onClick={onClose} style={{ width:'100%', fontFamily:'Sofia Sans,sans-serif', fontWeight:600, fontSize:15, color:'#141413', background:'white', border:'1px solid rgba(20,20,19,0.12)', borderRadius:999, padding:'13px 0', cursor:'pointer' }}>
-                Close
-              </button>
+            {/* bottom padding inside scroll area */}
+            <div style={{ height: showLogMood ? 0 : 104 }} />
             </div>
+            {showLogMood && (
+              <div style={{ padding:'16px 22px 104px', background:'#faf7f5', flexShrink:0 }}>
+                <button onClick={onLogMood} style={{ width:'100%', fontFamily:'Sofia Sans,sans-serif', fontWeight:600, fontSize:15, color:'white', background:'#141413', border:'none', borderRadius:999, padding:'13px 0', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>
+                  <span style={{ fontSize:17, lineHeight:1 }}>＋</span> Log Mood
+                </button>
+              </div>
+            )}
           </div>
         </div>
       );
@@ -96,10 +107,10 @@
                          (entry.location?.length > 0) || (entry.bodyParts?.length > 0) || entry.note;
 
       return (
-        <div style={{ position:'absolute', inset:0, zIndex:50, display:'flex', flexDirection:'column', justifyContent:'flex-end' }}
+        <div style={{ position:'absolute', inset:0, zIndex:400, display:'flex', flexDirection:'column', justifyContent:'flex-end' }}
           onClick={onClose}>
           <div onClick={e => e.stopPropagation()}
-            style={{ background:'#faf7f5', borderRadius:'20px 20px 0 0', padding:'0 0 40px',
+            style={{ background:'#faf7f5', borderRadius:'20px 20px 0 0', padding:'0 0 36px',
               boxShadow:'0 -8px 32px rgba(0,0,0,0.12)',
               animation:'slideUp 0.3s cubic-bezier(0.32,0.72,0,1)',
               position:'relative' }}>
@@ -299,14 +310,7 @@
               </div>
             )}
 
-            {/* Close button */}
-            <div style={{ padding:'22px 22px 0' }}>
-              <button onClick={onClose} style={{ width:'100%', fontFamily:'Sofia Sans,sans-serif', fontWeight:600, fontSize:15, color:'#141413', background:'white', border:'1px solid rgba(20,20,19,0.12)', borderRadius:999, padding:'13px 0', cursor:'pointer', letterSpacing:'-0.2px' }}>
-                Close
-              </button>
-            </div>
           </div>
         </div>
       );
     }
-

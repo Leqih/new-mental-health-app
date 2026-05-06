@@ -158,13 +158,13 @@
     const imgShield       = 'https://www.figma.com/api/mcp/asset/0a3f8eef-c0d9-48ba-be17-57db77acec5c';
 
     /* ── AI CHAT PAGE ASSETS (Figma node 269:1749) ── */
-    /* orb-pattern.svg and orb-mask.svg are local files — never expire */
-    const imgAiPattern     = 'src/assets/orb-pattern.svg';
-    const imgAiMaskGroup   = 'src/assets/orb-mask.svg';
-    const imgAiBrutalism28 = 'https://www.figma.com/api/mcp/asset/e6d0dc2d-e32b-4d7b-b101-5e565bc36d84';
-    const imgAiBrutalism13 = 'https://www.figma.com/api/mcp/asset/32f78ba1-0fc1-43d3-be3a-54ba47594e7d';
-    const imgAiGroup       = 'https://www.figma.com/api/mcp/asset/fedb352a-e85a-46da-ba6b-b56b863a6b57';
-    const imgAiVector      = 'https://www.figma.com/api/mcp/asset/8dfb4932-b649-4ccf-963c-f4e2b6cc5511';
+    /* AI Chat orb — nodes 291:5357 (pattern) and 291:5366 (mask face) */
+    const imgAiPattern     = 'https://www.figma.com/api/mcp/asset/8206f86b-d02c-42c9-8bef-58d68ecc46ab'; /* orb starburst pattern */
+    const imgAiMaskGroup   = 'https://www.figma.com/api/mcp/asset/ec250ce4-beae-4810-8014-5e2e4f45d260'; /* AI face inside orb */
+    const imgAiBrutalism28 = 'https://www.figma.com/api/mcp/asset/6f657637-eff1-484c-9f14-0e29d0825074';
+    const imgAiBrutalism13 = 'https://www.figma.com/api/mcp/asset/1962562e-72ab-4e82-bb29-4b2c0e5de524';
+    const imgAiGroup       = 'https://www.figma.com/api/mcp/asset/44586f60-224b-468d-a948-8f18353078bb';
+    const imgAiVector      = 'https://www.figma.com/api/mcp/asset/49bcda16-9418-4f5c-8295-f6663690c26d';
     const imgAiSolid       = 'https://www.figma.com/api/mcp/asset/86d55045-e7aa-4981-a677-fba2924f8092';
     const imgAiIcon        = 'https://www.figma.com/api/mcp/asset/9a9d4563-8b12-4ec6-a30e-1692a24d773a';
     const imgAiFrame32     = 'https://www.figma.com/api/mcp/asset/25171584-1a36-4ce6-963b-fbeabfe6da02';

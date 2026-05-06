@@ -64,6 +64,19 @@
           exhausted: 'linear-gradient(160deg,#d0d0f0,#a090d0)',
           boring:    'linear-gradient(160deg,#a0f0e8,#50c8c0)',
         };
+        /* Inline SVG data-URI mask shapes — no CORS requirement, never expire */
+        const MASK_SAD = 'data:image/svg+xml,' + encodeURIComponent(
+          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">' +
+          '<circle cx="50" cy="58" r="36" fill="white"/>' +
+          '<circle cx="28" cy="34" r="22" fill="white"/>' +
+          '<circle cx="72" cy="34" r="22" fill="white"/>' +
+          '<circle cx="18" cy="54" r="18" fill="white"/>' +
+          '<circle cx="82" cy="54" r="18" fill="white"/>' +
+          '</svg>');
+        const MASK_ANXIOUS = 'data:image/svg+xml,' + encodeURIComponent(
+          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">' +
+          '<polygon fill="white" points="96,50 78,39 83,18 62,22 50,4 39,22 18,18 22,39 4,50 22,62 18,83 39,78 50,96 62,78 83,83 78,62"/>' +
+          '</svg>');
         const bubbleBodyHTML = (mood) => {
           const s = mood.toLowerCase();
           const fallbackGrad = BUBBLE_FALLBACK_GRAD[s] || 'linear-gradient(160deg,#e0e0e0,#c0c0c0)';
@@ -76,12 +89,12 @@
             <img alt="" src="${imgBoringChar2}" onerror="this.style.display='none'" style="position:absolute;top:0;bottom:0;left:24.99%;right:50%;width:25.01%;height:100%;display:block;object-fit:cover;pointer-events:none">
             <img alt="" src="${imgBoringChar1}" onerror="this.style.display='none'" style="position:absolute;top:0;bottom:0;left:50%;right:24.99%;width:25.01%;height:100%;display:block;object-fit:cover;pointer-events:none">
             <img alt="" src="${imgBoringChar2}" onerror="this.style.display='none'" style="position:absolute;top:0;bottom:0;left:75%;right:0;width:25%;height:100%;display:block;object-fit:cover;pointer-events:none">`;
-          /* Sad + Anxious: CSS mask shapes the gradient into the character's body outline —
-             no face overlay so bubbles stay clean at small sizes */
+          /* Sad + Anxious: inline SVG data-URI masks — guaranteed CORS-free,
+             no dependency on external URLs, shapes never expire */
           if (s === 'sad' || s === 'anxious') {
-            const src  = s === 'sad' ? imgLogCloudChar : imgAnxiousChar;
-            const grad = FACE_BAKED_GRAD[s];
-            const mask = `url(${src}) center/contain no-repeat`;
+            const maskSvg = s === 'sad' ? MASK_SAD : MASK_ANXIOUS;
+            const grad    = FACE_BAKED_GRAD[s];
+            const mask    = `url("${maskSvg}") center/contain no-repeat`;
             return `<div style="position:absolute;inset:0;border-radius:50%;background:${grad};pointer-events:none"></div>` +
                    `<div style="position:absolute;inset:0;background:${grad};-webkit-mask:${mask};mask:${mask};pointer-events:none"></div>`;
           }

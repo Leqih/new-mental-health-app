@@ -47,7 +47,7 @@
     const imgGoodFace     = 'https://www.figma.com/api/mcp/asset/c341e8ee-d61b-4bcd-92a5-f44818541500'; // node 52:342 eyes group (92×48 top-left)
     const imgGoodBubble   = 'https://www.figma.com/api/mcp/asset/a8904e24-0184-4c00-8d82-46c76d23b296';
     /* Sad mood (node 52-238) – refreshed 2026-05-06 */
-    const imgSadChar      = 'https://www.figma.com/api/mcp/asset/a2e0be87-b218-4d3c-90db-2733a65e717b'; // node 52:249 sad cloud body
+    const imgSadChar      = 'https://www.figma.com/api/mcp/asset/83bc17a1-8dc1-4e3e-a0d9-91dcd45630b2'; // node 52:249 sad cloud body (refreshed)
     /* Happy mood (node 60-232) – fresh URLs */
     const imgHappyChar    = 'https://www.figma.com/api/mcp/asset/b7f17f3f-398b-408b-8c56-d5c6ecec2c4d';
     const imgHappyFaceL   = 'https://www.figma.com/api/mcp/asset/50e40067-7a72-4ec9-8b66-eaedbe4942cf';
@@ -63,7 +63,7 @@
     const imgAngryFaceA   = 'https://www.figma.com/api/mcp/asset/b9656d0c-0bed-49a9-aa32-87892eefc5de'; // node 56:30 eyebrows group
     const imgAngryFaceB   = 'https://www.figma.com/api/mcp/asset/88e140ed-422d-4d45-b09c-95a24c5f578f'; // node 56:51 mouth circle (24×28)
     /* Anxious mood (node 60-210) */
-    const imgAnxiousChar  = 'https://www.figma.com/api/mcp/asset/f392edd3-d9e7-41f0-ae2b-4000d0ddbe31'; // pink spiky blob body (node 55:3, 287px, includes face)
+    const imgAnxiousChar  = 'https://www.figma.com/api/mcp/asset/c39f226c-34c3-40a4-8a80-2045d077ac69'; // pink spiky blob body (node 55:3, refreshed)
     const imgAnxiousSweat = 'https://www.figma.com/api/mcp/asset/a56492de-2c40-40a3-a3c3-3ebb3eafc46b'; // sweat drop (node 52:397, 75×92)
     const imgAnxiousFace  = 'https://www.figma.com/api/mcp/asset/f1c3f497-facd-4273-97d7-6cf8d8c6da62'; // face overlay (eyes+mouth+sweat drop)
     const imgWeeklyAnxiousFigma = 'src/assets/anxious-weekly-figma.svg?v=1';
@@ -74,8 +74,8 @@
     const imgExhaustedMthA= 'https://www.figma.com/api/mcp/asset/7f91fae6-1fe7-4fad-848e-969e0756af57'; // node 56:47 wavy mouth left
     const imgExhaustedMthB= 'https://www.figma.com/api/mcp/asset/0bc1c040-d490-449c-b127-ff63b722a302'; // node 56:48 wavy mouth right
     /* Boring mood (node 56-60) – fresh URLs */
-    const imgBoringChar1  = 'https://www.figma.com/api/mcp/asset/7391e50f-751d-4b5d-aa4e-f953a8e08d37'; // body slice A (1+3)
-    const imgBoringChar2  = 'https://www.figma.com/api/mcp/asset/95325b8c-8783-45ce-a992-b3a28d4be2b7'; // body slice B (2+4)
+    const imgBoringChar1  = 'https://www.figma.com/api/mcp/asset/b4584c41-22cf-4d2e-806b-d04dc3d77759'; // body slice A (1+3, refreshed)
+    const imgBoringChar2  = 'https://www.figma.com/api/mcp/asset/507dc7ee-d0c2-41c6-a53b-71df123e161b'; // body slice B (2+4, refreshed)
     const imgBoringEyeL   = 'https://www.figma.com/api/mcp/asset/259b62e6-5a1a-4bd6-b7c9-6bd4497decc4'; // node 56:71 left dash-eye
     const imgBoringEyeR   = 'https://www.figma.com/api/mcp/asset/ffc5142d-ba28-4d76-bf47-cd4d52d5399d'; // node 57:76 right dash-eye
     const imgBoringMthA   = 'https://www.figma.com/api/mcp/asset/32be60a8-b333-49f6-93e2-a4aa54780ca6'; // node 56:73 mouth line

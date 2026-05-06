@@ -16,14 +16,14 @@
     const imgRectangle4   = 'https://www.figma.com/api/mcp/asset/558c1989-b9a4-4694-a2c7-8e179e29f146';
     const imgGroup3       = 'https://www.figma.com/api/mcp/asset/1aadbce5-4957-48ba-b535-60d24fb40406';
     /* Log Mood page (node 77-1264) – fresh URLs */
-    const imgLogCloudChar = 'https://www.figma.com/api/mcp/asset/38d7ef73-3dc0-490e-bc7d-f18f738ada90';
+    const imgLogCloudChar = 'https://www.figma.com/api/mcp/asset/a2e0be87-b218-4d3c-90db-2733a65e717b'; // node 52:249 sad cloud body (287px)
     const imgLogEllipse1  = 'https://www.figma.com/api/mcp/asset/5790a353-34d1-411f-853c-5721dfaff6ee';
     const imgLogEllipse5  = 'https://www.figma.com/api/mcp/asset/dd6c9513-a1f5-4ab6-8b9e-38f73b4f0561';
     const imgLogBubble    = 'https://www.figma.com/api/mcp/asset/eb936309-40c6-42b3-8daa-3d2dc138e749';
     /* Log Mood page exact Figma mood nodes */
     const imgLogGoodBody       = 'https://www.figma.com/api/mcp/asset/39d87076-5812-4c51-a38e-4d983da33722';
     const imgLogGoodHighlight  = 'https://www.figma.com/api/mcp/asset/7d39f7a3-20b6-4b78-b4cb-054cec08e06b';
-    const imgLogSadBody        = 'https://www.figma.com/api/mcp/asset/1759fe8a-29c7-4118-96d9-6175f135a3ad';
+    const imgLogSadBody        = 'https://www.figma.com/api/mcp/asset/a2e0be87-b218-4d3c-90db-2733a65e717b'; // node 52:249 sad cloud body
     const imgLogAngryBody      = 'https://www.figma.com/api/mcp/asset/b754a07a-c752-4564-8767-6d9e914e8e50';
     const imgLogAngryFace      = 'https://www.figma.com/api/mcp/asset/15249f1a-b70f-4377-b7d0-b46e80bacfc7';
     const imgLogAngryMouth     = 'https://www.figma.com/api/mcp/asset/d32aeb75-01f0-4eb0-ad13-056ada5c85b3';
@@ -46,8 +46,8 @@
     const imgGoodChar     = 'https://www.figma.com/api/mcp/asset/bf3f23a7-304c-4e14-baf5-690c306f879f'; // node 52:373 green blob body
     const imgGoodFace     = 'https://www.figma.com/api/mcp/asset/c341e8ee-d61b-4bcd-92a5-f44818541500'; // node 52:342 eyes group (92×48 top-left)
     const imgGoodBubble   = 'https://www.figma.com/api/mcp/asset/a8904e24-0184-4c00-8d82-46c76d23b296';
-    /* Sad mood (node 52-238) – refreshed 2026-05-01 */
-    const imgSadChar      = 'https://www.figma.com/api/mcp/asset/1759fe8a-29c7-4118-96d9-6175f135a3ad';
+    /* Sad mood (node 52-238) – refreshed 2026-05-06 */
+    const imgSadChar      = 'https://www.figma.com/api/mcp/asset/a2e0be87-b218-4d3c-90db-2733a65e717b'; // node 52:249 sad cloud body
     /* Happy mood (node 60-232) – fresh URLs */
     const imgHappyChar    = 'https://www.figma.com/api/mcp/asset/b7f17f3f-398b-408b-8c56-d5c6ecec2c4d';
     const imgHappyFaceL   = 'https://www.figma.com/api/mcp/asset/50e40067-7a72-4ec9-8b66-eaedbe4942cf';

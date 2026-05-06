@@ -130,7 +130,7 @@
     const imgExMth2  = 'https://www.figma.com/api/mcp/asset/dee00e34-3c56-4782-9d32-efdf92958661'; /* mouth B */
     /* Boring sticker folder (208:2784) */
     const imgBorR82  = 'https://www.figma.com/api/mcp/asset/fc3ca0b6-1aff-433c-b176-2f0d7e48f11a'; /* folder bg */
-    const imgBorMain = 'https://www.figma.com/api/mcp/asset/f3538e33-44d0-456f-be0f-528a4534880e'; /* main char 28×28 */
+    const imgBorMain = 'src/assets/boring-main.png?v=1'; /* main char 28×28 — local copy, node 212:2907 */
     const imgBorCh2  = 'https://www.figma.com/api/mcp/asset/bdbc5197-2cc4-4d24-979d-7678910f96e8'; /* second char body */
     const imgBorCh2V27='https://www.figma.com/api/mcp/asset/e214d6e5-6936-4902-8f3f-b1832ef4e9ea';/* 2nd eye A */
     const imgBorCh2V28='https://www.figma.com/api/mcp/asset/c62bb084-f302-4eb0-b8a0-b1469f63cc94';/* 2nd eye B */

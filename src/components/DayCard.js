@@ -76,9 +76,25 @@
 
     /* ── WEEK DAY CARD — pixel-perfect from Figma 191-2586 ── */
     function DayCard({ label, mood, onClick }) {
-      const isGood  = mood === 'good';
-      const isSad   = mood === 'sad';
       const isToday = label === 'TODAY';
+      const m = (mood || '').toLowerCase();
+
+      /* Pick sticker zone based on mood */
+      const stickerZone = !mood ? <EmptyStickerZone /> : (() => {
+        switch (m) {
+          case 'good':      return <GoodStickerZone />;
+          case 'sad':       return <SadStickerZone />;
+          case 'happy':     return <HappyStickerZone />;
+          case 'excited':   return <ExcitedStickerZone />;
+          case 'grateful':  return <GratefulStickerZone />;
+          case 'anxious':   return <AnxiousStickerZone />;
+          case 'exhausted':
+          case 'tired':     return <ExhaustedStickerZone />;
+          case 'boring':    return <BoringStickerZone />;
+          case 'angry':     return <AngryStickerZone />;
+          default:          return <CssFolderSticker mood={m} label={m.slice(0,5)} />;
+        }
+      })();
 
       return (
         <div onClick={onClick} style={{
@@ -92,7 +108,7 @@
         }}>
           <div style={{ display:'flex', flexDirection:'column', gap:4, alignItems:'center', justifyContent:'flex-end', paddingBottom:11, paddingTop:1, paddingLeft:1, paddingRight:1, width:'100%', height:'100%', boxSizing:'border-box', backgroundClip:'padding-box' }}>
             <p style={{ fontFamily:'Sofia Sans,sans-serif', fontWeight:600, lineHeight:'normal', flexShrink:0, fontSize:15, color:'black', letterSpacing:'-0.3px', textAlign:'center', whiteSpace:'nowrap', margin:0 }}>{label}</p>
-            {isGood ? <GoodStickerZone /> : isSad ? <SadStickerZone /> : <EmptyStickerZone />}
+            {stickerZone}
           </div>
         </div>
       );

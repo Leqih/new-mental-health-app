@@ -289,26 +289,35 @@
           setTypeChat(true);
         }
       }, [moodContext]);
-      const touchStartY = useRef(null);
-      const mouseStartY = useRef(null);
+      const swipeRef2 = useRef({ x: 0, axis: null });
+      const mouseStartX = useRef(null);
       const SECTIONS = ['AI Chat', 'Peer Support', 'Resource Center'];
 
       const goNext = () => setSection(s => Math.min(s + 1, 2));
       const goPrev = () => setSection(s => Math.max(s - 1, 0));
 
-      const onTouchStart = e => { touchStartY.current = e.touches[0].clientY; };
-      const onTouchEnd = e => {
-        if (touchStartY.current === null) return;
-        const dy = touchStartY.current - e.changedTouches[0].clientY;
-        if (dy > 55) goNext(); else if (dy < -55) goPrev();
-        touchStartY.current = null;
+      /* Left/right swipe to switch sections — up/down is reserved for content scroll */
+      const onTouchStart = e => { swipeRef2.current = { x: e.touches[0].clientX, axis: null }; };
+      const onTouchMove2 = e => {
+        if (swipeRef2.current.axis) return;
+        const dx = Math.abs(e.touches[0].clientX - swipeRef2.current.x);
+        const dy = Math.abs(e.touches[0].clientY - (swipeRef2.current.startY || e.touches[0].clientY));
+        swipeRef2.current.startY = swipeRef2.current.startY || e.touches[0].clientY;
+        if (dx < 6 && dy < 6) return;
+        swipeRef2.current.axis = dx > dy * 1.5 ? 'h' : 'v';
       };
-      const onMouseDown = e => { mouseStartY.current = e.clientY; };
+      const onTouchEnd = e => {
+        if (swipeRef2.current.axis !== 'h') return;
+        const dx = swipeRef2.current.x - e.changedTouches[0].clientX;
+        if (Math.abs(dx) < 55) return;
+        if (dx > 0) goNext(); else goPrev();
+      };
+      const onMouseDown = e => { mouseStartX.current = e.clientX; };
       const onMouseUp = e => {
-        if (mouseStartY.current === null) return;
-        const dy = mouseStartY.current - e.clientY;
-        if (dy > 55) goNext(); else if (dy < -55) goPrev();
-        mouseStartY.current = null;
+        if (mouseStartX.current === null) return;
+        const dx = mouseStartX.current - e.clientX;
+        if (Math.abs(dx) > 55) { if (dx > 0) goNext(); else goPrev(); }
+        mouseStartX.current = null;
       };
 
       /* ── peers data ── */
@@ -439,6 +448,7 @@
         <div
           style={{ position:'absolute', inset:0, zIndex: sidebarOpen ? 400 : (voiceMode || typeChat || activePeer) ? 350 : 200, overflow:'hidden', userSelect:'none', cursor: voiceMode || typeChat || activePeer ? 'default' : 'grab' }}
           onTouchStart={e => { if (!voiceMode && !typeChat && !activePeer) onTouchStart(e); }}
+          onTouchMove={e => { if (!voiceMode && !typeChat && !activePeer) onTouchMove2(e); }}
           onTouchEnd={e => { if (!voiceMode && !typeChat && !activePeer) onTouchEnd(e); }}
           onMouseDown={e => { if (!voiceMode && !typeChat && !activePeer) onMouseDown(e); }}
           onMouseUp={e => { if (!voiceMode && !typeChat && !activePeer) onMouseUp(e); }}
@@ -457,11 +467,12 @@
             </defs>
           </svg>
 
-          {/* Sliding container */}
+          {/* Sliding container — horizontal sections */}
           <div style={{
-            position:'absolute', top:0, left:0, width:390, height:844*3,
-            transform:`translateY(${-section * 844}px)`,
+            position:'absolute', top:0, left:0, width:390*3, height:844,
+            transform:`translateX(${-section * 390}px)`,
             transition:'transform 0.48s cubic-bezier(0.4,0,0.2,1)',
+            display:'flex',
           }}>
 
             {/* ══ SECTION 0 — AI CHAT (Figma 269:1749 pixel-accurate) ══ */}

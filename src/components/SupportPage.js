@@ -296,13 +296,14 @@
       const goNext = () => setSection(s => Math.min(s + 1, 2));
       const goPrev = () => setSection(s => Math.max(s - 1, 0));
 
-      /* Left/right swipe to switch sections — up/down is reserved for content scroll */
-      const onTouchStart = e => { swipeRef2.current = { x: e.touches[0].clientX, axis: null }; };
+      /* Left/right swipe to switch sections — up/down is for content scroll only */
+      const onTouchStart = e => {
+        swipeRef2.current = { x: e.touches[0].clientX, y: e.touches[0].clientY, axis: null };
+      };
       const onTouchMove2 = e => {
         if (swipeRef2.current.axis) return;
         const dx = Math.abs(e.touches[0].clientX - swipeRef2.current.x);
-        const dy = Math.abs(e.touches[0].clientY - (swipeRef2.current.startY || e.touches[0].clientY));
-        swipeRef2.current.startY = swipeRef2.current.startY || e.touches[0].clientY;
+        const dy = Math.abs(e.touches[0].clientY - swipeRef2.current.y);
         if (dx < 6 && dy < 6) return;
         swipeRef2.current.axis = dx > dy * 1.5 ? 'h' : 'v';
       };

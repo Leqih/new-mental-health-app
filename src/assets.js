@@ -42,39 +42,39 @@
     const imgLogGratefulMouth  = 'https://www.figma.com/api/mcp/asset/4665c6d3-a643-4fa5-922e-e62b4b71cfae';
     const imgLogGratefulEyeL   = 'https://www.figma.com/api/mcp/asset/20fbb3cb-45d7-4117-ab49-aed967cc758e';
     const imgLogGratefulEyeR   = 'https://www.figma.com/api/mcp/asset/52989d6f-61bf-4f2b-954a-49f4fc49a2a6';
-    /* Good mood (node 52-340) – clean export, no grain 2026-05-05 */
-    const imgGoodChar     = 'https://www.figma.com/api/mcp/asset/8778c249-cee2-4b0c-a975-79951c5c97dc';
+    /* Good mood (node 52-340) – fresh URLs */
+    const imgGoodChar     = 'https://www.figma.com/api/mcp/asset/f2b18bf0-cd71-4911-84cd-a5064f1265ac';
     const imgGoodFace     = 'https://www.figma.com/api/mcp/asset/b7fa8981-eb96-4fe3-a3b9-2edef5cbacd9';
     const imgGoodBubble   = 'https://www.figma.com/api/mcp/asset/a8904e24-0184-4c00-8d82-46c76d23b296';
     /* Sad mood (node 52-238) – refreshed 2026-05-01 */
     const imgSadChar      = 'https://www.figma.com/api/mcp/asset/1759fe8a-29c7-4118-96d9-6175f135a3ad';
     /* Happy mood (node 60-232) – fresh URLs */
-    const imgHappyChar    = 'https://www.figma.com/api/mcp/asset/aeea785e-9b8c-4a0d-b250-0629845886f3';
+    const imgHappyChar    = 'https://www.figma.com/api/mcp/asset/aa8c76cf-2239-481e-a6a0-98912179da7a';
     const imgHappyFaceL   = 'https://www.figma.com/api/mcp/asset/50e40067-7a72-4ec9-8b66-eaedbe4942cf';
     const imgHappyFaceR   = 'https://www.figma.com/api/mcp/asset/7937cc8c-93e1-4d95-894c-087544236cff';
     const imgHappyFaceM   = 'https://www.figma.com/api/mcp/asset/a20f7afa-d0e9-4347-ae6d-72c0150fc295';
     /* Grateful mood (node 58-96) – fresh URLs */
-    const imgGratefulChar = 'https://www.figma.com/api/mcp/asset/a702d4c0-d3ca-43ff-bd89-2714fc159ad6';
+    const imgGratefulChar = 'https://www.figma.com/api/mcp/asset/69ed84eb-94c2-48b1-8cc0-a25db0c06419';
     const imgGratefulFaceA= 'https://www.figma.com/api/mcp/asset/2707a490-4c25-43d0-9614-815d1268f068';
     const imgGratefulFaceB= 'https://www.figma.com/api/mcp/asset/8f59119f-c06f-49af-965b-192195cbe537';
     const imgGratefulFaceC= 'https://www.figma.com/api/mcp/asset/1b5d7965-2a75-4300-a59c-bbe73cf45d75';
     /* Angry mood (node 55-10) – fresh URLs */
-    const imgAngryChar    = 'https://www.figma.com/api/mcp/asset/48f69b47-9ec4-4f53-9a6f-35970b921441';
+    const imgAngryChar    = 'https://www.figma.com/api/mcp/asset/55f47b3d-d49c-43d6-b84a-91a654ac08ca';
     const imgAngryFaceA   = 'https://www.figma.com/api/mcp/asset/75e3bcad-fb16-4421-afd6-a9c4d04ceadc'; // eyebrows
     const imgAngryFaceB   = 'https://www.figma.com/api/mcp/asset/a2dc167c-f0f8-4d0f-aee1-4ebf72785560'; // nose/mouth
     /* Anxious mood (node 60-210) */
-    const imgAnxiousChar  = 'https://www.figma.com/api/mcp/asset/44ed0103-c1a4-4d46-b58a-c7814455f97b'; // pink spiky blob body
+    const imgAnxiousChar  = 'https://www.figma.com/api/mcp/asset/32415a5e-1db7-4326-8706-43c73adcd17f'; // pink spiky blob body
     const imgAnxiousFace  = 'https://www.figma.com/api/mcp/asset/f1c3f497-facd-4273-97d7-6cf8d8c6da62'; // face overlay (eyes+mouth+sweat drop)
     const imgWeeklyAnxiousFigma = 'src/assets/anxious-weekly-figma.svg?v=1';
     /* Exhausted mood (node 56-36) – fresh URLs */
-    const imgExhaustedChar= 'https://www.figma.com/api/mcp/asset/058ded47-5cb4-4f14-969e-b3e2b7e94695';
+    const imgExhaustedChar= 'https://www.figma.com/api/mcp/asset/1e4181e2-fa36-4d84-827f-c8a8c5d29784';
     const imgExhaustedEyeA= 'https://www.figma.com/api/mcp/asset/d66f2245-27b3-4ce4-afd8-48c83b7bed04'; // X-eye stroke 1
     const imgExhaustedEyeB= 'https://www.figma.com/api/mcp/asset/e3d09b1b-a3bb-452d-9a5e-3834d6a70fee'; // X-eye stroke 2
     const imgExhaustedMthA= 'https://www.figma.com/api/mcp/asset/a3ca156f-bdfa-4858-bfa8-027db80a5730'; // wavy mouth left
     const imgExhaustedMthB= 'https://www.figma.com/api/mcp/asset/33266ffd-2fef-4106-8f34-8f41542cf5c7'; // wavy mouth right
-    /* Boring mood (node 56-60) – refreshed 2026-05-01 */
-    const imgBoringChar1  = 'https://www.figma.com/api/mcp/asset/f2fb9c09-de10-434e-8fcb-7918149d6d6b'; // body slice A (1+3)
-    const imgBoringChar2  = 'https://www.figma.com/api/mcp/asset/ff8c8510-5b23-4928-8d60-f9ce3de044a9'; // body slice B (2+4)
+    /* Boring mood (node 56-60) – fresh URLs */
+    const imgBoringChar1  = 'https://www.figma.com/api/mcp/asset/a820e510-9834-4b40-8a6e-bea29c369db1'; // body slice A (1+3)
+    const imgBoringChar2  = 'https://www.figma.com/api/mcp/asset/92452801-f067-44dc-bafd-0f6f0bea91b6'; // body slice B (2+4)
     const imgBoringEyeL   = 'https://www.figma.com/api/mcp/asset/7841e5c3-420c-46f4-9315-db99fae9322b';
     const imgBoringEyeR   = 'https://www.figma.com/api/mcp/asset/8db05fb5-3dae-40fb-b89d-e5c1a08266fd';
     const imgBoringMthA   = 'https://www.figma.com/api/mcp/asset/309a7b2d-2620-4891-a357-9ae157fae78b'; // mouth line

@@ -54,23 +54,39 @@
           sad:     'linear-gradient(160deg,#cce8ff,#80b8f0)',
           anxious: 'linear-gradient(160deg,#ffb8d0,#f06888)',
         };
+        /* Fallback gradient for each mood if Figma image fails to load */
+        const BUBBLE_FALLBACK_GRAD = {
+          good:      'linear-gradient(160deg,#c8f090,#7acc40)',
+          happy:     'linear-gradient(160deg,#fff090,#fde030)',
+          excited:   'linear-gradient(160deg,#fff090,#fde030)',
+          grateful:  'linear-gradient(160deg,#ffd890,#f5a030)',
+          angry:     'linear-gradient(160deg,#ffb090,#f06040)',
+          exhausted: 'linear-gradient(160deg,#d0d0f0,#a090d0)',
+          boring:    'linear-gradient(160deg,#a0f0e8,#50c8c0)',
+        };
         const bubbleBodyHTML = (mood) => {
           const s = mood.toLowerCase();
-          const img = (src) => `<img alt="" src="${src}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;pointer-events:none">`;
-          if (s === 'boring') return `
-            <img alt="" src="${imgBoringChar1}" style="position:absolute;top:0;bottom:0;left:0;right:75%;width:25%;height:100%;display:block;object-fit:cover;pointer-events:none">
-            <img alt="" src="${imgBoringChar2}" style="position:absolute;top:0;bottom:0;left:24.99%;right:50%;width:25.01%;height:100%;display:block;object-fit:cover;pointer-events:none">
-            <img alt="" src="${imgBoringChar1}" style="position:absolute;top:0;bottom:0;left:50%;right:24.99%;width:25.01%;height:100%;display:block;object-fit:cover;pointer-events:none">
-            <img alt="" src="${imgBoringChar2}" style="position:absolute;top:0;bottom:0;left:75%;right:0;width:25%;height:100%;display:block;object-fit:cover;pointer-events:none">`;
+          const fallbackGrad = BUBBLE_FALLBACK_GRAD[s] || 'linear-gradient(160deg,#e0e0e0,#c0c0c0)';
+          /* onerror hides broken image so the fallback background shows through */
+          const img = (src) => `<img alt="" src="${src}" onerror="this.style.display='none'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;pointer-events:none">`;
+          /* Base fallback layer — always rendered beneath the character image */
+          const fallbackBase = `<div style="position:absolute;inset:0;border-radius:50%;background:${fallbackGrad};pointer-events:none"></div>`;
+          if (s === 'boring') return fallbackBase + `
+            <img alt="" src="${imgBoringChar1}" onerror="this.style.display='none'" style="position:absolute;top:0;bottom:0;left:0;right:75%;width:25%;height:100%;display:block;object-fit:cover;pointer-events:none">
+            <img alt="" src="${imgBoringChar2}" onerror="this.style.display='none'" style="position:absolute;top:0;bottom:0;left:24.99%;right:50%;width:25.01%;height:100%;display:block;object-fit:cover;pointer-events:none">
+            <img alt="" src="${imgBoringChar1}" onerror="this.style.display='none'" style="position:absolute;top:0;bottom:0;left:50%;right:24.99%;width:25.01%;height:100%;display:block;object-fit:cover;pointer-events:none">
+            <img alt="" src="${imgBoringChar2}" onerror="this.style.display='none'" style="position:absolute;top:0;bottom:0;left:75%;right:0;width:25%;height:100%;display:block;object-fit:cover;pointer-events:none">`;
           if (s === 'sad' || s === 'anxious') {
             const src = s === 'sad' ? imgLogCloudChar : imgAnxiousChar;
             const grad = FACE_BAKED_GRAD[s];
             const mask = `url(${src}) center/contain no-repeat`;
-            return `<div style="position:absolute;inset:0;background:${grad};-webkit-mask:${mask};mask:${mask};pointer-events:none"></div>`;
+            /* Fallback circle always shows; mask-based shaped blob renders on top if image loads */
+            return `<div style="position:absolute;inset:0;border-radius:50%;background:${grad};pointer-events:none"></div>` +
+                   `<div style="position:absolute;inset:0;background:${grad};-webkit-mask:${mask};mask:${mask};pointer-events:none"></div>`;
           }
           const src = s==='good' ? imgGoodChar : s==='happy'||s==='excited' ? imgHappyChar :
                       s==='grateful' ? imgGratefulChar : s==='angry' ? imgAngryChar : imgExhaustedChar;
-          return img(src);
+          return fallbackBase + img(src);
         };
 
         /* Spawn bubbles from top-inside the container, staggered */

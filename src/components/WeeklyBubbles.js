@@ -84,7 +84,18 @@
             return `<div style="position:absolute;inset:0;border-radius:50%;background:${grad};pointer-events:none"></div>` +
                    `<div style="position:absolute;inset:0;background:${grad};-webkit-mask:${mask};mask:${mask};pointer-events:none"></div>`;
           }
-          const src = s==='good' ? imgGoodChar : s==='happy'||s==='excited' ? imgHappyChar :
+          /* Excited: 4-pointed star shape — render WITHOUT a same-yellow circle background,
+             so the star silhouette is clearly visible. Face elements overlaid from Figma positions. */
+          if (s === 'excited') {
+            const eyeL  = 'https://www.figma.com/api/mcp/asset/18782091-d0eb-4839-8747-571aae20af2a';
+            const eyeR  = 'https://www.figma.com/api/mcp/asset/b2ece2cb-4f19-4b64-9949-564b79f39659';
+            const mouth = 'https://www.figma.com/api/mcp/asset/f47adf9f-9f96-44aa-87d9-c385b3bbb727';
+            return img(imgHappyChar) +
+              `<div style="position:absolute;top:35.54%;right:56.79%;bottom:55.75%;left:36.24%;overflow:visible"><div style="position:absolute;top:-30%;right:-28.63%;bottom:-30%;left:-37.51%">${img(eyeL)}</div></div>` +
+              `<div style="position:absolute;top:35.54%;right:36.24%;bottom:55.75%;left:56.79%;overflow:visible"><div style="position:absolute;top:-30%;right:-28.63%;bottom:-30%;left:-37.51%;transform:scaleX(-1)">${img(eyeR)}</div></div>` +
+              `<div style="position:absolute;top:46.34%;right:43.9%;bottom:45.47%;left:44.25%;overflow:visible"><div style="position:absolute;top:-25.53%;right:-13.01%;bottom:-25.53%;left:-13.01%">${img(mouth)}</div></div>`;
+          }
+          const src = s==='good' ? imgGoodChar : s==='happy' ? imgHappyChar :
                       s==='grateful' ? imgGratefulChar : s==='angry' ? imgAngryChar : imgExhaustedChar;
           return fallbackBase + img(src);
         };

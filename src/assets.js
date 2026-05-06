@@ -76,10 +76,10 @@
     /* Boring mood (node 56-60) – fresh URLs */
     const imgBoringChar1  = 'https://www.figma.com/api/mcp/asset/7391e50f-751d-4b5d-aa4e-f953a8e08d37'; // body slice A (1+3)
     const imgBoringChar2  = 'https://www.figma.com/api/mcp/asset/95325b8c-8783-45ce-a992-b3a28d4be2b7'; // body slice B (2+4)
-    const imgBoringEyeL   = 'https://www.figma.com/api/mcp/asset/7841e5c3-420c-46f4-9315-db99fae9322b';
-    const imgBoringEyeR   = 'https://www.figma.com/api/mcp/asset/8db05fb5-3dae-40fb-b89d-e5c1a08266fd';
-    const imgBoringMthA   = 'https://www.figma.com/api/mcp/asset/309a7b2d-2620-4891-a357-9ae157fae78b'; // mouth line
-    const imgBoringMthB   = 'https://www.figma.com/api/mcp/asset/7441948b-cdf3-4743-9674-f93100d1d218'; // mouth accent curve
+    const imgBoringEyeL   = 'https://www.figma.com/api/mcp/asset/259b62e6-5a1a-4bd6-b7c9-6bd4497decc4'; // node 56:71 left dash-eye
+    const imgBoringEyeR   = 'https://www.figma.com/api/mcp/asset/ffc5142d-ba28-4d76-bf47-cd4d52d5399d'; // node 57:76 right dash-eye
+    const imgBoringMthA   = 'https://www.figma.com/api/mcp/asset/32be60a8-b333-49f6-93e2-a4aa54780ca6'; // node 56:73 mouth line
+    const imgBoringMthB   = 'https://www.figma.com/api/mcp/asset/e07ab1cc-31af-4935-b006-8e9ce66b4395'; // node 56:75 mouth curve
     /* Calm Mode card (node 30-2147) – fresh URLs */
     const imgMesshu       = 'https://www.figma.com/api/mcp/asset/5a332c7d-7d8e-42e2-aea9-681e6326d905';
     const imgHourglass    = 'https://www.figma.com/api/mcp/asset/82c4a6f8-649d-45e5-b608-6372f1ba9c5e';

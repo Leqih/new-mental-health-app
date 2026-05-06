@@ -211,19 +211,7 @@
           </div>
         </div>`;
 
-      if (s === 'boring') return `
-        <img alt="" src="${imgBoringChar1}" style="position:absolute;top:0;bottom:0;left:0;right:75%;width:25%;height:100%;display:block;object-fit:cover">
-        <img alt="" src="${imgBoringChar2}" style="position:absolute;top:0;bottom:0;left:24.99%;right:50%;width:25.01%;height:100%;display:block;object-fit:cover">
-        <img alt="" src="${imgBoringChar1}" style="position:absolute;top:0;bottom:0;left:50%;right:24.99%;width:25.01%;height:100%;display:block;object-fit:cover">
-        <img alt="" src="${imgBoringChar2}" style="position:absolute;top:0;bottom:0;left:75%;right:0;width:25%;height:100%;display:block;object-fit:cover">
-        <svg style="position:absolute;left:37.6%;top:39.4%;width:10.8%;height:7%;overflow:visible" viewBox="0 0 32 20" fill="none">
-          <path d="M7.50195 12.2736L23.8186 7.50196" stroke="black" stroke-width="15" stroke-linecap="round"/>
-        </svg>
-        <svg style="position:absolute;left:54.4%;top:39.4%;width:10.8%;height:7%;overflow:visible" viewBox="0 0 32 20" fill="none">
-          <path d="M23.8186 12.2736L7.50199 7.50196" stroke="black" stroke-width="15" stroke-linecap="round"/>
-        </svg>
-        <img alt="" src="${imgBoringMthA}" style="position:absolute;left:40.4%;top:47.7%;width:17.8%;height:6.6%;display:block">
-        <img alt="" src="${imgBoringMthB}" style="position:absolute;left:55.4%;top:46%;width:7%;height:11.8%;display:block">`;
+      if (s === 'boring') return base(imgBorMain);
 
       if (s === 'anxious') return `
         ${base(imgAnxiousChar)}

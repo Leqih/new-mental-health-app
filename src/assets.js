@@ -16,7 +16,7 @@
     const imgRectangle4   = 'https://www.figma.com/api/mcp/asset/558c1989-b9a4-4694-a2c7-8e179e29f146';
     const imgGroup3       = 'https://www.figma.com/api/mcp/asset/1aadbce5-4957-48ba-b535-60d24fb40406';
     /* Log Mood page (node 77-1264) – fresh URLs */
-    const imgLogCloudChar = 'https://www.figma.com/api/mcp/asset/a2e0be87-b218-4d3c-90db-2733a65e717b'; // node 52:249 sad cloud body (287px)
+    const imgLogCloudChar = 'https://www.figma.com/api/mcp/asset/83bc17a1-8dc1-4e3e-a0d9-91dcd45630b2'; // node 52:249 full sad character (refreshed, face baked in)
     const imgLogEllipse1  = 'https://www.figma.com/api/mcp/asset/5790a353-34d1-411f-853c-5721dfaff6ee';
     const imgLogEllipse5  = 'https://www.figma.com/api/mcp/asset/dd6c9513-a1f5-4ab6-8b9e-38f73b4f0561';
     const imgLogBubble    = 'https://www.figma.com/api/mcp/asset/eb936309-40c6-42b3-8daa-3d2dc138e749';

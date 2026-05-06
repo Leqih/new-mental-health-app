@@ -1263,10 +1263,10 @@
           <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:8 }}>
             {moods.map(m => (
               <button key={m.label} onClick={() => onSelect(m.label)} style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:5, background:m.bg, border:`1.5px solid ${m.border}`, borderRadius:14, padding:'12px 4px 10px', cursor:'pointer', transition:'transform 0.15s ease', outline:'none' }}
-                onMouseDown={e => e.currentTarget.style.transform='scale(0.94)'}
-                onMouseUp={e => e.currentTarget.style.transform='scale(1)'}
-                onTouchStart={e => e.currentTarget.style.transform='scale(0.94)'}
-                onTouchEnd={e => e.currentTarget.style.transform='scale(1)'}>
+                onMouseDown={e => { e.currentTarget.style.transform = 'scale(0.94)'; }}
+                onMouseUp={e => { e.currentTarget.style.transform = 'scale(1)'; }}
+                onTouchStart={e => { e.currentTarget.style.transform = 'scale(0.94)'; }}
+                onTouchEnd={e => { e.currentTarget.style.transform = 'scale(1)'; }}>
                 <span style={{ fontSize:24, lineHeight:1 }}>{m.emoji}</span>
                 <span style={{ fontFamily:SF, fontSize:10.5, fontWeight:700, color:'#141413', letterSpacing:'0.2px' }}>{m.label}</span>
               </button>

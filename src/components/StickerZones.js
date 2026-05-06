@@ -14,14 +14,36 @@
       tired:     { bg:'rgba(216,208,248,0.94)', tab:'rgba(190,180,234,0.96)', emoji:'😴' },
     };
 
-    /* Pure-CSS folder sticker — uses inline SVG mood characters, never expires */
+    /* Returns a data-URI for a mood SVG character */
+    const getMoodSrc = (mood) => {
+      if (!window.moodCharSVG) return null;
+      return `data:image/svg+xml,${encodeURIComponent(window.moodCharSVG((mood||'').toLowerCase()))}`;
+    };
+
+    /* Three overlapping character cluster — mirrors original Figma sticker layout */
+    function CharCluster({ mood }) {
+      const src = getMoodSrc(mood);
+      if (!src) return null;
+      const img = (style) => (
+        <img alt="" src={src} style={{ position:'absolute', objectFit:'contain', pointerEvents:'none', ...style }} />
+      );
+      return (
+        <>
+          {/* Back character — right, slightly larger, rotated CW */}
+          {img({ left:13, top:2,  width:24, height:20, transform:'rotate(8deg)',   transformOrigin:'center center' })}
+          {/* Third character — middle back */}
+          {img({ left:7,  top:4,  width:22, height:18, transform:'rotate(5deg)',   transformOrigin:'center center', opacity:0.88 })}
+          {/* Main character — front left, rotated CCW */}
+          {img({ left:0,  top:6,  width:24, height:20, transform:'rotate(-13deg)', transformOrigin:'center center' })}
+        </>
+      );
+    }
+
+    /* Pure-CSS folder sticker with 3-character cluster */
     function CssFolderSticker({ mood, label }) {
       const m = (mood || '').toLowerCase();
       const pal = FOLDER_PALETTE[m] || { bg:'rgba(230,230,230,0.94)', tab:'rgba(200,200,200,0.96)' };
       const lbl = label || mood || '?';
-      /* Use the inline SVG cloud characters defined in index.html */
-      const svgChar = window.moodCharSVG ? window.moodCharSVG(m) : null;
-      const charSrc = svgChar ? `data:image/svg+xml,${encodeURIComponent(svgChar)}` : null;
       return (
         <div style={{ position:'relative', width:42, height:37, flexShrink:0 }}>
           {/* Folder tab */}
@@ -37,16 +59,8 @@
             border:'1px solid rgba(0,0,0,0.07)',
             boxShadow:'0 2px 5px rgba(0,0,0,0.05)',
           }} />
-          {/* SVG cloud character */}
-          {charSrc && (
-            <img
-              alt="" src={charSrc}
-              style={{
-                position:'absolute', top:0, left:'50%', transform:'translateX(-50%)',
-                width:36, height:22, objectFit:'contain', pointerEvents:'none',
-              }}
-            />
-          )}
+          {/* Three-character cluster */}
+          <CharCluster mood={m} />
           {/* Frosted badge */}
           <div style={{
             position:'absolute', left:1, bottom:0, right:1, height:14,

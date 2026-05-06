@@ -95,8 +95,8 @@
             const maskSvg = s === 'sad' ? MASK_SAD : MASK_ANXIOUS;
             const grad    = FACE_BAKED_GRAD[s];
             const mask    = `url("${maskSvg}") center/contain no-repeat`;
-            return `<div style="position:absolute;inset:0;border-radius:50%;background:${grad};pointer-events:none"></div>` +
-                   `<div style="position:absolute;inset:0;background:${grad};-webkit-mask:${mask};mask:${mask};pointer-events:none"></div>`;
+            /* No circle fallback — it would hide the shape (same color). Inline SVG mask never fails. */
+            return `<div style="position:absolute;inset:0;background:${grad};-webkit-mask:${mask};mask:${mask};pointer-events:none"></div>`;
           }
           /* Excited / Happy: 4-pointed star — body only, no face overlay */
           if (s === 'excited' || s === 'happy') {
@@ -120,7 +120,7 @@
             const d = r * 2;
             const fs = r >= 40 ? 13 : r >= 28 ? 11 : 9;
             const el = document.createElement('div');
-            el.style.cssText = `position:absolute;width:${d}px;height:${d}px;cursor:pointer;user-select:none;will-change:transform;`;
+            el.style.cssText = `position:absolute;width:${d}px;height:${d}px;border-radius:50%;overflow:hidden;cursor:pointer;user-select:none;will-change:transform;`;
             el.innerHTML = `
               <div style="position:relative;width:100%;height:100%;">
                 ${bubbleBodyHTML(label)}

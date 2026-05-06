@@ -14,9 +14,14 @@
       const FRAME_W = 390;
       const FRAME_H = 844;
       const todayKey = new Date().toDateString();
-      const load = (k, fb) => { try { const v = localStorage.getItem(k); return v !== null ? JSON.parse(v) : fb; } catch { return fb; } };
+      const STORE_V = 'v2_'; // bump to reset cached demo data
+      const load = (k, fb) => { try { const v = localStorage.getItem(STORE_V+k); return v !== null ? JSON.parse(v) : fb; } catch { return fb; } };
       const DEFAULT_TODAY_ENTRIES = [
-        { mood: 'Good', dayLabel: 'Today', time: '9:05 AM', activities: ['Fitness', 'Eating'], companions: ['By Myself'], location: ['Home'], bodyParts: [], note: 'Great morning run!' },
+        { mood: 'Good',     dayLabel: 'Today', time: '9:05 AM',  activities: ['Fitness', 'Eating'],     companions: ['By Myself'], location: ['Home'],    bodyParts: [],           note: 'Great morning run!' },
+        { mood: 'Anxious',  dayLabel: 'Today', time: '11:30 AM', activities: ['Academic'],              companions: ['By Myself'], location: ['School'],  bodyParts: ['Chest'],    note: 'Stressed before the exam.' },
+        { mood: 'Happy',    dayLabel: 'Today', time: '2:15 PM',  activities: ['Socializing', 'Eating'], companions: ['Friends'],   location: ['Outside'], bodyParts: [],           note: 'Lunch with friends cheered me up!' },
+        { mood: 'Sad',      dayLabel: 'Today', time: '5:00 PM',  activities: ['Resting'],              companions: ['By Myself'], location: ['Home'],    bodyParts: ['Head'],     note: 'Tired after a long day.' },
+        { mood: 'Grateful', dayLabel: 'Today', time: '9:00 PM',  activities: ['Hobbies'],              companions: ['Family'],   location: ['Home'],    bodyParts: [],           note: 'Grateful for a good evening.' },
       ];
       const DEFAULT_MOOD_ENTRIES = {
         // past weeks — oldest first
@@ -40,7 +45,7 @@
       const [bannerDismissed, setBannerDismissed] = useState(false);
       const [todayMood, setTodayMood] = useState(() => isNewDay ? null : load('todayMood', null));
       const [count, setCount] = useState(() => load('count', 8));
-      const [todayMoods, setTodayMoods] = useState(() => isNewDay ? [] : load('todayMoods', ['good']));
+      const [todayMoods, setTodayMoods] = useState(() => isNewDay ? [] : load('todayMoods', ['good','anxious','happy','sad','grateful']));
       const [viewEntry, setViewEntry] = useState(null);
       const [editEntry, setEditEntry] = useState(null);
       const [showTodaySheet, setShowTodaySheet] = useState(false);
@@ -63,14 +68,14 @@
       });
       const greeting = getGreeting();
 
-      useEffect(() => { localStorage.setItem('appDate', JSON.stringify(todayKey)); }, []);
-      useEffect(() => { localStorage.setItem('userName', JSON.stringify(userName)); }, [userName]);
-      useEffect(() => { localStorage.setItem('todayMood', JSON.stringify(todayMood)); }, [todayMood]);
-      useEffect(() => { localStorage.setItem('count', JSON.stringify(count)); }, [count]);
-      useEffect(() => { localStorage.setItem('todayMoods', JSON.stringify(todayMoods)); }, [todayMoods]);
-      useEffect(() => { localStorage.setItem('todayEntries', JSON.stringify(todayEntries)); }, [todayEntries]);
-      useEffect(() => { localStorage.setItem('moodEntries', JSON.stringify(moodEntries)); }, [moodEntries]);
-      useEffect(() => { localStorage.setItem('allMoodLogs', JSON.stringify(allMoodLogs)); }, [allMoodLogs]);
+      useEffect(() => { localStorage.setItem(STORE_V+'appDate', JSON.stringify(todayKey)); }, []);
+      useEffect(() => { localStorage.setItem(STORE_V+'userName', JSON.stringify(userName)); }, [userName]);
+      useEffect(() => { localStorage.setItem(STORE_V+'todayMood', JSON.stringify(todayMood)); }, [todayMood]);
+      useEffect(() => { localStorage.setItem(STORE_V+'count', JSON.stringify(count)); }, [count]);
+      useEffect(() => { localStorage.setItem(STORE_V+'todayMoods', JSON.stringify(todayMoods)); }, [todayMoods]);
+      useEffect(() => { localStorage.setItem(STORE_V+'todayEntries', JSON.stringify(todayEntries)); }, [todayEntries]);
+      useEffect(() => { localStorage.setItem(STORE_V+'moodEntries', JSON.stringify(moodEntries)); }, [moodEntries]);
+      useEffect(() => { localStorage.setItem(STORE_V+'allMoodLogs', JSON.stringify(allMoodLogs)); }, [allMoodLogs]);
       /* Clear mood context when leaving AI chat */
       useEffect(() => { if (page !== 'peers') setChatMoodContext(null); }, [page]);
       useEffect(() => {
